@@ -69347,6 +69347,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Game */ "./src/Game.js");
 /* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_Game__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _Board__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Board */ "./src/Board.js");
+/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! reactstrap */ "./node_modules/reactstrap/es/index.js");
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+
 
 
 
@@ -69360,18 +69374,41 @@ var TichuClient = Object(boardgame_io_react__WEBPACK_IMPORTED_MODULE_1__["Client
     server: 'localhost:1337'
   })
 });
+
+var ExpandableClient = function ExpandableClient(_ref) {
+  var playerID = _ref.playerID;
+
+  var _useState = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(false),
+      _useState2 = _slicedToArray(_useState, 2),
+      bodyVisible = _useState2[0],
+      setBodyVisible = _useState2[1];
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Card"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["CardHeader"], {
+    tag: "h5"
+  }, "Player ", playerID, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
+    className: "mx-3",
+    onClick: function onClick() {
+      return setBodyVisible(function (prev) {
+        return !prev;
+      });
+    }
+  }, "View")), bodyVisible && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["CardBody"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(TichuClient, {
+    playerID: playerID
+  }))));
+};
+
 var App = function App() {
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
     style: {
       width: "100%"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(TichuClient, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ExpandableClient, {
     playerID: "0"
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(TichuClient, {
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ExpandableClient, {
     playerID: "1"
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(TichuClient, {
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ExpandableClient, {
     playerID: "2"
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(TichuClient, {
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ExpandableClient, {
     playerID: "3"
   })))));
 };
@@ -69391,12 +69428,40 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Hand__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Hand */ "./src/Hand.js");
-/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! reactstrap */ "./node_modules/reactstrap/es/index.js");
-/* harmony import */ var bootstrap__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! bootstrap */ "./node_modules/bootstrap/dist/js/bootstrap.js");
-/* harmony import */ var bootstrap__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(bootstrap__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _PassArea__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./PassArea */ "./src/PassArea.js");
+/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! reactstrap */ "./node_modules/reactstrap/es/index.js");
+/* harmony import */ var bootstrap__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! bootstrap */ "./node_modules/bootstrap/dist/js/bootstrap.js");
+/* harmony import */ var bootstrap__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(bootstrap__WEBPACK_IMPORTED_MODULE_4__);
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
+
+
+
+
+var _require = __webpack_require__(/*! ./Game */ "./src/Game.js"),
+    sortCards = _require.sortCards,
+    removeFromHand = _require.removeFromHand,
+    getPlayerIDs = _require.getPlayerIDs;
 
 var TichuBoard = function TichuBoard(props) {
   var G = props.G,
@@ -69404,6 +69469,17 @@ var TichuBoard = function TichuBoard(props) {
       moves = props.moves,
       playerID = props.playerID;
   var player = G.players[playerID];
+  var stage = ctx.activePlayers[playerID];
+
+  var _useState = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])([]),
+      _useState2 = _slicedToArray(_useState, 2),
+      passedCards = _useState2[0],
+      setPassedCards = _useState2[1];
+
+  var _useState3 = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(player.hand),
+      _useState4 = _slicedToArray(_useState3, 2),
+      hand = _useState4[0],
+      setHand = _useState4[1];
 
   var onGrandClicked = function onGrandClicked() {
     moves.callGrand(playerID);
@@ -69411,19 +69487,46 @@ var TichuBoard = function TichuBoard(props) {
 
   var onTakeClicked = function onTakeClicked() {
     moves.takeCards(playerID);
+  }; // If the game stage or phase changes, refresh the hand from the game state.
+
+
+  Object(react__WEBPACK_IMPORTED_MODULE_0__["useEffect"])(function () {
+    setHand(function () {
+      return _toConsumableArray(player.hand);
+    });
+  }, [stage]);
+
+  var handleCardClicked = function handleCardClicked(cardID) {
+    switch (stage) {
+      case "passCards":
+        if (passedCards.length < 3) {
+          setPassedCards([].concat(_toConsumableArray(passedCards), [cardID])); // Remove the card from the local hand.
+
+          setHand(removeFromHand(hand, cardID));
+        }
+
+        break;
+
+      default:
+        break;
+    }
   };
 
-  var stage = ctx.activePlayers[playerID];
+  var handleReturnPass = function handleReturnPass(cardID) {
+    setPassedCards(removeFromHand(passedCards, cardID)); // Add the card back into your hand.
 
-  var handleCardClicked = function handleCardClicked(cardID) {};
+    hand.push(cardID);
+    sortCards(hand);
+    setHand(_toConsumableArray(hand));
+  };
 
-  var playOrder = ctx.playOrder;
-  var myPlayIndex = playOrder.findIndex(function (pId) {
-    return pId === playerID;
-  });
-  var leftPlayerID = playOrder[(myPlayIndex + 1) % 4];
-  var partnerID = playOrder[(myPlayIndex + 2) % 4];
-  var rightPlayerID = playOrder[(myPlayIndex + 3) % 4]; // <Hand hand={G.players[playerID].hand} />
+  var handlePassConfirmed = function handlePassConfirmed() {
+    if (stage === "passCards" && passedCards.length === 3) {
+      moves.passCards(playerID, passedCards);
+    }
+  };
+
+  var playerIDs = getPlayerIDs(ctx, playerID); // <Hand hand={G.players[playerID].hand} />
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board"
@@ -69433,22 +69536,27 @@ var TichuBoard = function TichuBoard(props) {
     className: "board-side"
   }, "Empty"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-middle"
-  }, "Player: ", partnerID, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["PartnerHand"], {
-    backs: G["public"].players[partnerID].cards
+  }, "Player: ", playerIDs.partner, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["PartnerHand"], {
+    backs: G["public"].players[playerIDs.partner].cards
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-side"
   }, "Empty")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-row"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-side"
-  }, "Player: ", leftPlayerID, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
-    backs: G["public"].players[leftPlayerID].cards
+  }, "Player: ", playerIDs.left, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
+    backs: G["public"].players[playerIDs.left].cards
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-middle"
-  }, "Play Area"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_PassArea__WEBPACK_IMPORTED_MODULE_2__["PassArea"], {
+    selectedCards: passedCards,
+    stage: stage,
+    onReturnPass: handleReturnPass,
+    onPassConfirmed: handlePassConfirmed
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-side"
-  }, "Player: ", rightPlayerID, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
-    backs: G["public"].players[rightPlayerID].cards
+  }, "Player: ", playerIDs.right, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
+    backs: G["public"].players[playerIDs.right].cards
   }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-row"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
@@ -69456,13 +69564,13 @@ var TichuBoard = function TichuBoard(props) {
   }, "Empty"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-middle"
   }, "Player: ", playerID, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
-    hand: player.hand,
+    hand: hand,
     onCardClicked: handleCardClicked
-  }), stage === "takeOrGrand" && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_2__["FormGroup"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_2__["Button"], {
+  }), stage === "takeOrGrand" && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_3__["FormGroup"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_3__["Button"], {
     color: "primary",
     className: "mx-1",
     onClick: onGrandClicked
-  }, "Grand Tichu"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_2__["Button"], {
+  }, "Grand Tichu"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_3__["Button"], {
     color: "primary",
     className: "mx-1",
     onClick: onTakeClicked
@@ -69609,9 +69717,17 @@ module.exports.cardDefinitions = generateCardDefinitions();
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _module$exports$Tichu;
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 var _require = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boardgame.io/dist/esm/core.js"),
     INVALID_MOVE = _require.INVALID_MOVE,
@@ -69620,7 +69736,7 @@ var _require = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boar
 var _require2 = __webpack_require__(/*! ./Deck */ "./src/Deck.js"),
     cardDefinitions = _require2.cardDefinitions;
 
-module.exports.Tichu = (_module$exports$Tichu = {
+var tichu = {
   setup: function setup() {
     return {
       cells: Array(9).fill(null),
@@ -69688,41 +69804,52 @@ module.exports.Tichu = (_module$exports$Tichu = {
         callGrand: callGrand,
         takeCards: takeCards
       },
+      turn: {
+        stages: {
+          takeOrGrand: {
+            moves: {
+              callGrand: callGrand,
+              takeCards: takeCards
+            },
+            next: "passCards"
+          },
+          passCards: {
+            moves: {
+              passCards: passCards
+            },
+            next: "waitForPass"
+          },
+          waitForPass: {}
+        }
+      },
       start: true
     }
-  }
-}, _defineProperty(_module$exports$Tichu, "turn", {
-  stages: {
-    takeOrGrand: {
-      moves: {
-        callGrand: callGrand,
-        takeCards: takeCards
-      },
-      next: "passCards"
-    },
-    passCards: {}
-  }
-}), _defineProperty(_module$exports$Tichu, "moves", {
-  clickCell: function clickCell(G, ctx, id) {
-    if (G.cells[id] !== null) {
-      return INVALID_MOVE;
+  },
+  moves: {
+    clickCell: function clickCell(G, ctx, id) {
+      if (G.cells[id] !== null) {
+        return INVALID_MOVE;
+      }
+
+      G.cells[id] = ctx.currentPlayer;
+    }
+  },
+  endIf: function endIf(G, ctx) {
+    if (IsVictory(G.cells)) {
+      return {
+        winner: ctx.currentPlayer
+      };
     }
 
-    G.cells[id] = ctx.currentPlayer;
-  }
-}), _defineProperty(_module$exports$Tichu, "endIf", function endIf(G, ctx) {
-  if (IsVictory(G.cells)) {
-    return {
-      winner: ctx.currentPlayer
-    };
-  }
-
-  if (IsDraw(G.cells)) {
-    return {
-      draw: true
-    };
-  }
-}), _defineProperty(_module$exports$Tichu, "minPlayers", 4), _defineProperty(_module$exports$Tichu, "maxPlayers", 4), _module$exports$Tichu); // Return true if `cells` is in a winning configuration.
+    if (IsDraw(G.cells)) {
+      return {
+        draw: true
+      };
+    }
+  },
+  minPlayers: 4,
+  maxPlayers: 4
+}; // Return true if `cells` is in a winning configuration.
 
 function IsVictory(cells) {
   var positions = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
@@ -69772,6 +69899,10 @@ function dealCards(G, number) {
   });
 }
 
+function sortCards(array) {
+  array.sort(cardComparison);
+}
+
 function cardComparison(a, b) {
   var cardA = cardDefinitions[a];
   var cardB = cardDefinitions[b];
@@ -69806,8 +69937,74 @@ function takeCards(G, ctx, playerID) {
   G.players[playerID].hand.sort(cardComparison);
   G["public"].players[playerID].cards = G.players[playerID].hand.length;
   ctx.events.endStage();
-  return G;
 }
+
+function passCards(G, ctx, playerID, selectedCards) {
+  // Check the player is on the passCards stage
+  if (ctx.activePlayers[playerID] !== "passCards") {
+    return INVALID_MOVE;
+  } // Make sure they have selected three cards to pass.
+
+
+  if (!selectedCards || selectedCards.length !== 3) {
+    return INVALID_MOVE;
+  } // Make sure all the cards they've selected are in their hand.
+
+
+  var player = G.players[playerID];
+
+  for (var i; i < 3; i++) {
+    if (!player.hand.some(function (c) {
+      return c === selectedCards[i];
+    })) {
+      return INVALID_MOVE;
+    }
+  }
+
+  var playerIDs = getPlayerIDs(ctx, playerID); // Remove the cards from your hand.
+
+  selectedCards.forEach(function (c) {
+    player.hand = removeFromHand(player.hand, c);
+  }); // Pass cards to the other players
+
+  executePass(G, playerIDs.left, playerID, selectedCards[0]);
+  executePass(G, playerIDs.partner, playerID, selectedCards[1]);
+  executePass(G, playerIDs.right, playerID, selectedCards[2]);
+  ctx.events.endStage();
+}
+
+function executePass(G, receivingPlayerID, sendingPlayerID, cardID) {
+  var receivingPlayer = G.players[receivingPlayerID];
+  receivingPlayer.receivedPass = receivingPlayer.receivedPass || {};
+  receivingPlayer.receivedPass[sendingPlayerID] = cardID;
+}
+
+function removeFromHand(hand, cardID) {
+  var indexToRemove = hand.findIndex(function (c) {
+    return c === cardID;
+  });
+  hand.splice(indexToRemove, 1);
+  return _toConsumableArray(hand);
+}
+
+function getPlayerIDs(ctx, playerID) {
+  var playOrder = ctx.playOrder;
+  var myPlayIndex = playOrder.findIndex(function (pId) {
+    return pId === playerID;
+  });
+  return {
+    left: playOrder[(myPlayIndex + 1) % 4],
+    partner: playOrder[(myPlayIndex + 2) % 4],
+    right: playOrder[(myPlayIndex + 3) % 4]
+  };
+}
+
+module.exports = {
+  Tichu: tichu,
+  sortCards: sortCards,
+  removeFromHand: removeFromHand,
+  getPlayerIDs: getPlayerIDs
+};
 
 /***/ }),
 
@@ -69872,6 +70069,63 @@ var OpponentHand = function OpponentHand(_ref3) {
       className: "card-back-rotated"
     }));
   }));
+};
+
+/***/ }),
+
+/***/ "./src/PassArea.js":
+/*!*************************!*\
+  !*** ./src/PassArea.js ***!
+  \*************************/
+/*! exports provided: PassArea */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PassArea", function() { return PassArea; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Card__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Card */ "./src/Card.js");
+/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! reactstrap */ "./node_modules/reactstrap/es/index.js");
+
+
+
+var PassArea = function PassArea(_ref) {
+  var stage = _ref.stage,
+      _ref$selectedCards = _ref.selectedCards,
+      selectedCards = _ref$selectedCards === void 0 ? [] : _ref$selectedCards,
+      onReturnPass = _ref.onReturnPass,
+      onPassConfirmed = _ref.onPassConfirmed;
+  var displayCards = Array(3).fill("back");
+
+  for (var i = 0; i < 3; i++) {
+    if (selectedCards.length > i) {
+      displayCards[i] = selectedCards[i];
+    }
+  }
+
+  if (stage !== "passCards" && stage !== "waitForPass" && stage !== "receivePass") {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "\xA0");
+  }
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
+    className: "pass-area"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Card__WEBPACK_IMPORTED_MODULE_1__["Card"], {
+    cardID: displayCards[1],
+    onCardClicked: onReturnPass
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Card__WEBPACK_IMPORTED_MODULE_1__["Card"], {
+    cardID: displayCards[0],
+    onCardClicked: onReturnPass
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Card__WEBPACK_IMPORTED_MODULE_1__["Card"], {
+    cardID: displayCards[2],
+    onCardClicked: onReturnPass
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, stage === "passCards" && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_2__["Button"], {
+    color: "primary",
+    disabled: selectedCards.length !== 3,
+    onClick: onPassConfirmed
+  }, "Pass"), stage === "receivePass" && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_2__["Button"], {
+    color: "primary"
+  }, "Accept")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null))));
 };
 
 /***/ }),

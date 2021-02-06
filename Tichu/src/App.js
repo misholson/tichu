@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Client } from 'boardgame.io/react';
 import { SocketIO } from 'boardgame.io/multiplayer';
 import { Tichu } from './Game';
 import { TichuBoard } from './Board';
+import { Card, CardHeader, CardBody, Button } from 'reactstrap';
 
 const TichuClient = Client({
     game: Tichu,
@@ -11,20 +12,38 @@ const TichuClient = Client({
     multiplayer: SocketIO({ server: 'localhost:1337' })
 });
 
+const ExpandableClient = ({ playerID }) => {
+    const [bodyVisible, setBodyVisible] = useState(false);
+
+    return (
+        <div>
+            <Card>
+                <CardHeader tag="h5">Player {playerID}<Button className="mx-3" onClick={() => setBodyVisible(prev => !prev)}>View</Button>
+                </CardHeader>
+                {bodyVisible &&
+                <CardBody>
+                    <TichuClient playerID={playerID} />
+                </CardBody>
+                }
+            </Card>
+        </div>
+    );
+}
+
 export const App = () => (
     <table style={{ width: "100%" }}>
         <tbody>
             <tr>
-                <td><TichuClient playerID="0" /></td>
+                <td><ExpandableClient playerID="0" /></td>
             </tr>
             <tr>
-                <td><TichuClient playerID="1" /></td>
+                <td><ExpandableClient playerID="1" /></td>
             </tr>
             <tr>
-                <td><TichuClient playerID="2" /></td>
+                <td><ExpandableClient playerID="2" /></td>
             </tr>
             <tr>
-                <td><TichuClient playerID="3" /></td>
+                <td><ExpandableClient playerID="3" /></td>
             </tr>
         </tbody>
     </table>

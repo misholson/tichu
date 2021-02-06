@@ -1,7 +1,7 @@
 const { INVALID_MOVE, PlayerView } = require('boardgame.io/core');
 var { cardDefinitions } = require('./Deck');
 
-module.exports.Tichu = {
+const tichu = {
     setup: () => ({
         cells: Array(9).fill(null), // TODO: Delete
         secret: {
@@ -68,22 +68,27 @@ module.exports.Tichu = {
                 callGrand: callGrand,
                 takeCards: takeCards
             },
-            start: true
-        }
-    },
+            turn: {
+                stages: {
+                    takeOrGrand: {
+                        moves: {
+                            callGrand: callGrand,
+                            takeCards: takeCards
+                        },
+                        next: "passCards"
+                    },
+                    passCards: {
+                        moves: {
+                            passCards: passCards
+                        },
+                        next: "waitForPass"
+                    },
+                    waitForPass: {
 
-    turn: {
-        stages: {
-            takeOrGrand: {
-                moves: {
-                    callGrand: callGrand,
-                    takeCards: takeCards
-                },
-                next: "passCards"
+                    }
+                }
             },
-            passCards: {
-
-            }
+            start: true
         }
     },
 
@@ -152,6 +157,10 @@ function dealCards(G, number) {
     });
 }
 
+function sortCards(array) {
+    array.sort(cardComparison);
+}
+
 function cardComparison(a, b) {
     let cardA = cardDefinitions[a];
     let cardB = cardDefinitions[b];
@@ -184,5 +193,67 @@ function takeCards(G, ctx, playerID) {
     G.players[playerID].hand.sort(cardComparison);
     G.public.players[playerID].cards = G.players[playerID].hand.length;
     ctx.events.endStage();
-    return G;
+}
+
+function passCards(G, ctx, playerID, selectedCards) {
+    // Check the player is on the passCards stage
+    if (ctx.activePlayers[playerID] !== "passCards") {
+        return INVALID_MOVE;
+    }
+
+    // Make sure they have selected three cards to pass.
+    if (!selectedCards || selectedCards.length !== 3) {
+        return INVALID_MOVE;
+    }
+
+    // Make sure all the cards they've selected are in their hand.
+    var player = G.players[playerID];
+    for (var i; i < 3; i++) {
+        if (!player.hand.some((c) => c === selectedCards[i])) {
+            return INVALID_MOVE;
+        }
+    }
+
+    var playerIDs = getPlayerIDs(ctx, playerID);
+
+    // Remove the cards from your hand.
+    selectedCards.forEach((c) => {
+        player.hand = removeFromHand(player.hand, c);
+    })
+
+    // Pass cards to the other players
+    executePass(G, playerIDs.left, playerID, selectedCards[0]);
+    executePass(G, playerIDs.partner, playerID, selectedCards[1]);
+    executePass(G, playerIDs.right, playerID, selectedCards[2]);
+
+    ctx.events.endStage();
+}
+
+function executePass(G, receivingPlayerID, sendingPlayerID, cardID) {
+    var receivingPlayer = G.players[receivingPlayerID];
+    receivingPlayer.receivedPass = receivingPlayer.receivedPass || {};
+    receivingPlayer.receivedPass[sendingPlayerID] = cardID;
+}
+
+function removeFromHand(hand, cardID) {
+    var indexToRemove = hand.findIndex((c) => c === cardID);
+    hand.splice(indexToRemove, 1);
+    return [...hand];
+}
+
+function getPlayerIDs(ctx, playerID) {
+    var playOrder = ctx.playOrder;
+    var myPlayIndex = playOrder.findIndex((pId) => pId === playerID);
+    return {
+        left: playOrder[(myPlayIndex + 1) % 4],
+        partner: playOrder[(myPlayIndex + 2) % 4],
+        right: playOrder[(myPlayIndex + 3) % 4]
+    };
+}
+
+module.exports = {
+    Tichu: tichu,
+    sortCards: sortCards,
+    removeFromHand: removeFromHand,
+    getPlayerIDs: getPlayerIDs
 }

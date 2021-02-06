@@ -21,6 +21,14 @@
     background-size: cover;
 }
 
+.pass-area .card {
+    width: 80px;
+    height: 120px;
+    border: 1px solid black;
+    border-radius: 5px;
+    box-shadow: 1px 1px 5px #555;
+}
+
 .hand .selectedCard {
     padding-bottom: 20px;
 }
@@ -44,11 +52,13 @@ ul.hand {
 }
 
 .board-side {
-    border: 1px solid gray;
     width: 15%;
 }
 
 .board-middle {
-    border: 1px solid gray;
     width: 70%;
+}
+
+.board-middle table {
+    margin: auto;
 }

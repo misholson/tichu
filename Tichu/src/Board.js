@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Hand, OpponentHand, PartnerHand } from './Hand';
+import { PassArea } from './PassArea';
 import { FormGroup, Button } from 'reactstrap';
 import 'bootstrap';
+const { sortCards, removeFromHand, getPlayerIDs } = require('./Game');
 
 export const TichuBoard = (props) => {
 
@@ -13,6 +15,11 @@ export const TichuBoard = (props) => {
     } = props;
 
     const player = G.players[playerID];
+    var stage = ctx.activePlayers[playerID];
+
+    const [passedCards, setPassedCards] = useState([]);
+    const [hand, setHand] = useState(player.hand);
+
 
     const onGrandClicked = () => {
         moves.callGrand(playerID);
@@ -22,17 +29,45 @@ export const TichuBoard = (props) => {
         moves.takeCards(playerID);
     }
 
-    var stage = ctx.activePlayers[playerID];
+    // If the game stage or phase changes, refresh the hand from the game state.
+    useEffect(() => {
+        setHand(() => {
+            return [...player.hand];
+        })
+    }, [stage]);
+
 
     const handleCardClicked = (cardID) => {
+        switch (stage) {
+            case "passCards":
+                if (passedCards.length < 3) {
+                    setPassedCards([...passedCards, cardID]);
 
+                    // Remove the card from the local hand.
+                    setHand(removeFromHand(hand, cardID));
+                }
+                break;
+            default:
+                break;
+        }
     }
 
-    var playOrder = ctx.playOrder;
-    var myPlayIndex = playOrder.findIndex((pId) => pId === playerID);
-    var leftPlayerID = playOrder[(myPlayIndex + 1) % 4];
-    var partnerID = playOrder[(myPlayIndex + 2) % 4];
-    var rightPlayerID = playOrder[(myPlayIndex + 3) % 4];
+    const handleReturnPass = (cardID) => {
+        setPassedCards(removeFromHand(passedCards, cardID));
+
+        // Add the card back into your hand.
+        hand.push(cardID);
+        sortCards(hand);
+        setHand([...hand]);
+    }
+
+    const handlePassConfirmed = () => {
+        if (stage === "passCards" && passedCards.length === 3) {
+            moves.passCards(playerID, passedCards);
+        }
+    }
+
+    var playerIDs = getPlayerIDs(ctx, playerID);
 
     // <Hand hand={G.players[playerID].hand} />
     return (
@@ -42,8 +77,8 @@ export const TichuBoard = (props) => {
                     Empty
                 </div>
                 <div className="board-middle">
-                    Player: {partnerID}
-                    <PartnerHand backs={G.public.players[partnerID].cards} />
+                    Player: {playerIDs.partner}
+                    <PartnerHand backs={G.public.players[playerIDs.partner].cards} />
                 </div>
                 <div className="board-side">
                     Empty
@@ -51,15 +86,15 @@ export const TichuBoard = (props) => {
             </div>
             <div className="board-row">
                 <div className="board-side">
-                    Player: {leftPlayerID}
-                    <OpponentHand backs={G.public.players[leftPlayerID].cards} />
+                    Player: {playerIDs.left}
+                    <OpponentHand backs={G.public.players[playerIDs.left].cards} />
                 </div>
                 <div className="board-middle">
-                    Play Area
+                    <PassArea selectedCards={passedCards} stage={stage} onReturnPass={handleReturnPass} onPassConfirmed={handlePassConfirmed} />
                 </div>
                 <div className="board-side">
-                    Player: {rightPlayerID}
-                    <OpponentHand backs={G.public.players[rightPlayerID].cards} />
+                    Player: {playerIDs.right}
+                    <OpponentHand backs={G.public.players[playerIDs.right].cards} />
                 </div>
             </div>
             <div className="board-row">
@@ -68,7 +103,7 @@ export const TichuBoard = (props) => {
                 </div>
                 <div className="board-middle">
                     Player: {playerID}
-                    <Hand hand={player.hand} onCardClicked={handleCardClicked} />
+                    <Hand hand={hand} onCardClicked={handleCardClicked} />
                     {stage === "takeOrGrand" &&
                         <FormGroup>
                             <Button color="primary" className="mx-1" onClick={onGrandClicked}>Grand Tichu</Button>
