@@ -69398,10 +69398,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
-var _require = __webpack_require__(/*! ./Game */ "./src/Game.js"),
-    getPartner = _require.getPartner;
-
 var TichuBoard = function TichuBoard(props) {
   var G = props.G,
       ctx = props.ctx,
@@ -69419,8 +69415,15 @@ var TichuBoard = function TichuBoard(props) {
 
   var stage = ctx.activePlayers[playerID];
 
-  var handleCardClicked = function handleCardClicked(cardID) {}; // <Hand hand={G.players[playerID].hand} />
+  var handleCardClicked = function handleCardClicked(cardID) {};
 
+  var playOrder = ctx.playOrder;
+  var myPlayIndex = playOrder.findIndex(function (pId) {
+    return pId === playerID;
+  });
+  var leftPlayerID = playOrder[(myPlayIndex + 1) % 4];
+  var partnerID = playOrder[(myPlayIndex + 2) % 4];
+  var rightPlayerID = playOrder[(myPlayIndex + 3) % 4]; // <Hand hand={G.players[playerID].hand} />
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board"
@@ -69430,25 +69433,29 @@ var TichuBoard = function TichuBoard(props) {
     className: "board-side"
   }, "Empty"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-middle"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
-    backs: G["public"].players[getPartner(playerID)].cards
+  }, "Player: ", partnerID, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["PartnerHand"], {
+    backs: G["public"].players[partnerID].cards
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-side"
   }, "Empty")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-row"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-side"
-  }, "Left Opponent"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+  }, "Player: ", leftPlayerID, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
+    backs: G["public"].players[leftPlayerID].cards
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-middle"
   }, "Play Area"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-side"
-  }, "Right Opponent")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+  }, "Player: ", rightPlayerID, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
+    backs: G["public"].players[rightPlayerID].cards
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-row"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-side"
   }, "Empty"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-middle"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
+  }, "Player: ", playerID, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
     hand: player.hand,
     onCardClicked: handleCardClicked
   }), stage === "takeOrGrand" && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_2__["FormGroup"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_2__["Button"], {
@@ -69715,8 +69722,7 @@ module.exports.Tichu = (_module$exports$Tichu = {
       draw: true
     };
   }
-}), _defineProperty(_module$exports$Tichu, "minPlayers", 4), _defineProperty(_module$exports$Tichu, "maxPlayers", 4), _module$exports$Tichu);
-module.exports.getPartner = getPartner; // Return true if `cells` is in a winning configuration.
+}), _defineProperty(_module$exports$Tichu, "minPlayers", 4), _defineProperty(_module$exports$Tichu, "maxPlayers", 4), _module$exports$Tichu); // Return true if `cells` is in a winning configuration.
 
 function IsVictory(cells) {
   var positions = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
@@ -69788,7 +69794,7 @@ function cardComparison(a, b) {
 function callGrand(G, ctx, playerID) {
   G["public"].players[playerID].tichu = true;
   G["public"].players[playerID].grand = true;
-  return takeCards(G, playerID);
+  return takeCards(G, ctx, playerID);
 }
 
 function takeCards(G, ctx, playerID) {
@@ -69803,37 +69809,20 @@ function takeCards(G, ctx, playerID) {
   return G;
 }
 
-function getPartner(playerID) {
-  switch (playerID) {
-    case "0":
-      return "2";
-
-    case "1":
-      return "3";
-
-    case "2":
-      return "0";
-
-    case "3":
-      return "1";
-
-    default:
-      return null;
-  }
-}
-
 /***/ }),
 
 /***/ "./src/Hand.js":
 /*!*********************!*\
   !*** ./src/Hand.js ***!
   \*********************/
-/*! exports provided: Hand */
+/*! exports provided: Hand, PartnerHand, OpponentHand */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Hand", function() { return Hand; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PartnerHand", function() { return PartnerHand; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "OpponentHand", function() { return OpponentHand; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Card__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Card */ "./src/Card.js");
@@ -69857,6 +69846,30 @@ var Hand = function Hand(_ref) {
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Card__WEBPACK_IMPORTED_MODULE_1__["Card"], {
       cardID: cardID,
       onCardClicked: onCardClicked
+    }));
+  }));
+};
+var PartnerHand = function PartnerHand(_ref2) {
+  var backs = _ref2.backs;
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("ul", {
+    className: "hand-vertical hand"
+  }, backs && Array(backs).fill(null).map(function (_, i) {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", {
+      key: i
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Card__WEBPACK_IMPORTED_MODULE_1__["Card"], {
+      cardID: "back"
+    }));
+  }));
+};
+var OpponentHand = function OpponentHand(_ref3) {
+  var backs = _ref3.backs;
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("ul", {
+    className: "hand-vertical hand"
+  }, backs && Array(backs).fill(null).map(function (_, i) {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", {
+      key: i
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      className: "card-back-rotated"
     }));
   }));
 };

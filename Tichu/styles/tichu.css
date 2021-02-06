@@ -8,6 +8,19 @@
     margin-left: -40px;
 }
 
+.hand-vertical .card-back-rotated {
+    width: 120px;
+    height: 80px;
+    border: 1px solid black;
+    border-radius: 5px;
+    box-shadow: 1px 1px 5px #555;
+    /*float: left;*/
+    margin-top: -40px;
+    background-image: url("/images/back_rotated.jpg");
+    background-position: center;
+    background-size: cover;
+}
+
 .hand .selectedCard {
     padding-bottom: 20px;
 }

@@ -1,8 +1,7 @@
 import React from 'react';
-import { Hand } from './Hand';
+import { Hand, OpponentHand, PartnerHand } from './Hand';
 import { FormGroup, Button } from 'reactstrap';
 import 'bootstrap';
-const { getPartner } = require('./Game');
 
 export const TichuBoard = (props) => {
 
@@ -29,6 +28,12 @@ export const TichuBoard = (props) => {
 
     }
 
+    var playOrder = ctx.playOrder;
+    var myPlayIndex = playOrder.findIndex((pId) => pId === playerID);
+    var leftPlayerID = playOrder[(myPlayIndex + 1) % 4];
+    var partnerID = playOrder[(myPlayIndex + 2) % 4];
+    var rightPlayerID = playOrder[(myPlayIndex + 3) % 4];
+
     // <Hand hand={G.players[playerID].hand} />
     return (
         <div className="board">
@@ -37,7 +42,8 @@ export const TichuBoard = (props) => {
                     Empty
                 </div>
                 <div className="board-middle">
-                    <Hand backs={G.public.players[getPartner(playerID)].cards} />
+                    Player: {partnerID}
+                    <PartnerHand backs={G.public.players[partnerID].cards} />
                 </div>
                 <div className="board-side">
                     Empty
@@ -45,13 +51,15 @@ export const TichuBoard = (props) => {
             </div>
             <div className="board-row">
                 <div className="board-side">
-                    Left Opponent
+                    Player: {leftPlayerID}
+                    <OpponentHand backs={G.public.players[leftPlayerID].cards} />
                 </div>
                 <div className="board-middle">
                     Play Area
                 </div>
                 <div className="board-side">
-                    Right Opponent
+                    Player: {rightPlayerID}
+                    <OpponentHand backs={G.public.players[rightPlayerID].cards} />
                 </div>
             </div>
             <div className="board-row">
@@ -59,6 +67,7 @@ export const TichuBoard = (props) => {
                     Empty
                 </div>
                 <div className="board-middle">
+                    Player: {playerID}
                     <Hand hand={player.hand} onCardClicked={handleCardClicked} />
                     {stage === "takeOrGrand" &&
                         <FormGroup>

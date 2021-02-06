@@ -110,8 +110,6 @@ module.exports.Tichu = {
     maxPlayers: 4
 };
 
-module.exports.getPartner = getPartner;
-
 // Return true if `cells` is in a winning configuration.
 function IsVictory(cells) {
     const positions = [
@@ -187,19 +185,4 @@ function takeCards(G, ctx, playerID) {
     G.public.players[playerID].cards = G.players[playerID].hand.length;
     ctx.events.endStage();
     return G;
-}
-
-function getPartner(playerID) {
-    switch (playerID) {
-        case "0":
-            return "2";
-        case "1":
-            return "3";
-        case "2":
-            return "0";
-        case "3":
-            return "1";
-        default:
-            return null;
-    }
 }
