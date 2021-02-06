@@ -1,0 +1,11 @@
+{
+  "presets": [ "@babel/preset-env", "@babel/preset-react" ],
+  "exclude": [
+    "**/bin",
+    "**/bower_components",
+    "**/jspm_packages",
+    "**/node_modules",
+    "**/obj",
+    "**/platforms"
+  ]
+}

@@ -7,6 +7,12 @@
     "name": ""
   },
   "dependencies": {
+    "@babel/core": "^7.12.13",
+    "@babel/preset-env": "^7.12.13",
+    "@babel/preset-react": "^7.12.13",
+    "babel-loader": "^8.2.2",
+    "babel-preset-env": "^1.7.0",
+    "boardgame.io": "^0.43.2",
     "express": "~4.17.1",
     "jsx-loader": "^0.13.2",
     "path": "~0.12.7",
