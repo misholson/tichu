@@ -13,7 +13,7 @@ const TichuClient = Client({
 });
 
 const ExpandableClient = ({ playerID }) => {
-    const [bodyVisible, setBodyVisible] = useState(false);
+    const [bodyVisible, setBodyVisible] = useState(true);
 
     return (
         <div>

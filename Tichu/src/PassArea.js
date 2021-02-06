@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card } from './Card';
 import { Button } from 'reactstrap';
+const { constants } = require('./Game');
 
 export const PassArea = ({ stage, selectedCards = [], onReturnPass, onPassConfirmed }) => {
 
@@ -10,10 +11,22 @@ export const PassArea = ({ stage, selectedCards = [], onReturnPass, onPassConfir
             displayCards[i] = selectedCards[i];
         }
     }
-    if (stage !== "passCards" && stage !== "waitForPass" && stage !== "receivePass") {
+    if (stage !== constants.phases.preHand.stages.passCards && stage !== constants.phases.preHand.stages.acceptPass) {
         return (
             <>&nbsp;</>
         );
+    }
+
+    const handleCardClicked = (cardID) => {
+        if (stage === constants.phases.preHand.stages.passCards && onReturnPass) {
+            onReturnPass(cardID);
+        }
+    }
+
+    const handlePassConfirmed = () => {
+        if (stage === constants.phases.preHand.stages.passCards && onPassConfirmed) {
+            onPassConfirmed();
+        }
     }
 
     return (
@@ -21,19 +34,19 @@ export const PassArea = ({ stage, selectedCards = [], onReturnPass, onPassConfir
             <tbody>
                 <tr>
                     <td></td>
-                    <td><Card cardID={displayCards[1]} onCardClicked={onReturnPass} /></td>
+                    <td><Card cardID={displayCards[1]} onCardClicked={handleCardClicked} /></td>
                     <td></td>
                 </tr>
                 <tr>
-                    <td><Card cardID={displayCards[0]} onCardClicked={onReturnPass} /></td>
+                    <td><Card cardID={displayCards[0]} onCardClicked={handleCardClicked} /></td>
                     <td></td>
-                    <td><Card cardID={displayCards[2]} onCardClicked={onReturnPass} /></td>
+                    <td><Card cardID={displayCards[2]} onCardClicked={handleCardClicked} /></td>
                 </tr>
                 <tr>
                     <td></td>
                     <td>
-                        {stage === "passCards" && <Button color="primary" disabled={selectedCards.length !== 3} onClick={onPassConfirmed}>Pass</Button>}
-                        {stage === "receivePass" && <Button color="primary">Accept</Button>}
+                        {stage === constants.phases.preHand.stages.passCards && <Button color="primary" disabled={selectedCards.length !== 3} onClick={handlePassConfirmed}>Pass</Button>}
+                        {stage === constants.phases.preHand.stages.acceptPass && <Button color="primary">Accept</Button>}
                     </td>
                     <td></td>
                 </tr>

@@ -69378,7 +69378,7 @@ var TichuClient = Object(boardgame_io_react__WEBPACK_IMPORTED_MODULE_1__["Client
 var ExpandableClient = function ExpandableClient(_ref) {
   var playerID = _ref.playerID;
 
-  var _useState = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(false),
+  var _useState = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(true),
       _useState2 = _slicedToArray(_useState, 2),
       bodyVisible = _useState2[0],
       setBodyVisible = _useState2[1];
@@ -69461,7 +69461,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 var _require = __webpack_require__(/*! ./Game */ "./src/Game.js"),
     sortCards = _require.sortCards,
     removeFromHand = _require.removeFromHand,
-    getPlayerIDs = _require.getPlayerIDs;
+    getPlayerIDs = _require.getPlayerIDs,
+    constants = _require.constants;
 
 var TichuBoard = function TichuBoard(props) {
   var G = props.G,
@@ -69470,6 +69471,7 @@ var TichuBoard = function TichuBoard(props) {
       playerID = props.playerID;
   var player = G.players[playerID];
   var stage = ctx.activePlayers[playerID];
+  var playerIDs = getPlayerIDs(ctx, playerID);
 
   var _useState = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])([]),
       _useState2 = _slicedToArray(_useState, 2),
@@ -69498,7 +69500,7 @@ var TichuBoard = function TichuBoard(props) {
 
   var handleCardClicked = function handleCardClicked(cardID) {
     switch (stage) {
-      case "passCards":
+      case constants.phases.preHand.stages.passCards:
         if (passedCards.length < 3) {
           setPassedCards([].concat(_toConsumableArray(passedCards), [cardID])); // Remove the card from the local hand.
 
@@ -69521,12 +69523,19 @@ var TichuBoard = function TichuBoard(props) {
   };
 
   var handlePassConfirmed = function handlePassConfirmed() {
-    if (stage === "passCards" && passedCards.length === 3) {
+    if (stage === constants.phases.preHand.stages.passCards && passedCards.length === 3) {
       moves.passCards(playerID, passedCards);
     }
   };
 
-  var playerIDs = getPlayerIDs(ctx, playerID); // <Hand hand={G.players[playerID].hand} />
+  var receivedCards = [];
+
+  if (stage === constants.phases.preHand.stages.acceptPass) {
+    receivedCards.push(player.receivedPass[playerIDs.left]);
+    receivedCards.push(player.receivedPass[playerIDs.partner]);
+    receivedCards.push(player.receivedPass[playerIDs.right]);
+  } // <Hand hand={G.players[playerID].hand} />
+
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board"
@@ -69549,7 +69558,7 @@ var TichuBoard = function TichuBoard(props) {
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-middle"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_PassArea__WEBPACK_IMPORTED_MODULE_2__["PassArea"], {
-    selectedCards: passedCards,
+    selectedCards: stage === constants.phases.preHand.stages.passCards ? passedCards : receivedCards,
     stage: stage,
     onReturnPass: handleReturnPass,
     onPassConfirmed: handlePassConfirmed
@@ -69566,7 +69575,7 @@ var TichuBoard = function TichuBoard(props) {
   }, "Player: ", playerID, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
     hand: hand,
     onCardClicked: handleCardClicked
-  }), stage === "takeOrGrand" && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_3__["FormGroup"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_3__["Button"], {
+  }), stage === constants.phases.preHand.stages.takeOrGrand && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_3__["FormGroup"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_3__["Button"], {
     color: "primary",
     className: "mx-1",
     onClick: onGrandClicked
@@ -69736,11 +69745,21 @@ var _require = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boar
 var _require2 = __webpack_require__(/*! ./Deck */ "./src/Deck.js"),
     cardDefinitions = _require2.cardDefinitions;
 
+var constants = {
+  phases: {
+    preHand: {
+      stages: {
+        takeOrGrand: "takeOrGrand",
+        passCards: "passCards",
+        waitForPass: "waitForPass",
+        acceptPass: "acceptPass"
+      }
+    }
+  }
+};
 var tichu = {
   setup: function setup() {
     return {
-      cells: Array(9).fill(null),
-      // TODO: Delete
       secret: {
         deck: generateDeck(56)
       },
@@ -69789,14 +69808,14 @@ var tichu = {
     moveLimit: 1
   },
   phases: {
-    first8: {
+    preHand: {
       onBegin: function onBegin(G, ctx) {
         console.log("first8 onBegin");
         G.secret.deck = ctx.random.Shuffle(G.secret.deck);
         console.debug("first8 done shuffling");
         dealCards(G, 8);
         ctx.events.setActivePlayers({
-          all: "takeOrGrand"
+          all: constants.phases.preHand.stages.takeOrGrand
         });
         return G;
       },
@@ -69811,69 +69830,31 @@ var tichu = {
               callGrand: callGrand,
               takeCards: takeCards
             },
-            next: "passCards"
+            next: constants.phases.preHand.stages.passCards
           },
           passCards: {
             moves: {
               passCards: passCards
             },
-            next: "waitForPass"
+            next: constants.phases.preHand.stages.waitForPass
           },
-          waitForPass: {}
-        }
+          waitForPass: {
+            next: constants.phases.preHand.stages.acceptPass
+          },
+          acceptPass: {
+            moves: {
+              acceptPass: acceptPass
+            }
+          }
+        },
+        onMove: checkPlayersHavePassed
       },
       start: true
     }
   },
-  moves: {
-    clickCell: function clickCell(G, ctx, id) {
-      if (G.cells[id] !== null) {
-        return INVALID_MOVE;
-      }
-
-      G.cells[id] = ctx.currentPlayer;
-    }
-  },
-  endIf: function endIf(G, ctx) {
-    if (IsVictory(G.cells)) {
-      return {
-        winner: ctx.currentPlayer
-      };
-    }
-
-    if (IsDraw(G.cells)) {
-      return {
-        draw: true
-      };
-    }
-  },
   minPlayers: 4,
   maxPlayers: 4
-}; // Return true if `cells` is in a winning configuration.
-
-function IsVictory(cells) {
-  var positions = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
-
-  var isRowComplete = function isRowComplete(row) {
-    var symbols = row.map(function (i) {
-      return cells[i];
-    });
-    return symbols.every(function (i) {
-      return i !== null && i === symbols[0];
-    });
-  };
-
-  return positions.map(isRowComplete).some(function (i) {
-    return i === true;
-  });
-} // Return true if all `cells` are occupied.
-
-
-function IsDraw(cells) {
-  return cells.filter(function (c) {
-    return c === null;
-  }).length === 0;
-}
+};
 
 function generateDeck(size) {
   var deck = [];
@@ -69941,7 +69922,7 @@ function takeCards(G, ctx, playerID) {
 
 function passCards(G, ctx, playerID, selectedCards) {
   // Check the player is on the passCards stage
-  if (ctx.activePlayers[playerID] !== "passCards") {
+  if (ctx.activePlayers[playerID] !== constants.phases.preHand.stages.passCards) {
     return INVALID_MOVE;
   } // Make sure they have selected three cards to pass.
 
@@ -69953,7 +69934,7 @@ function passCards(G, ctx, playerID, selectedCards) {
 
   var player = G.players[playerID];
 
-  for (var i; i < 3; i++) {
+  for (var i = 0; i < 3; i++) {
     if (!player.hand.some(function (c) {
       return c === selectedCards[i];
     })) {
@@ -69999,11 +69980,50 @@ function getPlayerIDs(ctx, playerID) {
   };
 }
 
+function checkPlayersHavePassed(G, ctx) {
+  console.debug("Checking players have passed.");
+  var allPassed = ctx.playOrder.every(function (playerID) {
+    // Make sure we have received some passes.
+    var receivedPass = G.players[playerID].receivedPass;
+
+    if (!receivedPass) {
+      return false;
+    } // Make sure we have received a pass from every player.
+
+
+    var playerIDs = getPlayerIDs(ctx, playerID);
+
+    if (!receivedPass[playerIDs.left]) {
+      return false;
+    }
+
+    if (!receivedPass[playerIDs.partner]) {
+      return false;
+    }
+
+    if (!receivedPass[playerIDs.right]) {
+      return false;
+    }
+
+    return true;
+  });
+
+  if (allPassed) {
+    console.debug("Setting stage to accept pass.");
+    ctx.events.setActivePlayers({
+      all: constants.phases.preHand.stages.acceptPass
+    });
+  }
+}
+
+function acceptPass(G, ctx, playerID) {}
+
 module.exports = {
   Tichu: tichu,
   sortCards: sortCards,
   removeFromHand: removeFromHand,
-  getPlayerIDs: getPlayerIDs
+  getPlayerIDs: getPlayerIDs,
+  constants: constants
 };
 
 /***/ }),
@@ -70090,6 +70110,10 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+var _require = __webpack_require__(/*! ./Game */ "./src/Game.js"),
+    constants = _require.constants;
+
 var PassArea = function PassArea(_ref) {
   var stage = _ref.stage,
       _ref$selectedCards = _ref.selectedCards,
@@ -70104,26 +70128,38 @@ var PassArea = function PassArea(_ref) {
     }
   }
 
-  if (stage !== "passCards" && stage !== "waitForPass" && stage !== "receivePass") {
+  if (stage !== constants.phases.preHand.stages.passCards && stage !== constants.phases.preHand.stages.waitForPass && stage !== constants.phases.preHand.stages.acceptPass) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "\xA0");
   }
+
+  var handleCardClicked = function handleCardClicked(cardID) {
+    if (stage === constants.phases.preHand.stages.passCards && onReturnPass) {
+      onReturnPass(cardID);
+    }
+  };
+
+  var handlePassConfirmed = function handlePassConfirmed() {
+    if (stage === constants.phases.preHand.stages.passCards && onPassConfirmed) {
+      onPassConfirmed();
+    }
+  };
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
     className: "pass-area"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Card__WEBPACK_IMPORTED_MODULE_1__["Card"], {
     cardID: displayCards[1],
-    onCardClicked: onReturnPass
+    onCardClicked: handleCardClicked
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Card__WEBPACK_IMPORTED_MODULE_1__["Card"], {
     cardID: displayCards[0],
-    onCardClicked: onReturnPass
+    onCardClicked: handleCardClicked
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Card__WEBPACK_IMPORTED_MODULE_1__["Card"], {
     cardID: displayCards[2],
-    onCardClicked: onReturnPass
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, stage === "passCards" && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_2__["Button"], {
+    onCardClicked: handleCardClicked
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, stage === constants.phases.preHand.stages.passCards && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_2__["Button"], {
     color: "primary",
     disabled: selectedCards.length !== 3,
-    onClick: onPassConfirmed
-  }, "Pass"), stage === "receivePass" && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_2__["Button"], {
+    onClick: handlePassConfirmed
+  }, "Pass"), stage === constants.phases.preHand.stages.acceptPass && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_2__["Button"], {
     color: "primary"
   }, "Accept")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null))));
 };

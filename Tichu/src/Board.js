@@ -3,7 +3,7 @@ import { Hand, OpponentHand, PartnerHand } from './Hand';
 import { PassArea } from './PassArea';
 import { FormGroup, Button } from 'reactstrap';
 import 'bootstrap';
-const { sortCards, removeFromHand, getPlayerIDs } = require('./Game');
+const { sortCards, removeFromHand, getPlayerIDs, constants } = require('./Game');
 
 export const TichuBoard = (props) => {
 
@@ -16,6 +16,7 @@ export const TichuBoard = (props) => {
 
     const player = G.players[playerID];
     var stage = ctx.activePlayers[playerID];
+    var playerIDs = getPlayerIDs(ctx, playerID);
 
     const [passedCards, setPassedCards] = useState([]);
     const [hand, setHand] = useState(player.hand);
@@ -39,7 +40,7 @@ export const TichuBoard = (props) => {
 
     const handleCardClicked = (cardID) => {
         switch (stage) {
-            case "passCards":
+            case constants.phases.preHand.stages.passCards:
                 if (passedCards.length < 3) {
                     setPassedCards([...passedCards, cardID]);
 
@@ -62,12 +63,18 @@ export const TichuBoard = (props) => {
     }
 
     const handlePassConfirmed = () => {
-        if (stage === "passCards" && passedCards.length === 3) {
+        if (stage === constants.phases.preHand.stages.passCards && passedCards.length === 3) {
             moves.passCards(playerID, passedCards);
         }
     }
 
-    var playerIDs = getPlayerIDs(ctx, playerID);
+    const receivedCards = []
+
+    if (stage === constants.phases.preHand.stages.acceptPass) {
+        receivedCards.push(player.receivedPass[playerIDs.left]);
+        receivedCards.push(player.receivedPass[playerIDs.partner]);
+        receivedCards.push(player.receivedPass[playerIDs.right]);
+    }
 
     // <Hand hand={G.players[playerID].hand} />
     return (
@@ -90,7 +97,7 @@ export const TichuBoard = (props) => {
                     <OpponentHand backs={G.public.players[playerIDs.left].cards} />
                 </div>
                 <div className="board-middle">
-                    <PassArea selectedCards={passedCards} stage={stage} onReturnPass={handleReturnPass} onPassConfirmed={handlePassConfirmed} />
+                    <PassArea selectedCards={stage === constants.phases.preHand.stages.passCards ? passedCards : receivedCards} stage={stage} onReturnPass={handleReturnPass} onPassConfirmed={handlePassConfirmed} />
                 </div>
                 <div className="board-side">
                     Player: {playerIDs.right}
@@ -104,7 +111,7 @@ export const TichuBoard = (props) => {
                 <div className="board-middle">
                     Player: {playerID}
                     <Hand hand={hand} onCardClicked={handleCardClicked} />
-                    {stage === "takeOrGrand" &&
+                    {stage === constants.phases.preHand.stages.takeOrGrand &&
                         <FormGroup>
                             <Button color="primary" className="mx-1" onClick={onGrandClicked}>Grand Tichu</Button>
                             <Button color="primary" className="mx-1" onClick={onTakeClicked}>Take</Button>

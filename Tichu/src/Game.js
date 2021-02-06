@@ -1,9 +1,21 @@
 const { INVALID_MOVE, PlayerView } = require('boardgame.io/core');
 var { cardDefinitions } = require('./Deck');
 
+const constants = {
+    phases: {
+        preHand: {
+            stages: {
+                takeOrGrand: "takeOrGrand",
+                passCards: "passCards",
+                waitForPass: "waitForPass",
+                acceptPass: "acceptPass"
+            }
+        }
+    }
+}
+
 const tichu = {
     setup: () => ({
-        cells: Array(9).fill(null), // TODO: Delete
         secret: {
             deck: generateDeck(56)
         },
@@ -55,13 +67,13 @@ const tichu = {
     },
 
     phases: {
-        first8: {
+        preHand: {
             onBegin: (G, ctx) => {
                 console.log("first8 onBegin");
                 G.secret.deck = ctx.random.Shuffle(G.secret.deck);
                 console.debug("first8 done shuffling");
                 dealCards(G, 8);
-                ctx.events.setActivePlayers({ all: "takeOrGrand" });
+                ctx.events.setActivePlayers({ all: constants.phases.preHand.stages.takeOrGrand });
                 return G;
             },
             moves: {
@@ -75,65 +87,32 @@ const tichu = {
                             callGrand: callGrand,
                             takeCards: takeCards
                         },
-                        next: "passCards"
+                        next: constants.phases.preHand.stages.passCards
                     },
                     passCards: {
                         moves: {
                             passCards: passCards
                         },
-                        next: "waitForPass"
+                        next: constants.phases.preHand.stages.waitForPass
                     },
                     waitForPass: {
-
+                        next: constants.phases.preHand.stages.acceptPass
+                    },
+                    acceptPass: {
+                        moves: {
+                            acceptPass: acceptPass
+                        }
                     }
-                }
+                },
+                onMove: checkPlayersHavePassed
             },
             start: true
-        }
-    },
-
-    moves: {
-        clickCell: (G, ctx, id) => {
-            if (G.cells[id] !== null) {
-                return INVALID_MOVE;
-            }
-            G.cells[id] = ctx.currentPlayer;
-        },
-    },
-
-    endIf: (G, ctx) => {
-        if (IsVictory(G.cells)) {
-            return { winner: ctx.currentPlayer };
-        }
-
-        if (IsDraw(G.cells)) {
-            return { draw: true };
         }
     },
 
     minPlayers: 4,
     maxPlayers: 4
 };
-
-// Return true if `cells` is in a winning configuration.
-function IsVictory(cells) {
-    const positions = [
-        [0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6],
-        [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]
-    ];
-
-    const isRowComplete = row => {
-        const symbols = row.map(i => cells[i]);
-        return symbols.every(i => i !== null && i === symbols[0]);
-    };
-
-    return positions.map(isRowComplete).some(i => i === true);
-}
-
-// Return true if all `cells` are occupied.
-function IsDraw(cells) {
-    return cells.filter(c => c === null).length === 0;
-}
 
 
 function generateDeck(size) {
@@ -197,7 +176,7 @@ function takeCards(G, ctx, playerID) {
 
 function passCards(G, ctx, playerID, selectedCards) {
     // Check the player is on the passCards stage
-    if (ctx.activePlayers[playerID] !== "passCards") {
+    if (ctx.activePlayers[playerID] !== constants.phases.preHand.stages.passCards) {
         return INVALID_MOVE;
     }
 
@@ -208,7 +187,7 @@ function passCards(G, ctx, playerID, selectedCards) {
 
     // Make sure all the cards they've selected are in their hand.
     var player = G.players[playerID];
-    for (var i; i < 3; i++) {
+    for (var i = 0; i < 3; i++) {
         if (!player.hand.some((c) => c === selectedCards[i])) {
             return INVALID_MOVE;
         }
@@ -251,9 +230,34 @@ function getPlayerIDs(ctx, playerID) {
     };
 }
 
+function checkPlayersHavePassed(G, ctx) {
+    console.debug(`Checking players have passed.`);
+    var allPassed = ctx.playOrder.every((playerID) => {
+        // Make sure we have received some passes.
+        var receivedPass = G.players[playerID].receivedPass;
+        if (!receivedPass) { return false; }
+
+        // Make sure we have received a pass from every player.
+        var playerIDs = getPlayerIDs(ctx, playerID);
+        if (!receivedPass[playerIDs.left]) { return false; }
+        if (!receivedPass[playerIDs.partner]) { return false; }
+        if (!receivedPass[playerIDs.right]) { return false; }
+
+        return true;
+    });
+    if (allPassed) {
+        console.debug("Setting stage to accept pass.");
+        ctx.events.setActivePlayers({ all: constants.phases.preHand.stages.acceptPass });
+    }
+}
+
+function acceptPass(G, ctx, playerID) {
+}
+
 module.exports = {
     Tichu: tichu,
     sortCards: sortCards,
     removeFromHand: removeFromHand,
-    getPlayerIDs: getPlayerIDs
+    getPlayerIDs: getPlayerIDs,
+    constants: constants
 }
