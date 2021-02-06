@@ -32,12 +32,65 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="app.jsx">
-      <SubType>Code</SubType>
-    </Content>
     <Content Include="babel.config.json">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="images\s_mahjong.png" />
+    <Content Include="images\s_phoenix.png" />
+    <Content Include="images\s_dog.png" />
+    <Content Include="images\s_dragon.png" />
+    <Content Include="images\b10.png" />
+    <Content Include="images\b11.png" />
+    <Content Include="images\b12.png" />
+    <Content Include="images\b13.png" />
+    <Content Include="images\b14.png" />
+    <Content Include="images\b02.png" />
+    <Content Include="images\b03.png" />
+    <Content Include="images\b04.png" />
+    <Content Include="images\b05.png" />
+    <Content Include="images\b06.png" />
+    <Content Include="images\b07.png" />
+    <Content Include="images\b08.png" />
+    <Content Include="images\b09.png" />
+    <Content Include="images\g02.png" />
+    <Content Include="images\g03.png" />
+    <Content Include="images\g04.png" />
+    <Content Include="images\g05.png" />
+    <Content Include="images\g06.png" />
+    <Content Include="images\g07.png" />
+    <Content Include="images\g08.png" />
+    <Content Include="images\g09.png" />
+    <Content Include="images\g10.png" />
+    <Content Include="images\g11.png" />
+    <Content Include="images\g12.png" />
+    <Content Include="images\g13.png" />
+    <Content Include="images\g14.png" />
+    <Content Include="images\k02.png" />
+    <Content Include="images\k03.png" />
+    <Content Include="images\k04.png" />
+    <Content Include="images\k05.png" />
+    <Content Include="images\k06.png" />
+    <Content Include="images\k07.png" />
+    <Content Include="images\k08.png" />
+    <Content Include="images\k09.png" />
+    <Content Include="images\k10.png" />
+    <Content Include="images\k11.png" />
+    <Content Include="images\k12.png" />
+    <Content Include="images\k13.png" />
+    <Content Include="images\k14.png" />
+    <Content Include="images\r02.png" />
+    <Content Include="images\r03.png" />
+    <Content Include="images\r04.png" />
+    <Content Include="images\r05.png" />
+    <Content Include="images\r06.png" />
+    <Content Include="images\r07.png" />
+    <Content Include="images\r08.png" />
+    <Content Include="images\r09.png" />
+    <Content Include="images\r10.png" />
+    <Content Include="images\r11.png" />
+    <Content Include="images\r12.png" />
+    <Content Include="images\r13.png" />
+    <Content Include="images\r14.png" />
     <Content Include="index.html">
       <SubType>Code</SubType>
     </Content>
@@ -50,7 +103,16 @@
     <Content Include="src\Board.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="src\Card.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="src\Deck.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="src\Game.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="styles\tichu.css">
       <SubType>Code</SubType>
     </Content>
     <Content Include="tsconfig.json">
@@ -66,6 +128,8 @@
     </TypeScriptCompile>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="images\" />
+    <Folder Include="styles\" />
     <Folder Include="src\" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />

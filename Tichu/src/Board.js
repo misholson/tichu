@@ -1,4 +1,6 @@
 import React from 'react';
+import { cardDefinitions } from './Deck';
+import { Card } from './Card';
 
 export const TicTacToeBoard = (props) => {
 
@@ -16,22 +18,14 @@ export const TicTacToeBoard = (props) => {
                 );
     }
 
-    const cellStyle = {
-        border: '1px solid #555',
-        width: '50px',
-        height: '50px',
-        lineHeight: '50px',
-        textAlign: 'center',
-    };
-
     let tbody = [];
     for (let i = 0; i < 3; i++) {
         let cells = [];
         for (let j = 0; j < 3; j++) {
             const id = 3 * i + j;
             cells.push(
-                <td style={cellStyle} key={id} onClick={() => onClick(id)}>
-                    {props.G.cells[id]}
+                <td key={id} onClick={() => onClick(id)}>
+                    <Card card={cardDefinitions[id]} />
                 </td>
             );
         }

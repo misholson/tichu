@@ -38417,6 +38417,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TicTacToeBoard", function() { return TicTacToeBoard; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Deck__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Deck */ "./src/Deck.js");
+/* harmony import */ var _Card__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Card */ "./src/Card.js");
+
+
 
 var TicTacToeBoard = function TicTacToeBoard(props) {
   var _onClick = function onClick(id) {
@@ -38433,13 +38437,6 @@ var TicTacToeBoard = function TicTacToeBoard(props) {
     }, "Draw!");
   }
 
-  var cellStyle = {
-    border: '1px solid #555',
-    width: '50px',
-    height: '50px',
-    lineHeight: '50px',
-    textAlign: 'center'
-  };
   var tbody = [];
 
   for (var i = 0; i < 3; i++) {
@@ -38448,12 +38445,13 @@ var TicTacToeBoard = function TicTacToeBoard(props) {
     var _loop = function _loop(j) {
       var id = 3 * i + j;
       cells.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", {
-        style: cellStyle,
         key: id,
         onClick: function onClick() {
           return _onClick(id);
         }
-      }, props.G.cells[id]));
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Card__WEBPACK_IMPORTED_MODULE_2__["Card"], {
+        card: _Deck__WEBPACK_IMPORTED_MODULE_1__["cardDefinitions"][id]
+      })));
     };
 
     for (var j = 0; j < 3; j++) {
@@ -38469,6 +38467,113 @@ var TicTacToeBoard = function TicTacToeBoard(props) {
     id: "board"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, tbody)), winner);
 };
+
+/***/ }),
+
+/***/ "./src/Card.js":
+/*!*********************!*\
+  !*** ./src/Card.js ***!
+  \*********************/
+/*! exports provided: Card */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Card", function() { return Card; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+
+var Card = function Card(_ref) {
+  var card = _ref.card;
+  var style = {
+    backgroundImage: "url(\"/images/".concat(card.image, "\")"),
+    backgroundPosition: "center",
+    backgroundSize: "cover"
+  };
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "card",
+    style: style
+  });
+};
+
+/***/ }),
+
+/***/ "./src/Deck.js":
+/*!*********************!*\
+  !*** ./src/Deck.js ***!
+  \*********************/
+/*! exports provided: cardDefinitions */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cardDefinitions", function() { return cardDefinitions; });
+var suits = [{
+  suit: "pagodas",
+  imagePrefix: "b"
+}, {
+  suit: "jade",
+  imagePrefix: "g"
+}, {
+  suit: "swords",
+  imagePrefix: "k"
+}, {
+  suit: "stars",
+  imagePrefix: "r"
+}];
+
+var generateDeck = function generateDeck() {
+  var cards = []; // Loop over the 4 suits
+
+  for (var iSuit = 0; iSuit < 4; iSuit++) {
+    var suit = suits[iSuit]; // Loop over 2 to 14 (Ace) in each suit
+
+    for (var iRank = 2; iRank <= 14; iRank++) {
+      var imgNo = iRank.toString();
+
+      if (iRank < 10) {
+        imgNo = '0' + imgNo;
+      } // This shouldn't be so complicated in js!
+
+
+      cards.push({
+        isSpecial: false,
+        rank: iRank,
+        suit: suit.suit,
+        image: "".concat(suit.imagePrefix).concat(imgNo, ".png")
+      });
+    }
+  } // Specials
+
+
+  cards.push({
+    isSpecial: true,
+    rank: 15,
+    suit: "dragon",
+    image: "s_dragon.png"
+  });
+  cards.push({
+    isSpecial: true,
+    rank: 14.5,
+    suit: "phoenix",
+    image: "s_phoenix.png"
+  });
+  cards.push({
+    isSpecial: true,
+    rank: -1,
+    suit: "dog",
+    image: "s_dog.png"
+  });
+  cards.push({
+    isSpecial: true,
+    rank: 1,
+    suit: "mahjong",
+    image: "s_mahjong.png"
+  });
+  return cards;
+};
+
+var cardDefinitions = generateDeck();
 
 /***/ }),
 
