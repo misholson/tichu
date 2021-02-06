@@ -35,6 +35,8 @@
     <Content Include="babel.config.json">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="images\back.png" />
+    <Content Include="images\back_rotated.jpg" />
     <Content Include="images\s_mahjong.png" />
     <Content Include="images\s_phoenix.png" />
     <Content Include="images\s_dog.png" />
@@ -110,6 +112,12 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="src\Game.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="src\Hand.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="src\PassArea.js">
       <SubType>Code</SubType>
     </Content>
     <Content Include="styles\tichu.css">

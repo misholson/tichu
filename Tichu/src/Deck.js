@@ -1,24 +1,28 @@
 
 const suits = [
     {
-        suit: "pagodas",
+        suit: 0,
+        suitName: "pagodas",
         imagePrefix: "b"
     },
     {
-        suit: "jade",
+        suit: 1,
+        suitName: "jade",
         imagePrefix: "g",
     },
     {
-        suit: "swords",
+        suit: 2,
+        suitName: "swords",
         imagePrefix: "k"
     },
     {
-        suit: "stars",
+        suit: 3,
+        suitName: "stars",
         imagePrefix: "r"
     }
 ];
 
-const generateDeck = () => {
+const generateCardDefinitions = () => {
     let cards = [];
 
     // Loop over the 4 suits
@@ -67,4 +71,5 @@ const generateDeck = () => {
     return cards;
 }
 
-export const cardDefinitions = generateDeck();
+
+module.exports.cardDefinitions = generateCardDefinitions();

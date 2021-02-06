@@ -1,43 +1,76 @@
 import React from 'react';
-import { cardDefinitions } from './Deck';
-import { Card } from './Card';
+import { Hand } from './Hand';
+import { FormGroup, Button } from 'reactstrap';
+import 'bootstrap';
+const { getPartner } = require('./Game');
 
-export const TicTacToeBoard = (props) => {
+export const TichuBoard = (props) => {
 
-    const onClick = (id) => {
-        props.moves.clickCell(id);
+    const {
+        G,
+        ctx,
+        moves,
+        playerID
+    } = props;
+
+    const player = G.players[playerID];
+
+    const onGrandClicked = () => {
+        moves.callGrand(playerID);
     }
 
-    let winner = '';
-    if (props.ctx.gameover) {
-        winner =
-            props.ctx.gameover.winner !== undefined ? (
-                <div id="winner">Winner: {props.ctx.gameover.winner}</div>
-            ) : (
-                    <div id="winner">Draw!</div>
-                );
+    const onTakeClicked = () => {
+        moves.takeCards(playerID);
     }
 
-    let tbody = [];
-    for (let i = 0; i < 3; i++) {
-        let cells = [];
-        for (let j = 0; j < 3; j++) {
-            const id = 3 * i + j;
-            cells.push(
-                <td key={id} onClick={() => onClick(id)}>
-                    <Card card={cardDefinitions[id]} />
-                </td>
-            );
-        }
-        tbody.push(<tr key={i}>{cells}</tr>);
+    var stage = ctx.activePlayers[playerID];
+
+    const handleCardClicked = (cardID) => {
+
     }
 
+    // <Hand hand={G.players[playerID].hand} />
     return (
-        <div>
-            <table id="board">
-                <tbody>{tbody}</tbody>
-            </table>
-            {winner}
+        <div className="board">
+            <div className="board-row">
+                <div className="board-side">
+                    Empty
+                </div>
+                <div className="board-middle">
+                    <Hand backs={G.public.players[getPartner(playerID)].cards} />
+                </div>
+                <div className="board-side">
+                    Empty
+                </div>
+            </div>
+            <div className="board-row">
+                <div className="board-side">
+                    Left Opponent
+                </div>
+                <div className="board-middle">
+                    Play Area
+                </div>
+                <div className="board-side">
+                    Right Opponent
+                </div>
+            </div>
+            <div className="board-row">
+                <div className="board-side">
+                    Empty
+                </div>
+                <div className="board-middle">
+                    <Hand hand={player.hand} onCardClicked={handleCardClicked} />
+                    {stage === "takeOrGrand" &&
+                        <FormGroup>
+                            <Button color="primary" className="mx-1" onClick={onGrandClicked}>Grand Tichu</Button>
+                            <Button color="primary" className="mx-1" onClick={onTakeClicked}>Take</Button>
+                        </FormGroup>
+                    }
+                </div>
+                <div className="board-side">
+                    Empty
+                </div>
+            </div>
         </div>
     );
 }

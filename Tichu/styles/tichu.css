@@ -1,7 +1,41 @@
-.card {
+.hand .card {
     width: 80px;
     height: 120px;
     border: 1px solid black;
     border-radius: 5px;
     box-shadow: 1px 1px 5px #555;
+    float: left;
+    margin-left: -40px;
+}
+
+.hand .selectedCard {
+    padding-bottom: 20px;
+}
+
+ul.hand {
+    list-style: none;
+}
+
+.board {
+    border: 1px solid black;
+    height: 800px; /* Can I make this more dynamic later?*/
+    width: 1200px;
+}
+
+.board-row {
+    height: 30%;
+}
+
+.board-row div {
+    float: left;
+}
+
+.board-side {
+    border: 1px solid gray;
+    width: 15%;
+}
+
+.board-middle {
+    border: 1px solid gray;
+    width: 70%;
 }
