@@ -245,6 +245,7 @@ function checkPlayersHavePassed(G, ctx) {
 
     // onMove runs on all stages, so make sure that all players are in the passCards or waitForPass stage before really checking this.
     if (!Object.values(ctx.activePlayers).every((stage) => stage === constants.phases.preHand.stages.passCards || stage === constants.phases.preHand.stages.waitForPass)) {
+        console.debug("All players must be in the passCards or waitForPass stage before checking if pass is complete.");
         return;
     }
     
@@ -285,23 +286,19 @@ function checkPlayersHavePassed(G, ctx) {
 }
 
 function acceptPass(G, ctx, playerID) {
-    console.debug("acceptPass 1");
+    console.debug("acceptPass");
     var player = G.players[playerID];
 
-    console.debug("acceptPass 2");
     // Integrate the received cards into your hand.
     Object.values(player.receivedPass).forEach((card) => { player.hand.push(card); });
     sortCards(player.hand);
 
-    console.debug("acceptPass 3");
     // Update the number of cards the player has in their hand.
     G.public.players[playerID].cards = 14;
 
-    console.debug("acceptPass 4");
     // Note that the player is ready to play.
     G.public.players[playerID].readyToPlay = true;
 
-    console.debug("acceptPass 5");
     if (Object.values(G.public.players).every((publicPlayerData) => publicPlayerData.readyToPlay)) {
         console.debug("All players have accepted their pass. Ending phase.");
         ctx.events.endPhase();
