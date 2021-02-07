@@ -4,11 +4,18 @@ var { cardDefinitions } = require('./Deck');
 const constants = {
     phases: {
         preHand: {
+            name: "preHand",
             stages: {
                 takeOrGrand: "takeOrGrand",
                 passCards: "passCards",
                 waitForPass: "waitForPass",
                 acceptPass: "acceptPass"
+            }
+        },
+        primaryPlay: {
+            name: "primaryPlay",
+            stages: {
+
             }
         }
     }
@@ -106,7 +113,10 @@ const tichu = {
                 },
                 onMove: checkPlayersHavePassed
             },
+            next: constants.phases.primaryPlay.name,
             start: true
+        },
+        primaryPlay: {
         }
     },
 
@@ -232,19 +242,42 @@ function getPlayerIDs(ctx, playerID) {
 
 function checkPlayersHavePassed(G, ctx) {
     console.debug(`Checking players have passed.`);
+
+    // onMove runs on all stages, so make sure that all players are in the passCards or waitForPass stage before really checking this.
+    if (!Object.values(ctx.activePlayers).every((stage) => stage === constants.phases.preHand.stages.passCards || stage === constants.phases.preHand.stages.waitForPass)) {
+        return;
+    }
+    
     var allPassed = ctx.playOrder.every((playerID) => {
         // Make sure we have received some passes.
-        var receivedPass = G.players[playerID].receivedPass;
-        if (!receivedPass) { return false; }
+        console.log(G.players[playerID])
+        var player = G.players[playerID];
+        //console.log(player);
+        var receivedPass = player.receivedPass;
+        console.log(receivedPass);
+        if (!receivedPass) {
+            console.debug(`checkPlayersHavePassed: Player ${playerID} id has received no cards`);
+            return false;
+        }
 
         // Make sure we have received a pass from every player.
         var playerIDs = getPlayerIDs(ctx, playerID);
-        if (!receivedPass[playerIDs.left]) { return false; }
-        if (!receivedPass[playerIDs.partner]) { return false; }
-        if (!receivedPass[playerIDs.right]) { return false; }
+        if (!(receivedPass[playerIDs.left] >= 0)) {
+            console.debug(`checkPlayersHavePassed: Player ${playerIDs.left} (left) has not passed to player ${playerID}`)
+            return false;
+        }
+        if (!(receivedPass[playerIDs.partner] >= 0)) {
+            console.debug(`checkPlayersHavePassed: Player ${playerIDs.partner} (partner) has not passed to player ${playerID}`)
+            return false;
+        }
+        if (!(receivedPass[playerIDs.right] >= 0)) {
+            console.debug(`checkPlayersHavePassed: Player ${playerIDs.right} (right) has not passed to player ${playerID}`)
+            return false;
+        }
 
         return true;
     });
+    console.debug(`allPassed: ${allPassed}`)
     if (allPassed) {
         console.debug("Setting stage to accept pass.");
         ctx.events.setActivePlayers({ all: constants.phases.preHand.stages.acceptPass });
@@ -252,6 +285,27 @@ function checkPlayersHavePassed(G, ctx) {
 }
 
 function acceptPass(G, ctx, playerID) {
+    console.debug("acceptPass 1");
+    var player = G.players[playerID];
+
+    console.debug("acceptPass 2");
+    // Integrate the received cards into your hand.
+    Object.values(player.receivedPass).forEach((card) => { player.hand.push(card); });
+    sortCards(player.hand);
+
+    console.debug("acceptPass 3");
+    // Update the number of cards the player has in their hand.
+    G.public.players[playerID].cards = 14;
+
+    console.debug("acceptPass 4");
+    // Note that the player is ready to play.
+    G.public.players[playerID].readyToPlay = true;
+
+    console.debug("acceptPass 5");
+    if (Object.values(G.public.players).every((publicPlayerData) => publicPlayerData.readyToPlay)) {
+        console.debug("All players have accepted their pass. Ending phase.");
+        ctx.events.endPhase();
+    }
 }
 
 module.exports = {

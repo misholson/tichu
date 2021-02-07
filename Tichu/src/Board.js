@@ -15,7 +15,10 @@ export const TichuBoard = (props) => {
     } = props;
 
     const player = G.players[playerID];
-    var stage = ctx.activePlayers[playerID];
+    var stage = null;
+    if (ctx.activePlayers) {
+        stage = ctx.activePlayers[playerID];
+    }
     var playerIDs = getPlayerIDs(ctx, playerID);
 
     const [passedCards, setPassedCards] = useState([]);
@@ -68,6 +71,10 @@ export const TichuBoard = (props) => {
         }
     }
 
+    const handleAcceptConfirmed = () => {
+        moves.acceptPass(playerID);
+    }
+
     const receivedCards = []
 
     if (stage === constants.phases.preHand.stages.acceptPass) {
@@ -97,7 +104,7 @@ export const TichuBoard = (props) => {
                     <OpponentHand backs={G.public.players[playerIDs.left].cards} />
                 </div>
                 <div className="board-middle">
-                    <PassArea selectedCards={stage === constants.phases.preHand.stages.passCards ? passedCards : receivedCards} stage={stage} onReturnPass={handleReturnPass} onPassConfirmed={handlePassConfirmed} />
+                    <PassArea selectedCards={stage === constants.phases.preHand.stages.passCards ? passedCards : receivedCards} stage={stage} onReturnPass={handleReturnPass} onPassConfirmed={handlePassConfirmed} onAcceptConfirmed={handleAcceptConfirmed} />
                 </div>
                 <div className="board-side">
                     Player: {playerIDs.right}

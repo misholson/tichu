@@ -3,7 +3,7 @@ import { Card } from './Card';
 import { Button } from 'reactstrap';
 const { constants } = require('./Game');
 
-export const PassArea = ({ stage, selectedCards = [], onReturnPass, onPassConfirmed }) => {
+export const PassArea = ({ stage, selectedCards = [], onReturnPass, onPassConfirmed, onAcceptConfirmed }) => {
 
     var displayCards = Array(3).fill("back");
     for (var i = 0; i < 3; i++) {
@@ -29,6 +29,12 @@ export const PassArea = ({ stage, selectedCards = [], onReturnPass, onPassConfir
         }
     }
 
+    const handleAcceptConfirmed = () => {
+        if (stage === constants.phases.preHand.stages.acceptPass && onAcceptConfirmed) {
+            onAcceptConfirmed();
+        }
+    }
+
     return (
         <table className="pass-area">
             <tbody>
@@ -46,7 +52,7 @@ export const PassArea = ({ stage, selectedCards = [], onReturnPass, onPassConfir
                     <td></td>
                     <td>
                         {stage === constants.phases.preHand.stages.passCards && <Button color="primary" disabled={selectedCards.length !== 3} onClick={handlePassConfirmed}>Pass</Button>}
-                        {stage === constants.phases.preHand.stages.acceptPass && <Button color="primary">Accept</Button>}
+                        {stage === constants.phases.preHand.stages.acceptPass && <Button color="primary" onClick={handleAcceptConfirmed}>Accept</Button>}
                     </td>
                     <td></td>
                 </tr>
