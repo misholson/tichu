@@ -133,6 +133,9 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="src\PrimaryPlay.js" />
+    <Content Include="src\ValidPlays.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="styles\tichu.css">
       <SubType>Code</SubType>
     </Content>

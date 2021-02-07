@@ -6,6 +6,7 @@ import { FormGroup, Button } from 'reactstrap';
 import 'bootstrap';
 const { sortCards, removeFromHand, getPlayerIDs, addToHand } = require('./Helpers');
 const { constants } = require('./Constants');
+const { isValidPlay, detectPlayType } = require('./ValidPlays');
 
 export const TichuBoard = (props) => {
 
@@ -73,6 +74,9 @@ export const TichuBoard = (props) => {
         }
     }
 
+    // See what kind of play is selected.
+    var selectedPlayType = detectPlayType(selectedCards);
+
     const handleReturnPass = (cardID) => {
         setPassedCards(removeFromHand(passedCards, cardID));
 
@@ -122,7 +126,7 @@ export const TichuBoard = (props) => {
                 </div>
                 <div className="board-middle">
                     {phase === constants.phases.preHand.name && <PassArea selectedCards={stage === constants.phases.preHand.stages.passCards ? passedCards : receivedCards} stage={stage} readyToPlay={G.public.players[playerID].readyToPlay} onReturnPass={handleReturnPass} onPassConfirmed={handlePassConfirmed} onAcceptConfirmed={handleAcceptConfirmed} />}
-                    {phase === constants.phases.primaryPlay.name && <>Primary Play</>}
+                    {phase === constants.phases.primaryPlay.name && <>Selected Play Type: {selectedPlayType?.name}<br />{selectedPlayType?.isValid(selectedCards) ? "VALID" : "INVALID"}</>}
                 </div>
                 <div className="board-side">
                     <Player playerID={playerIDs.right} phase={phase} currentPlayer={ctx.currentPlayer} />

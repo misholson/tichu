@@ -69469,6 +69469,10 @@ var _require = __webpack_require__(/*! ./Helpers */ "./src/Helpers.js"),
 var _require2 = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
     constants = _require2.constants;
 
+var _require3 = __webpack_require__(/*! ./ValidPlays */ "./src/ValidPlays.js"),
+    isValidPlay = _require3.isValidPlay,
+    detectPlayType = _require3.detectPlayType;
+
 var TichuBoard = function TichuBoard(props) {
   var G = props.G,
       ctx = props.ctx,
@@ -69543,7 +69547,10 @@ var TichuBoard = function TichuBoard(props) {
     } else if (phase === constants.phases.primaryPlay.name && playerID === ctx.currentPlayer) {
       selectCardForPlay(cardID);
     }
-  };
+  }; // See what kind of play is selected.
+
+
+  var selectedPlayType = detectPlayType(selectedCards);
 
   var handleReturnPass = function handleReturnPass(cardID) {
     setPassedCards(removeFromHand(passedCards, cardID)); // Add the card back into your hand.
@@ -69606,7 +69613,7 @@ var TichuBoard = function TichuBoard(props) {
     onReturnPass: handleReturnPass,
     onPassConfirmed: handlePassConfirmed,
     onAcceptConfirmed: handleAcceptConfirmed
-  }), phase === constants.phases.primaryPlay.name && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "Primary Play")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+  }), phase === constants.phases.primaryPlay.name && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "Selected Play Type: ", selectedPlayType === null || selectedPlayType === void 0 ? void 0 : selectedPlayType.name, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), selectedPlayType !== null && selectedPlayType !== void 0 && selectedPlayType.isValid(selectedCards) ? "VALID" : "INVALID")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-side"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Player__WEBPACK_IMPORTED_MODULE_2__["Player"], {
     playerID: playerIDs.right,
@@ -70450,6 +70457,218 @@ module.exports = {
   onHandStart: onHandStart,
   onTurnBegin: onTurnBegin,
   findStartPlayer: findStartPlayer
+};
+
+/***/ }),
+
+/***/ "./src/ValidPlays.js":
+/*!***************************!*\
+  !*** ./src/ValidPlays.js ***!
+  \***************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var _require = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boardgame.io/dist/esm/core.js"),
+    INVALID_MOVE = _require.INVALID_MOVE;
+
+var _require2 = __webpack_require__(/*! ./Helpers */ "./src/Helpers.js"),
+    sortCards = _require2.sortCards,
+    removeFromHand = _require2.removeFromHand,
+    getPlayerIDs = _require2.getPlayerIDs;
+
+var _require3 = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
+    constants = _require3.constants;
+
+var _require4 = __webpack_require__(/*! ./Deck */ "./src/Deck.js"),
+    cardDefinitions = _require4.cardDefinitions;
+
+var validPlays = {
+  single: {
+    name: "Single",
+    isValid: isValidSingle
+  },
+  pair: {
+    name: "Pair",
+    isValid: isValidPair
+  },
+  threeOfAKind: {
+    name: "Three of a Kind",
+    isValid: isValidThreeOfAKind
+  },
+  steppedPairs: {
+    name: "Stepped Pairs",
+    isValid: function isValid() {
+      return false;
+    }
+  },
+  fullHouse: {
+    name: "Full House",
+    isValid: function isValid() {
+      return false;
+    }
+  },
+  straight: {
+    name: "Straight",
+    isValid: function isValid() {
+      return false;
+    }
+  },
+  fourOfAKind: {
+    name: "4 Bomb",
+    isValid: isValid4Bomb,
+    isBomb: true
+  },
+  straightFlush: {
+    name: "Straight Flush Bomb",
+    isValid: function isValid() {
+      return false;
+    },
+    isBomb: true
+  },
+  dog: {
+    name: "Dog",
+    isValid: isValidDog
+  },
+  invalid: {
+    name: "Invalid",
+    isValid: function isValid() {
+      return false;
+    }
+  }
+};
+module.exports = {
+  validPlays: validPlays,
+  isValidPlay: isValidPlay,
+  detectPlayType: detectPlayType
+};
+
+function detectPlayType(selectedCards) {
+  if (!selectedCards || selectedCards.length === 0) {
+    return validPlays.invalid;
+  }
+
+  return Object.values(validPlays).find(function (playType) {
+    return playType.isValid(selectedCards);
+  }) || validPlays.invalid;
+}
+
+function isValidPlay(selectedCards, currentTrick) {
+  var type = currentTrick === null || currentTrick === void 0 ? void 0 : currentTrick.type;
+
+  if (!type) {
+    type = detectPlayType(selectedCards);
+  }
+
+  return type(selectedCards, currentTrick);
+}
+
+function isValidSingle(selectedCards, currentTrick) {
+  // Only one card can be selected
+  if (!selectedCards || selectedCards.length !== 1) {
+    return false;
+  } // Cannot select the dog
+
+
+  if (selectedCards[0] === constants.specials.dog) {
+    return false;
+  } // If nothing currently played, everything else is valid.
+
+
+  if (!(currentTrick !== null && currentTrick !== void 0 && currentTrick.plays) || currentTrick.plays.length === 0) {
+    return true;
+  } // Otherwise, it has to be higher in rank than the most recent play.
+
+
+  var currentHighest = currentTrick.plays[0][0]; // If the current highest is a phoenix then we need to beat the next highest card.
+
+  if (currentHighest === constants.specials.phoenix) {
+    // The phoenix is the only card played, so a 2 beats it.
+    if (currentTrick.plays.length === 1) {
+      return cardDefinitions[selectedCards[0]].rank >= 2;
+    } else {
+      // Find the next card under the phoenix and make sure we beat that.
+      return cardDefinitions[selectedCards[0]].rank > cardDefinitions[currentTrick.plays[1][0]].rank;
+    }
+  } // If the card being played is a phoenix then it beats anything but a dragon.
+
+
+  if (selectedCards[0] === constants.specials.phoenix) {
+    return currentTrick.plays[0][0] !== constants.specials.dragon;
+  } // It's not a phoenix, so we can just check the rank.
+
+
+  return cardDefinitions[selectedCards[0]].rank > cardDefinitions[currentHighest].rank;
+}
+
+function isValidDog(selectedCards, currentTrick) {
+  if (!selectedCards || selectedCards.length !== 1) {
+    return false;
+  } // Only the first play of a trick can be the dog.
+
+
+  if (currentTrick && currentTrick.plays && currentTrick.plays.length > 0) {
+    return false;
+  } // Works
+
+
+  return selectedCards[0] === constants.specials.dog;
+}
+
+function isValidPair(selectedCards, currentTrick) {
+  return isValidMultiCardSet(selectedCards, currentTrick, 2);
+}
+
+function isValidThreeOfAKind(selectedCards, currentTrick) {
+  return isValidMultiCardSet(selectedCards, currentTrick, 3);
+}
+
+function isValid4Bomb(selectedCards, currentTrick) {
+  return isValidMultiCardSet(selectedCards, currentTrick, 4);
+}
+
+function isValidMultiCardSet(selectedCards, currentTrick, length) {
+  // Only do pairs, three of a kind, and four of a kind
+  if (selectedCards.length < 2 || selectedCards.length > 4) {
+    return false;
+  }
+
+  if (!selectedCards || selectedCards.length !== length) {
+    return false;
+  } // If any card is a special other than the phoenix, it's not valid.
+
+
+  if (selectedCards.some(function (c) {
+    return isNonPhoenixSpecial(c);
+  })) {
+    return false;
+  } // Sort the selection.
+
+
+  sortCards(selectedCards); // Because phoenix has a rank of 14.5 it will always be first in a sorted list if it's present, so grab the last card as the reference.
+
+  var checkRank = rank(selectedCards[selectedCards.length - 1]);
+  return selectedCards.every(function (c) {
+    if (length !== 4 && c === constants.specials.phoenix) {
+      return true;
+    } else if (rank(c) === checkRank) {
+      return true;
+    }
+
+    return false;
+  });
+}
+
+function rank(card) {
+  return cardDefinitions[card].rank;
+}
+
+function isNonPhoenixSpecial(card) {
+  return card === constants.specials.dog || card === constants.specials.dragon || card === constants.specials.mahjong;
+}
+
+var currentTrickExample = {
+  type: "typeFunction",
+  plays: [["play n"], ["play n-1"], ["..."], ["play 0"]]
 };
 
 /***/ }),
