@@ -33,12 +33,14 @@ export const TichuBoard = (props) => {
         moves.takeCards(playerID);
     }
 
+    var readyToPlay = G.public.players[playerID].readyToPlay;
+
     // If the game stage or phase changes, refresh the hand from the game state.
     useEffect(() => {
         setHand(() => {
             return [...player.hand];
         })
-    }, [stage]);
+    }, [stage, readyToPlay]);
 
 
     const handleCardClicked = (cardID) => {
@@ -83,7 +85,6 @@ export const TichuBoard = (props) => {
         receivedCards.push(player.receivedPass[playerIDs.right]);
     }
 
-    // <Hand hand={G.players[playerID].hand} />
     return (
         <div className="board">
             <div className="board-row">
@@ -104,7 +105,7 @@ export const TichuBoard = (props) => {
                     <OpponentHand backs={G.public.players[playerIDs.left].cards} />
                 </div>
                 <div className="board-middle">
-                    <PassArea selectedCards={stage === constants.phases.preHand.stages.passCards ? passedCards : receivedCards} stage={stage} onReturnPass={handleReturnPass} onPassConfirmed={handlePassConfirmed} onAcceptConfirmed={handleAcceptConfirmed} />
+                    <PassArea selectedCards={stage === constants.phases.preHand.stages.passCards ? passedCards : receivedCards} stage={stage} readyToPlay={G.public.players[playerID].readyToPlay} onReturnPass={handleReturnPass} onPassConfirmed={handlePassConfirmed} onAcceptConfirmed={handleAcceptConfirmed} />
                 </div>
                 <div className="board-side">
                     Player: {playerIDs.right}

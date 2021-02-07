@@ -69494,14 +69494,15 @@ var TichuBoard = function TichuBoard(props) {
 
   var onTakeClicked = function onTakeClicked() {
     moves.takeCards(playerID);
-  }; // If the game stage or phase changes, refresh the hand from the game state.
+  };
 
+  var readyToPlay = G["public"].players[playerID].readyToPlay; // If the game stage or phase changes, refresh the hand from the game state.
 
   Object(react__WEBPACK_IMPORTED_MODULE_0__["useEffect"])(function () {
     setHand(function () {
       return _toConsumableArray(player.hand);
     });
-  }, [stage]);
+  }, [stage, readyToPlay]);
 
   var handleCardClicked = function handleCardClicked(cardID) {
     switch (stage) {
@@ -69543,8 +69544,7 @@ var TichuBoard = function TichuBoard(props) {
     receivedCards.push(player.receivedPass[playerIDs.left]);
     receivedCards.push(player.receivedPass[playerIDs.partner]);
     receivedCards.push(player.receivedPass[playerIDs.right]);
-  } // <Hand hand={G.players[playerID].hand} />
-
+  }
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board"
@@ -69569,6 +69569,7 @@ var TichuBoard = function TichuBoard(props) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_PassArea__WEBPACK_IMPORTED_MODULE_2__["PassArea"], {
     selectedCards: stage === constants.phases.preHand.stages.passCards ? passedCards : receivedCards,
     stage: stage,
+    readyToPlay: G["public"].players[playerID].readyToPlay,
     onReturnPass: handleReturnPass,
     onPassConfirmed: handlePassConfirmed,
     onAcceptConfirmed: handleAcceptConfirmed
@@ -70174,6 +70175,7 @@ var PassArea = function PassArea(_ref) {
   var stage = _ref.stage,
       _ref$selectedCards = _ref.selectedCards,
       selectedCards = _ref$selectedCards === void 0 ? [] : _ref$selectedCards,
+      readyToPlay = _ref.readyToPlay,
       onReturnPass = _ref.onReturnPass,
       onPassConfirmed = _ref.onPassConfirmed,
       onAcceptConfirmed = _ref.onAcceptConfirmed;
@@ -70186,6 +70188,11 @@ var PassArea = function PassArea(_ref) {
   }
 
   if (stage !== constants.phases.preHand.stages.passCards && stage !== constants.phases.preHand.stages.acceptPass) {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "\xA0");
+  } // We've already accepted our cards and we're just waiting on everyone else.
+
+
+  if (stage === constants.phases.preHand.stages.acceptPass && readyToPlay) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "\xA0");
   }
 

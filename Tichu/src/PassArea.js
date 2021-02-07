@@ -3,7 +3,7 @@ import { Card } from './Card';
 import { Button } from 'reactstrap';
 const { constants } = require('./Game');
 
-export const PassArea = ({ stage, selectedCards = [], onReturnPass, onPassConfirmed, onAcceptConfirmed }) => {
+export const PassArea = ({ stage, selectedCards = [], readyToPlay, onReturnPass, onPassConfirmed, onAcceptConfirmed }) => {
 
     var displayCards = Array(3).fill("back");
     for (var i = 0; i < 3; i++) {
@@ -12,6 +12,13 @@ export const PassArea = ({ stage, selectedCards = [], onReturnPass, onPassConfir
         }
     }
     if (stage !== constants.phases.preHand.stages.passCards && stage !== constants.phases.preHand.stages.acceptPass) {
+        return (
+            <>&nbsp;</>
+        );
+    }
+
+    // We've already accepted our cards and we're just waiting on everyone else.
+    if (stage === constants.phases.preHand.stages.acceptPass && readyToPlay) {
         return (
             <>&nbsp;</>
         );
