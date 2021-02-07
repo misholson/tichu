@@ -1,16 +1,16 @@
 import React from 'react';
 import { Card } from './Card';
 
-export const Hand = ({ hand, backs, onCardClicked }) => {
+export const Hand = ({ hand, selectedCards, onCardClicked }) => {
 
-    // If we passed a number of card backs to show, show them
-    if (backs) {
-        hand = Array(backs).fill("back");
+    const isSelected = (cardID) => {
+        if (!selectedCards) { return false; }
+        return selectedCards.some(c => c === cardID);
     }
 
     return (
         <ul className="hand">
-            {hand && hand.map((cardID) => <li key={cardID}><Card cardID={cardID} onCardClicked={onCardClicked} /></li>)}
+            {hand && hand.map((cardID) => <li key={cardID}><Card cardID={cardID} selected={isSelected(cardID)} onCardClicked={onCardClicked} /></li>)}
         </ul>
         )
 }

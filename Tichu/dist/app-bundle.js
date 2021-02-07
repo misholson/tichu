@@ -69463,7 +69463,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 var _require = __webpack_require__(/*! ./Helpers */ "./src/Helpers.js"),
     sortCards = _require.sortCards,
     removeFromHand = _require.removeFromHand,
-    getPlayerIDs = _require.getPlayerIDs;
+    getPlayerIDs = _require.getPlayerIDs,
+    addToHand = _require.addToHand;
 
 var _require2 = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
     constants = _require2.constants;
@@ -69481,7 +69482,6 @@ var TichuBoard = function TichuBoard(props) {
   }
 
   var phase = ctx.phase;
-  var isPrimaryPlayPhase = phase === constants.phases.primaryPlay.name;
   var playerIDs = getPlayerIDs(ctx, playerID);
 
   var _useState = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])([]),
@@ -69493,6 +69493,11 @@ var TichuBoard = function TichuBoard(props) {
       _useState4 = _slicedToArray(_useState3, 2),
       hand = _useState4[0],
       setHand = _useState4[1];
+
+  var _useState5 = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])([]),
+      _useState6 = _slicedToArray(_useState5, 2),
+      selectedCards = _useState6[0],
+      setSelectedCards = _useState6[1];
 
   var onGrandClicked = function onGrandClicked() {
     moves.callGrand(playerID);
@@ -69510,19 +69515,33 @@ var TichuBoard = function TichuBoard(props) {
     });
   }, [stage, readyToPlay]);
 
+  var selectCardToPass = function selectCardToPass(cardID) {
+    if (passedCards.length < 3) {
+      setPassedCards([].concat(_toConsumableArray(passedCards), [cardID])); // Remove the card from the local hand.
+
+      setHand(removeFromHand(hand, cardID));
+    }
+  };
+
+  var selectCardForPlay = function selectCardForPlay(cardID) {
+    console.debug("card clicked: ".concat(cardID));
+
+    if (selectedCards.some(function (c) {
+      return c === cardID;
+    })) {
+      removeFromHand(selectedCards, cardID);
+    } else {
+      addToHand(selectedCards, cardID);
+    }
+
+    setSelectedCards(_toConsumableArray(selectedCards));
+  };
+
   var handleCardClicked = function handleCardClicked(cardID) {
-    switch (stage) {
-      case constants.phases.preHand.stages.passCards:
-        if (passedCards.length < 3) {
-          setPassedCards([].concat(_toConsumableArray(passedCards), [cardID])); // Remove the card from the local hand.
-
-          setHand(removeFromHand(hand, cardID));
-        }
-
-        break;
-
-      default:
-        break;
+    if (phase === constants.phases.preHand.name && stage === constants.phases.preHand.stages.passCards) {
+      selectCardToPass(cardID);
+    } else if (phase === constants.phases.primaryPlay.name && playerID === ctx.currentPlayer) {
+      selectCardForPlay(cardID);
     }
   };
 
@@ -69607,6 +69626,7 @@ var TichuBoard = function TichuBoard(props) {
     currentPlayer: ctx.currentPlayer
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
     hand: hand,
+    selectedCards: selectedCards,
     onCardClicked: handleCardClicked
   }), stage === constants.phases.preHand.stages.takeOrGrand && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_4__["FormGroup"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_4__["Button"], {
     color: "primary",
@@ -69642,6 +69662,7 @@ var _require = __webpack_require__(/*! ./Deck */ "./src/Deck.js"),
 
 var Card = function Card(_ref) {
   var cardID = _ref.cardID,
+      selected = _ref.selected,
       onCardClicked = _ref.onCardClicked;
   var image = null;
 
@@ -69656,6 +69677,10 @@ var Card = function Card(_ref) {
     backgroundPosition: "center",
     backgroundSize: "cover"
   };
+
+  if (selected) {
+    style.bottom = "20px";
+  }
 
   var handleClick = function handleClick() {
     if (onCardClicked && cardID !== "back") {
@@ -69793,8 +69818,7 @@ module.exports.cardDefinitions = generateCardDefinitions();
 /***/ (function(module, exports, __webpack_require__) {
 
 var _require = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boardgame.io/dist/esm/core.js"),
-    PlayerView = _require.PlayerView,
-    TurnOrder = _require.TurnOrder;
+    PlayerView = _require.PlayerView;
 
 var _require2 = __webpack_require__(/*! ./Helpers */ "./src/Helpers.js"),
     sortCards = _require2.sortCards;
@@ -69971,13 +69995,18 @@ __webpack_require__.r(__webpack_exports__);
 
 var Hand = function Hand(_ref) {
   var hand = _ref.hand,
-      backs = _ref.backs,
+      selectedCards = _ref.selectedCards,
       onCardClicked = _ref.onCardClicked;
 
-  // If we passed a number of card backs to show, show them
-  if (backs) {
-    hand = Array(backs).fill("back");
-  }
+  var isSelected = function isSelected(cardID) {
+    if (!selectedCards) {
+      return false;
+    }
+
+    return selectedCards.some(function (c) {
+      return c === cardID;
+    });
+  };
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("ul", {
     className: "hand"
@@ -69986,6 +70015,7 @@ var Hand = function Hand(_ref) {
       key: cardID
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Card__WEBPACK_IMPORTED_MODULE_1__["Card"], {
       cardID: cardID,
+      selected: isSelected(cardID),
       onCardClicked: onCardClicked
     }));
   }));
@@ -70042,7 +70072,8 @@ var _require = __webpack_require__(/*! ./Deck */ "./src/Deck.js"),
 module.exports = {
   sortCards: sortCards,
   removeFromHand: removeFromHand,
-  getPlayerIDs: getPlayerIDs
+  getPlayerIDs: getPlayerIDs,
+  addToHand: addToHand
 };
 
 function removeFromHand(hand, cardID) {
@@ -70051,6 +70082,11 @@ function removeFromHand(hand, cardID) {
   });
   hand.splice(indexToRemove, 1);
   return _toConsumableArray(hand);
+}
+
+function addToHand(hand, cardID) {
+  hand.push(cardID);
+  sortCards(hand);
 }
 
 function getPlayerIDs(ctx, playerID) {
@@ -70390,39 +70426,12 @@ function onHandStart(G, ctx) {
 }
 
 function onTurnBegin(G, ctx) {
-  console.debug("Turn of ".concat(ctx.currentPlayer, " is beginning. Looking for start player: ").concat(G.lookingForStartPlayer)); //if (G.lookingForStartPlayer) {
-  //    if (G.players[ctx.currentPlayer].hand.some((cardID) => cardID === constants.specials.mahjong)) {
-  //        console.debug(`found mahjong with player ${ctx.currentPlayer}`);
-  //        G.lookingForStartPlayer = false;
-  //    } else {
-  //        console.debug(`calling endTurn for player ${ctx.currentPlayer}`);
-  //        ctx.events.endTurn();
-  //    }
-  //}
-  //for (var i = 0; i < ctx.playOrder.length; i++) {
-  //    var playerID = ctx.playOrder[i];
-  //    console.debug(`checking hand of player: ${playerID}`);
-  //    console.log(G.players[playerID].hand)
-  //    if (G.players[playerID].hand.some((cardID) => cardID === constants.specials.mahjong)) {
-  //        console.debug(`mahjong is in the hand of player ${playerID}. Current player: ${ctx.currentPlayer}`);
-  //        //while (ctx.currentPlayer !== playerID) {
-  //        //    console.debug(`ending turns until we get to ${playerID}`);
-  //        //    ctx.events.endTurn();
-  //        //}
-  //        G.lookingForMahjong = false;
-  //        ctx.events.endTurn({ next: playerID });
-  //        //var activePlayer = {
-  //        //    value: {}
-  //        //};
-  //        //activePlayer.value[playerID] = Stage.NULL;
-  //        //console.log(activePlayer);
-  //        //ctx.events.setActivePlayers(activePlayer);
-  //        break;
-  //    }
-  //}
+  console.debug("Turn of ".concat(ctx.currentPlayer, " is beginning. Looking for start player: ").concat(G.lookingForStartPlayer));
 }
 
 function findStartPlayer(G, ctx) {
+  console.debug("finding start player at the beginning of phase ".concat(ctx.phase));
+
   for (var i = 0; i < ctx.playOrder.length; i++) {
     var playerID = ctx.playOrder[i];
     console.debug("checking hand of player: ".concat(playerID));

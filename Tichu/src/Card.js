@@ -1,7 +1,7 @@
 import React from 'react';
 var { cardDefinitions } = require('./Deck');
 
-export const Card = ({ cardID, onCardClicked }) => {
+export const Card = ({ cardID, selected, onCardClicked }) => {
     let image = null;
     if (cardID === "back") {
         image = "/images/back.png";
@@ -13,6 +13,10 @@ export const Card = ({ cardID, onCardClicked }) => {
         backgroundPosition: "center",
         backgroundSize: "cover"
     };
+
+    if (selected) {
+        style.bottom = "20px";
+    }
 
     const handleClick = () => {
         if (onCardClicked && cardID !== "back") {

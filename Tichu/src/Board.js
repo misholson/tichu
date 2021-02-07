@@ -4,7 +4,7 @@ import { Player } from './Player';
 import { PassArea } from './PassArea';
 import { FormGroup, Button } from 'reactstrap';
 import 'bootstrap';
-const { sortCards, removeFromHand, getPlayerIDs } = require('./Helpers');
+const { sortCards, removeFromHand, getPlayerIDs, addToHand } = require('./Helpers');
 const { constants } = require('./Constants');
 
 export const TichuBoard = (props) => {
@@ -26,6 +26,7 @@ export const TichuBoard = (props) => {
 
     const [passedCards, setPassedCards] = useState([]);
     const [hand, setHand] = useState(player.hand);
+    const [selectedCards, setSelectedCards] = useState([]);
 
 
     const onGrandClicked = () => {
@@ -45,19 +46,30 @@ export const TichuBoard = (props) => {
         })
     }, [stage, readyToPlay]);
 
+    const selectCardToPass = (cardID) => {
+        if (passedCards.length < 3) {
+            setPassedCards([...passedCards, cardID]);
+
+            // Remove the card from the local hand.
+            setHand(removeFromHand(hand, cardID));
+        }
+    }
+
+    const selectCardForPlay = (cardID) => {
+        console.debug(`card clicked: ${cardID}`);
+        if (selectedCards.some((c) => c === cardID)) {
+            removeFromHand(selectedCards, cardID);
+        } else {
+            addToHand(selectedCards, cardID);
+        }
+        setSelectedCards([...selectedCards]);
+    }
 
     const handleCardClicked = (cardID) => {
-        switch (stage) {
-            case constants.phases.preHand.stages.passCards:
-                if (passedCards.length < 3) {
-                    setPassedCards([...passedCards, cardID]);
-
-                    // Remove the card from the local hand.
-                    setHand(removeFromHand(hand, cardID));
-                }
-                break;
-            default:
-                break;
+        if (phase === constants.phases.preHand.name && stage === constants.phases.preHand.stages.passCards) {
+            selectCardToPass(cardID);
+        } else if (phase === constants.phases.primaryPlay.name && playerID === ctx.currentPlayer) {
+            selectCardForPlay(cardID);
         }
     }
 
@@ -123,7 +135,7 @@ export const TichuBoard = (props) => {
                 </div>
                 <div className="board-middle">
                     <Player playerID={playerID} phase={phase} currentPlayer={ctx.currentPlayer} />
-                    <Hand hand={hand} onCardClicked={handleCardClicked} />
+                    <Hand hand={hand} selectedCards={selectedCards} onCardClicked={handleCardClicked} />
                     {stage === constants.phases.preHand.stages.takeOrGrand &&
                         <FormGroup>
                             <Button color="primary" className="mx-1" onClick={onGrandClicked}>Grand Tichu</Button>

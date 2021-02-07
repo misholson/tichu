@@ -3,13 +3,19 @@ var { cardDefinitions } = require('./Deck');
 module.exports = {
     sortCards: sortCards,
     removeFromHand: removeFromHand,
-    getPlayerIDs: getPlayerIDs
+    getPlayerIDs: getPlayerIDs,
+    addToHand: addToHand
 }
 
 function removeFromHand(hand, cardID) {
     var indexToRemove = hand.findIndex((c) => c === cardID);
     hand.splice(indexToRemove, 1);
     return [...hand];
+}
+
+function addToHand(hand, cardID) {
+    hand.push(cardID);
+    sortCards(hand);
 }
 
 function getPlayerIDs(ctx, playerID) {
