@@ -108,6 +108,9 @@
     <Content Include="src\Card.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="src\Constants.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="src\Deck.js">
       <SubType>Code</SubType>
     </Content>
@@ -117,7 +120,13 @@
     <Content Include="src\Hand.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="src\Helpers.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="src\PassArea.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="src\PreHand.js">
       <SubType>Code</SubType>
     </Content>
     <Content Include="styles\tichu.css">

@@ -3,7 +3,8 @@ import { Hand, OpponentHand, PartnerHand } from './Hand';
 import { PassArea } from './PassArea';
 import { FormGroup, Button } from 'reactstrap';
 import 'bootstrap';
-const { sortCards, removeFromHand, getPlayerIDs, constants } = require('./Game');
+const { sortCards, removeFromHand, getPlayerIDs } = require('./Helpers');
+const { constants } = require('./Constants');
 
 export const TichuBoard = (props) => {
 

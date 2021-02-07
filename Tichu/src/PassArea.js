@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card } from './Card';
 import { Button } from 'reactstrap';
-const { constants } = require('./Game');
+const { constants } = require('./Constants');
 
 export const PassArea = ({ stage, selectedCards = [], readyToPlay, onReturnPass, onPassConfirmed, onAcceptConfirmed }) => {
 
