@@ -126,9 +126,13 @@
     <Content Include="src\PassArea.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="src\Player.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="src\PreHand.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="src\PrimaryPlay.js" />
     <Content Include="styles\tichu.css">
       <SubType>Code</SubType>
     </Content>

@@ -69428,10 +69428,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Hand__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Hand */ "./src/Hand.js");
-/* harmony import */ var _PassArea__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./PassArea */ "./src/PassArea.js");
-/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! reactstrap */ "./node_modules/reactstrap/es/index.js");
-/* harmony import */ var bootstrap__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! bootstrap */ "./node_modules/bootstrap/dist/js/bootstrap.js");
-/* harmony import */ var bootstrap__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(bootstrap__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _Player__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Player */ "./src/Player.js");
+/* harmony import */ var _PassArea__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./PassArea */ "./src/PassArea.js");
+/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! reactstrap */ "./node_modules/reactstrap/es/index.js");
+/* harmony import */ var bootstrap__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! bootstrap */ "./node_modules/bootstrap/dist/js/bootstrap.js");
+/* harmony import */ var bootstrap__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(bootstrap__WEBPACK_IMPORTED_MODULE_5__);
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -69458,11 +69459,14 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
-var _require = __webpack_require__(/*! ./Game */ "./src/Game.js"),
+
+var _require = __webpack_require__(/*! ./Helpers */ "./src/Helpers.js"),
     sortCards = _require.sortCards,
     removeFromHand = _require.removeFromHand,
-    getPlayerIDs = _require.getPlayerIDs,
-    constants = _require.constants;
+    getPlayerIDs = _require.getPlayerIDs;
+
+var _require2 = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
+    constants = _require2.constants;
 
 var TichuBoard = function TichuBoard(props) {
   var G = props.G,
@@ -69476,6 +69480,8 @@ var TichuBoard = function TichuBoard(props) {
     stage = ctx.activePlayers[playerID];
   }
 
+  var phase = ctx.phase;
+  var isPrimaryPlayPhase = phase === constants.phases.primaryPlay.name;
   var playerIDs = getPlayerIDs(ctx, playerID);
 
   var _useState = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])([]),
@@ -69554,7 +69560,11 @@ var TichuBoard = function TichuBoard(props) {
     className: "board-side"
   }, "Empty"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-middle"
-  }, "Player: ", playerIDs.partner, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["PartnerHand"], {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Player__WEBPACK_IMPORTED_MODULE_2__["Player"], {
+    playerID: playerIDs.partner,
+    phase: phase,
+    currentPlayer: ctx.currentPlayer
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["PartnerHand"], {
     backs: G["public"].players[playerIDs.partner].cards
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-side"
@@ -69562,20 +69572,28 @@ var TichuBoard = function TichuBoard(props) {
     className: "board-row"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-side"
-  }, "Player: ", playerIDs.left, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Player__WEBPACK_IMPORTED_MODULE_2__["Player"], {
+    playerID: playerIDs.left,
+    phase: phase,
+    currentPlayer: ctx.currentPlayer
+  }), "Player: ", playerIDs.left, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
     backs: G["public"].players[playerIDs.left].cards
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-middle"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_PassArea__WEBPACK_IMPORTED_MODULE_2__["PassArea"], {
+  }, phase === constants.phases.preHand.name && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_PassArea__WEBPACK_IMPORTED_MODULE_3__["PassArea"], {
     selectedCards: stage === constants.phases.preHand.stages.passCards ? passedCards : receivedCards,
     stage: stage,
     readyToPlay: G["public"].players[playerID].readyToPlay,
     onReturnPass: handleReturnPass,
     onPassConfirmed: handlePassConfirmed,
     onAcceptConfirmed: handleAcceptConfirmed
-  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+  }), phase === constants.phases.primaryPlay.name && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "Primary Play")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-side"
-  }, "Player: ", playerIDs.right, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Player__WEBPACK_IMPORTED_MODULE_2__["Player"], {
+    playerID: playerIDs.right,
+    phase: phase,
+    currentPlayer: ctx.currentPlayer
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
     backs: G["public"].players[playerIDs.right].cards
   }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-row"
@@ -69583,14 +69601,18 @@ var TichuBoard = function TichuBoard(props) {
     className: "board-side"
   }, "Empty"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-middle"
-  }, "Player: ", playerID, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Player__WEBPACK_IMPORTED_MODULE_2__["Player"], {
+    playerID: playerID,
+    phase: phase,
+    currentPlayer: ctx.currentPlayer
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
     hand: hand,
     onCardClicked: handleCardClicked
-  }), stage === constants.phases.preHand.stages.takeOrGrand && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_3__["FormGroup"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_3__["Button"], {
+  }), stage === constants.phases.preHand.stages.takeOrGrand && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_4__["FormGroup"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_4__["Button"], {
     color: "primary",
     className: "mx-1",
     onClick: onGrandClicked
-  }, "Grand Tichu"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_3__["Button"], {
+  }, "Grand Tichu"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_4__["Button"], {
     color: "primary",
     className: "mx-1",
     onClick: onTakeClicked
@@ -69646,6 +69668,39 @@ var Card = function Card(_ref) {
     style: style,
     onClick: handleClick
   });
+};
+
+/***/ }),
+
+/***/ "./src/Constants.js":
+/*!**************************!*\
+  !*** ./src/Constants.js ***!
+  \**************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports.constants = {
+  phases: {
+    preHand: {
+      name: "preHand",
+      stages: {
+        takeOrGrand: "takeOrGrand",
+        passCards: "passCards",
+        waitForPass: "waitForPass",
+        acceptPass: "acceptPass"
+      }
+    },
+    primaryPlay: {
+      name: "primaryPlay",
+      stages: {}
+    }
+  },
+  specials: {
+    dragon: 52,
+    phoenix: 53,
+    dog: 54,
+    mahjong: 55
+  }
 };
 
 /***/ }),
@@ -69737,42 +69792,28 @@ module.exports.cardDefinitions = generateCardDefinitions();
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
-
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
 var _require = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boardgame.io/dist/esm/core.js"),
-    INVALID_MOVE = _require.INVALID_MOVE,
-    PlayerView = _require.PlayerView;
+    PlayerView = _require.PlayerView,
+    TurnOrder = _require.TurnOrder;
 
-var _require2 = __webpack_require__(/*! ./Deck */ "./src/Deck.js"),
-    cardDefinitions = _require2.cardDefinitions;
+var _require2 = __webpack_require__(/*! ./Helpers */ "./src/Helpers.js"),
+    sortCards = _require2.sortCards;
 
-var constants = {
-  phases: {
-    preHand: {
-      name: "preHand",
-      stages: {
-        takeOrGrand: "takeOrGrand",
-        passCards: "passCards",
-        waitForPass: "waitForPass",
-        acceptPass: "acceptPass"
-      }
-    },
-    primaryPlay: {
-      name: "primaryPlay",
-      stages: {}
-    }
-  }
-};
+var _require3 = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
+    constants = _require3.constants;
+
+var _require4 = __webpack_require__(/*! ./PreHand */ "./src/PreHand.js"),
+    callGrand = _require4.callGrand,
+    takeCards = _require4.takeCards,
+    passCards = _require4.passCards,
+    checkPlayersHavePassed = _require4.checkPlayersHavePassed,
+    acceptPass = _require4.acceptPass;
+
+var _require5 = __webpack_require__(/*! ./PrimaryPlay */ "./src/PrimaryPlay.js"),
+    onHandStart = _require5.onHandStart,
+    onTurnBegin = _require5.onTurnBegin,
+    findStartPlayer = _require5.findStartPlayer;
+
 var tichu = {
   setup: function setup() {
     return {
@@ -69835,10 +69876,6 @@ var tichu = {
         });
         return G;
       },
-      moves: {
-        callGrand: callGrand,
-        takeCards: takeCards
-      },
       turn: {
         stages: {
           takeOrGrand: {
@@ -69868,7 +69905,18 @@ var tichu = {
       next: constants.phases.primaryPlay.name,
       start: true
     },
-    primaryPlay: {}
+    primaryPlay: {
+      onBegin: onHandStart,
+      turn: {
+        onEnd: function onEnd(G, ctx) {
+          console.debug("Turn of ".concat(ctx.currentPlayer, " is ending"));
+        },
+        onBegin: onTurnBegin,
+        order: {
+          first: findStartPlayer
+        }
+      }
+    }
   },
   minPlayers: 4,
   maxPlayers: 4
@@ -69892,195 +69940,14 @@ function dealCards(G, number) {
       hand.push(G.secret.deck.pop());
     }
 
-    hand.sort(cardComparison);
+    sortCards(hand);
     G.players[playerNumber].hand = hand;
     G["public"].players[playerNumber].cards = hand.length;
   });
 }
 
-function sortCards(array) {
-  array.sort(cardComparison);
-}
-
-function cardComparison(a, b) {
-  var cardA = cardDefinitions[a];
-  var cardB = cardDefinitions[b];
-
-  if (cardA.rank < cardB.rank) {
-    return 1;
-  } else if (cardA.rank > cardB.rank) {
-    return -1;
-  } else {
-    if (cardA.suit < cardB.suit) {
-      return 1;
-    } else if (cardA.suit > cardB.suit) {
-      return -1;
-    }
-  }
-
-  return 0;
-}
-
-function callGrand(G, ctx, playerID) {
-  G["public"].players[playerID].tichu = true;
-  G["public"].players[playerID].grand = true;
-  return takeCards(G, ctx, playerID);
-}
-
-function takeCards(G, ctx, playerID) {
-  // Take 6 more cards.
-  for (var i = 0; i < 6; i++) {
-    G.players[playerID].hand.push(G.secret.deck.pop());
-  }
-
-  G.players[playerID].hand.sort(cardComparison);
-  G["public"].players[playerID].cards = G.players[playerID].hand.length;
-  ctx.events.endStage();
-}
-
-function passCards(G, ctx, playerID, selectedCards) {
-  // Check the player is on the passCards stage
-  if (ctx.activePlayers[playerID] !== constants.phases.preHand.stages.passCards) {
-    return INVALID_MOVE;
-  } // Make sure they have selected three cards to pass.
-
-
-  if (!selectedCards || selectedCards.length !== 3) {
-    return INVALID_MOVE;
-  } // Make sure all the cards they've selected are in their hand.
-
-
-  var player = G.players[playerID];
-
-  for (var i = 0; i < 3; i++) {
-    if (!player.hand.some(function (c) {
-      return c === selectedCards[i];
-    })) {
-      return INVALID_MOVE;
-    }
-  }
-
-  var playerIDs = getPlayerIDs(ctx, playerID); // Remove the cards from your hand.
-
-  selectedCards.forEach(function (c) {
-    player.hand = removeFromHand(player.hand, c);
-  }); // Pass cards to the other players
-
-  executePass(G, playerIDs.left, playerID, selectedCards[0]);
-  executePass(G, playerIDs.partner, playerID, selectedCards[1]);
-  executePass(G, playerIDs.right, playerID, selectedCards[2]);
-  ctx.events.endStage();
-}
-
-function executePass(G, receivingPlayerID, sendingPlayerID, cardID) {
-  var receivingPlayer = G.players[receivingPlayerID];
-  receivingPlayer.receivedPass = receivingPlayer.receivedPass || {};
-  receivingPlayer.receivedPass[sendingPlayerID] = cardID;
-}
-
-function removeFromHand(hand, cardID) {
-  var indexToRemove = hand.findIndex(function (c) {
-    return c === cardID;
-  });
-  hand.splice(indexToRemove, 1);
-  return _toConsumableArray(hand);
-}
-
-function getPlayerIDs(ctx, playerID) {
-  var playOrder = ctx.playOrder;
-  var myPlayIndex = playOrder.findIndex(function (pId) {
-    return pId === playerID;
-  });
-  return {
-    left: playOrder[(myPlayIndex + 1) % 4],
-    partner: playOrder[(myPlayIndex + 2) % 4],
-    right: playOrder[(myPlayIndex + 3) % 4]
-  };
-}
-
-function checkPlayersHavePassed(G, ctx) {
-  console.debug("Checking players have passed."); // onMove runs on all stages, so make sure that all players are in the passCards or waitForPass stage before really checking this.
-
-  if (!Object.values(ctx.activePlayers).every(function (stage) {
-    return stage === constants.phases.preHand.stages.passCards || stage === constants.phases.preHand.stages.waitForPass;
-  })) {
-    return;
-  }
-
-  var allPassed = ctx.playOrder.every(function (playerID) {
-    // Make sure we have received some passes.
-    console.log(G.players[playerID]);
-    var player = G.players[playerID]; //console.log(player);
-
-    var receivedPass = player.receivedPass;
-    console.log(receivedPass);
-
-    if (!receivedPass) {
-      console.debug("checkPlayersHavePassed: Player ".concat(playerID, " id has received no cards"));
-      return false;
-    } // Make sure we have received a pass from every player.
-
-
-    var playerIDs = getPlayerIDs(ctx, playerID);
-
-    if (!(receivedPass[playerIDs.left] >= 0)) {
-      console.debug("checkPlayersHavePassed: Player ".concat(playerIDs.left, " (left) has not passed to player ").concat(playerID));
-      return false;
-    }
-
-    if (!(receivedPass[playerIDs.partner] >= 0)) {
-      console.debug("checkPlayersHavePassed: Player ".concat(playerIDs.partner, " (partner) has not passed to player ").concat(playerID));
-      return false;
-    }
-
-    if (!(receivedPass[playerIDs.right] >= 0)) {
-      console.debug("checkPlayersHavePassed: Player ".concat(playerIDs.right, " (right) has not passed to player ").concat(playerID));
-      return false;
-    }
-
-    return true;
-  });
-  console.debug("allPassed: ".concat(allPassed));
-
-  if (allPassed) {
-    console.debug("Setting stage to accept pass.");
-    ctx.events.setActivePlayers({
-      all: constants.phases.preHand.stages.acceptPass
-    });
-  }
-}
-
-function acceptPass(G, ctx, playerID) {
-  console.debug("acceptPass 1");
-  var player = G.players[playerID];
-  console.debug("acceptPass 2"); // Integrate the received cards into your hand.
-
-  Object.values(player.receivedPass).forEach(function (card) {
-    player.hand.push(card);
-  });
-  sortCards(player.hand);
-  console.debug("acceptPass 3"); // Update the number of cards the player has in their hand.
-
-  G["public"].players[playerID].cards = 14;
-  console.debug("acceptPass 4"); // Note that the player is ready to play.
-
-  G["public"].players[playerID].readyToPlay = true;
-  console.debug("acceptPass 5");
-
-  if (Object.values(G["public"].players).every(function (publicPlayerData) {
-    return publicPlayerData.readyToPlay;
-  })) {
-    console.debug("All players have accepted their pass. Ending phase.");
-    ctx.events.endPhase();
-  }
-}
-
 module.exports = {
-  Tichu: tichu,
-  sortCards: sortCards,
-  removeFromHand: removeFromHand,
-  getPlayerIDs: getPlayerIDs,
-  constants: constants
+  Tichu: tichu
 };
 
 /***/ }),
@@ -70150,6 +70017,79 @@ var OpponentHand = function OpponentHand(_ref3) {
 
 /***/ }),
 
+/***/ "./src/Helpers.js":
+/*!************************!*\
+  !*** ./src/Helpers.js ***!
+  \************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+var _require = __webpack_require__(/*! ./Deck */ "./src/Deck.js"),
+    cardDefinitions = _require.cardDefinitions;
+
+module.exports = {
+  sortCards: sortCards,
+  removeFromHand: removeFromHand,
+  getPlayerIDs: getPlayerIDs
+};
+
+function removeFromHand(hand, cardID) {
+  var indexToRemove = hand.findIndex(function (c) {
+    return c === cardID;
+  });
+  hand.splice(indexToRemove, 1);
+  return _toConsumableArray(hand);
+}
+
+function getPlayerIDs(ctx, playerID) {
+  var playOrder = ctx.playOrder;
+  var myPlayIndex = playOrder.findIndex(function (pId) {
+    return pId === playerID;
+  });
+  return {
+    left: playOrder[(myPlayIndex + 1) % 4],
+    partner: playOrder[(myPlayIndex + 2) % 4],
+    right: playOrder[(myPlayIndex + 3) % 4]
+  };
+}
+
+function sortCards(array) {
+  array.sort(cardComparison);
+}
+
+function cardComparison(a, b) {
+  var cardA = cardDefinitions[a];
+  var cardB = cardDefinitions[b];
+
+  if (cardA.rank < cardB.rank) {
+    return 1;
+  } else if (cardA.rank > cardB.rank) {
+    return -1;
+  } else {
+    if (cardA.suit < cardB.suit) {
+      return 1;
+    } else if (cardA.suit > cardB.suit) {
+      return -1;
+    }
+  }
+
+  return 0;
+}
+
+/***/ }),
+
 /***/ "./src/PassArea.js":
 /*!*************************!*\
   !*** ./src/PassArea.js ***!
@@ -70168,7 +70108,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var _require = __webpack_require__(/*! ./Game */ "./src/Game.js"),
+var _require = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
     constants = _require.constants;
 
 var PassArea = function PassArea(_ref) {
@@ -70233,6 +70173,274 @@ var PassArea = function PassArea(_ref) {
     color: "primary",
     onClick: handleAcceptConfirmed
   }, "Accept")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null))));
+};
+
+/***/ }),
+
+/***/ "./src/Player.js":
+/*!***********************!*\
+  !*** ./src/Player.js ***!
+  \***********************/
+/*! exports provided: Player */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Player", function() { return Player; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+
+
+var _require = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
+    constants = _require.constants;
+
+var Player = function Player(_ref) {
+  var playerID = _ref.playerID,
+      phase = _ref.phase,
+      currentPlayer = _ref.currentPlayer;
+  var displayIsActive = phase === constants.phases.primaryPlay.name && playerID === currentPlayer;
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    style: {
+      "float": "none"
+    }
+  }, "Player ", playerID, " ", displayIsActive && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "ACTIVE"));
+};
+
+/***/ }),
+
+/***/ "./src/PreHand.js":
+/*!************************!*\
+  !*** ./src/PreHand.js ***!
+  \************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var _require = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boardgame.io/dist/esm/core.js"),
+    INVALID_MOVE = _require.INVALID_MOVE;
+
+var _require2 = __webpack_require__(/*! ./Helpers */ "./src/Helpers.js"),
+    sortCards = _require2.sortCards,
+    removeFromHand = _require2.removeFromHand,
+    getPlayerIDs = _require2.getPlayerIDs;
+
+var _require3 = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
+    constants = _require3.constants;
+
+function callGrand(G, ctx, playerID) {
+  G["public"].players[playerID].tichu = true;
+  G["public"].players[playerID].grand = true;
+  return takeCards(G, ctx, playerID);
+}
+
+function takeCards(G, ctx, playerID) {
+  // Take 6 more cards.
+  for (var i = 0; i < 6; i++) {
+    G.players[playerID].hand.push(G.secret.deck.pop());
+  }
+
+  sortCards(G.players[playerID].hand);
+  G["public"].players[playerID].cards = G.players[playerID].hand.length;
+  ctx.events.endStage();
+}
+
+function passCards(G, ctx, playerID, selectedCards) {
+  // Check the player is on the passCards stage
+  if (ctx.activePlayers[playerID] !== constants.phases.preHand.stages.passCards) {
+    return INVALID_MOVE;
+  } // Make sure they have selected three cards to pass.
+
+
+  if (!selectedCards || selectedCards.length !== 3) {
+    return INVALID_MOVE;
+  } // Make sure all the cards they've selected are in their hand.
+
+
+  var player = G.players[playerID];
+
+  for (var i = 0; i < 3; i++) {
+    if (!player.hand.some(function (c) {
+      return c === selectedCards[i];
+    })) {
+      return INVALID_MOVE;
+    }
+  }
+
+  var playerIDs = getPlayerIDs(ctx, playerID); // Remove the cards from your hand.
+
+  selectedCards.forEach(function (c) {
+    player.hand = removeFromHand(player.hand, c);
+  }); // Pass cards to the other players
+
+  executePass(G, playerIDs.left, playerID, selectedCards[0]);
+  executePass(G, playerIDs.partner, playerID, selectedCards[1]);
+  executePass(G, playerIDs.right, playerID, selectedCards[2]);
+  ctx.events.endStage();
+}
+
+function executePass(G, receivingPlayerID, sendingPlayerID, cardID) {
+  var receivingPlayer = G.players[receivingPlayerID];
+  receivingPlayer.receivedPass = receivingPlayer.receivedPass || {};
+  receivingPlayer.receivedPass[sendingPlayerID] = cardID;
+}
+
+function checkPlayersHavePassed(G, ctx) {
+  console.debug("Checking players have passed."); // onMove runs on all stages, so make sure that all players are in the passCards or waitForPass stage before really checking this.
+
+  if (!Object.values(ctx.activePlayers).every(function (stage) {
+    return stage === constants.phases.preHand.stages.passCards || stage === constants.phases.preHand.stages.waitForPass;
+  })) {
+    console.debug("All players must be in the passCards or waitForPass stage before checking if pass is complete.");
+    return;
+  }
+
+  var allPassed = ctx.playOrder.every(function (playerID) {
+    // Make sure we have received some passes.
+    console.log(G.players[playerID]);
+    var player = G.players[playerID]; //console.log(player);
+
+    var receivedPass = player.receivedPass;
+    console.log(receivedPass);
+
+    if (!receivedPass) {
+      console.debug("checkPlayersHavePassed: Player ".concat(playerID, " id has received no cards"));
+      return false;
+    } // Make sure we have received a pass from every player.
+
+
+    var playerIDs = getPlayerIDs(ctx, playerID);
+
+    if (!(receivedPass[playerIDs.left] >= 0)) {
+      console.debug("checkPlayersHavePassed: Player ".concat(playerIDs.left, " (left) has not passed to player ").concat(playerID));
+      return false;
+    }
+
+    if (!(receivedPass[playerIDs.partner] >= 0)) {
+      console.debug("checkPlayersHavePassed: Player ".concat(playerIDs.partner, " (partner) has not passed to player ").concat(playerID));
+      return false;
+    }
+
+    if (!(receivedPass[playerIDs.right] >= 0)) {
+      console.debug("checkPlayersHavePassed: Player ".concat(playerIDs.right, " (right) has not passed to player ").concat(playerID));
+      return false;
+    }
+
+    return true;
+  });
+  console.debug("allPassed: ".concat(allPassed));
+
+  if (allPassed) {
+    console.debug("Setting stage to accept pass.");
+    ctx.events.setActivePlayers({
+      all: constants.phases.preHand.stages.acceptPass
+    });
+  }
+}
+
+function acceptPass(G, ctx, playerID) {
+  console.debug("acceptPass");
+  var player = G.players[playerID]; // Integrate the received cards into your hand.
+
+  Object.values(player.receivedPass).forEach(function (card) {
+    player.hand.push(card);
+  });
+  sortCards(player.hand); // Update the number of cards the player has in their hand.
+
+  G["public"].players[playerID].cards = 14; // Note that the player is ready to play.
+
+  G["public"].players[playerID].readyToPlay = true;
+
+  if (Object.values(G["public"].players).every(function (publicPlayerData) {
+    return publicPlayerData.readyToPlay;
+  })) {
+    console.debug("All players have accepted their pass. Ending phase.");
+    ctx.events.endPhase();
+  }
+}
+
+module.exports = {
+  callGrand: callGrand,
+  takeCards: takeCards,
+  passCards: passCards,
+  checkPlayersHavePassed: checkPlayersHavePassed,
+  acceptPass: acceptPass
+};
+
+/***/ }),
+
+/***/ "./src/PrimaryPlay.js":
+/*!****************************!*\
+  !*** ./src/PrimaryPlay.js ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var _require = __webpack_require__(/*! ./Helpers */ "./src/Helpers.js"),
+    sortCards = _require.sortCards,
+    removeFromHand = _require.removeFromHand,
+    getPlayerIDs = _require.getPlayerIDs;
+
+var _require2 = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
+    constants = _require2.constants;
+
+var _require3 = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boardgame.io/dist/esm/core.js"),
+    Stage = _require3.Stage;
+
+function onHandStart(G, ctx) {
+  console.debug("onHandStart");
+}
+
+function onTurnBegin(G, ctx) {
+  console.debug("Turn of ".concat(ctx.currentPlayer, " is beginning. Looking for start player: ").concat(G.lookingForStartPlayer)); //if (G.lookingForStartPlayer) {
+  //    if (G.players[ctx.currentPlayer].hand.some((cardID) => cardID === constants.specials.mahjong)) {
+  //        console.debug(`found mahjong with player ${ctx.currentPlayer}`);
+  //        G.lookingForStartPlayer = false;
+  //    } else {
+  //        console.debug(`calling endTurn for player ${ctx.currentPlayer}`);
+  //        ctx.events.endTurn();
+  //    }
+  //}
+  //for (var i = 0; i < ctx.playOrder.length; i++) {
+  //    var playerID = ctx.playOrder[i];
+  //    console.debug(`checking hand of player: ${playerID}`);
+  //    console.log(G.players[playerID].hand)
+  //    if (G.players[playerID].hand.some((cardID) => cardID === constants.specials.mahjong)) {
+  //        console.debug(`mahjong is in the hand of player ${playerID}. Current player: ${ctx.currentPlayer}`);
+  //        //while (ctx.currentPlayer !== playerID) {
+  //        //    console.debug(`ending turns until we get to ${playerID}`);
+  //        //    ctx.events.endTurn();
+  //        //}
+  //        G.lookingForMahjong = false;
+  //        ctx.events.endTurn({ next: playerID });
+  //        //var activePlayer = {
+  //        //    value: {}
+  //        //};
+  //        //activePlayer.value[playerID] = Stage.NULL;
+  //        //console.log(activePlayer);
+  //        //ctx.events.setActivePlayers(activePlayer);
+  //        break;
+  //    }
+  //}
+}
+
+function findStartPlayer(G, ctx) {
+  for (var i = 0; i < ctx.playOrder.length; i++) {
+    var playerID = ctx.playOrder[i];
+    console.debug("checking hand of player: ".concat(playerID));
+    console.log(G.players[playerID].hand);
+
+    if (G.players[playerID].hand.some(function (cardID) {
+      return cardID === constants.specials.mahjong;
+    })) {
+      console.debug("mahjong is in the hand of player ".concat(playerID, ". Current player: ").concat(ctx.currentPlayer));
+      return i;
+    }
+  }
+}
+
+module.exports = {
+  onHandStart: onHandStart,
+  onTurnBegin: onTurnBegin,
+  findStartPlayer: findStartPlayer
 };
 
 /***/ }),
