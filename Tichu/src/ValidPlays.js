@@ -87,7 +87,7 @@ function isValidSingle(selectedCards, currentTrick) {
     }
 
     // Otherwise, it has to be higher in rank than the most recent play.
-    var currentHighest = currentTrick.plays[0][0];
+    var currentHighest = currentTrick.plays[0].cards[0];
 
     // If the current highest is a phoenix then we need to beat the next highest card.
     if (currentHighest === constants.specials.phoenix) {
@@ -102,7 +102,7 @@ function isValidSingle(selectedCards, currentTrick) {
 
     // If the card being played is a phoenix then it beats anything but a dragon.
     if (selectedCards[0] === constants.specials.phoenix) {
-        return currentTrick.plays[0][0] !== constants.specials.dragon;
+        return currentTrick.plays[0].cards[0] !== constants.specials.dragon;
     }
 
     // It's not a phoenix, so we can just check the rank.
@@ -169,7 +169,7 @@ function isValidMultiCardSet(selectedCards, currentTrick, length) {
         return true;
     }
 
-    var previousPlay = currentTrick.plays[0];
+    var previousPlay = currentTrick.plays[0].cards;
 
     if (length !== 4) {
         if (previousPlay.length !== selectedCards.length) {
@@ -250,7 +250,7 @@ function isValidSteppedPairs(selectedCards, currentTrick) {
         return true;
     }
 
-    var previousPlay = currentTrick.plays[0];
+    var previousPlay = currentTrick.plays[0].cards;
 
     // They need to be the same number of cards.
     if (selectedCards.length !== previousPlay.length) {
@@ -276,7 +276,7 @@ function isValidFullHouse(selectedCards, currentTrick) {
     }
 
     // Get the value of the 3 of a kind in the previous play.
-    var previousThreesRank = getFullHouseThreesRank(currentTrick.plays[0]);
+    var previousThreesRank = getFullHouseThreesRank(currentTrick.plays[0].cards);
 
     // Check that the new play is higher than the previous.
     return (threesRank > previousThreesRank);
@@ -344,7 +344,7 @@ function isValidStraight(selectedCards, currentTrick) {
         return true;
     }
 
-    var previousPlay = currentTrick.plays[0];
+    var previousPlay = currentTrick.plays[0].cards;
 
     // Check that it's the same number of cards as the previous straight.
     if (selectedCards.length !== previousPlay.length) { return false; }
@@ -385,7 +385,7 @@ function isValidStraightBomb(selectedCards, currentTrick) {
         return true;
     }
 
-    var previousPlay = currentTrick.plays[0];
+    var previousPlay = currentTrick.plays[0].cards;
     if (!isBomb(previousPlay)) {
         // If the previous play was not a bomb then you're 
         return true;
@@ -501,10 +501,14 @@ function hasCurrent(currentTrick) {
 const currentTrickExample = {
     type: "typeFunction",
     plays: [
-        ["play n"],
-        ["play n-1"],
-        ["..."],
-        ["play 0"]
+        { 
+            cards: ["play n"],
+            player: "0"
+        },
+        {
+            cards: ["play n-1"],
+            player: "2"
+        }
     ]
 }
 */
