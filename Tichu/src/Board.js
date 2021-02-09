@@ -6,7 +6,7 @@ import { FormGroup, Button } from 'reactstrap';
 import 'bootstrap';
 const { sortCards, removeFromHand, getPlayerIDs, addToHand } = require('./Helpers');
 const { constants } = require('./Constants');
-const { validPlays, detectPlayType } = require('./ValidPlays');
+const { validPlays, detectPlayType, canPass, isValidPlay } = require('./ValidPlays');
 
 export const TichuBoard = (props) => {
 
@@ -113,6 +113,13 @@ export const TichuBoard = (props) => {
         }
     }
 
+    const onPassClicked = () => {
+        if (isPlayerActive) {
+            moves.pass();
+            setSelectedCards([]);
+        }
+    }
+
     return (
         <div className="board">
             <div className="board-row">
@@ -135,7 +142,7 @@ export const TichuBoard = (props) => {
                 </div>
                 <div className="board-middle">
                     {phase === constants.phases.preHand.name && <PassArea selectedCards={stage === constants.phases.preHand.stages.passCards ? passedCards : receivedCards} stage={stage} readyToPlay={G.public.players[playerID].readyToPlay} onReturnPass={handleReturnPass} onPassConfirmed={handlePassConfirmed} onAcceptConfirmed={handleAcceptConfirmed} />}
-                    {phase === constants.phases.primaryPlay.name && <>Selected Play Type: {selectedPlayType?.name}<br />{selectedPlayType?.isValid(selectedCards, G.currentTrick) ? "VALID" : "INVALID"}</>}
+                    {phase === constants.phases.primaryPlay.name && <>Selected Play Type: {selectedPlayType?.name}<br />{isValidPlay(selectedCards, G.currentTrick) ? "VALID" : "INVALID"}</>}
                 </div>
                 <div className="board-side">
                     <Player playerID={playerIDs.right} phase={phase} currentPlayer={ctx.currentPlayer} />
@@ -156,7 +163,10 @@ export const TichuBoard = (props) => {
                         </FormGroup>
                     }
                     {isPlayerActive &&
-                        <Button color="primary" className="mx-1" onClick={onPlayClicked} disabled={!selectedPlayType?.isValid(selectedCards, G.currentTrick)}>Play</Button>
+                        <FormGroup>
+                            <Button color="primary" className="mx-1" onClick={onPlayClicked} disabled={!selectedPlayType?.isValid(selectedCards, G.currentTrick)}>Play</Button>
+                            <Button color="primary" className="mx-1" onClick={onPassClicked} disabled={!canPass(G.currentTrick)}>Pass</Button>
+                        </FormGroup>
                     }
                 </div>
                 <div className="board-side">

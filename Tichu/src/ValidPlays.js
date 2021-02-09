@@ -49,21 +49,18 @@ const validPlays = {
 }
 
 function detectPlayType(selectedCards) {
-    if (!selectedCards || selectedCards.length === 0) { return validPlays.invalid; }
+    if (!selectedCards || selectedCards.length === 0) { return "invalid"; }
 
     return Object.keys(validPlays).find((playType) => validPlays[playType].isValid(selectedCards)) || "invalid";
 }
 
 function isValidPlay(selectedCards, currentTrick) {
-    var type;
-    if (currentTrick) {
-        type = currentTrick.type;
-    }
-    if (!type) {
-        type = detectPlayType(selectedCards);
+    var selectedPlayType = detectPlayType(selectedCards);
+    if (currentTrick && currentTrick.type !== selectedPlayType) {
+        return false;
     }
 
-    return validPlays[type].isValid(selectedCards, currentTrick);
+    return validPlays[selectedPlayType].isValid(selectedCards, currentTrick);
 }
 
 function isValidSingle(selectedCards, currentTrick) {
@@ -494,12 +491,17 @@ function hasCurrent(currentTrick) {
     return (currentTrick && currentTrick.plays && currentTrick.plays.length > 0);
 }
 
+function canPass(currentTrick) {
+    // TODO: Handle when a wish is active.
+    return hasCurrent(currentTrick);
+}
 
 
 module.exports = {
     validPlays: validPlays,
     isValidPlay: isValidPlay,
-    detectPlayType: detectPlayType
+    detectPlayType: detectPlayType,
+    canPass: canPass
 }
 
 /*

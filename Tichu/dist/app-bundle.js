@@ -69507,7 +69507,9 @@ var _require2 = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
 
 var _require3 = __webpack_require__(/*! ./ValidPlays */ "./src/ValidPlays.js"),
     validPlays = _require3.validPlays,
-    detectPlayType = _require3.detectPlayType;
+    detectPlayType = _require3.detectPlayType,
+    canPass = _require3.canPass,
+    isValidPlay = _require3.isValidPlay;
 
 var TichuBoard = function TichuBoard(props) {
   var G = props.G,
@@ -69624,6 +69626,13 @@ var TichuBoard = function TichuBoard(props) {
     }
   };
 
+  var onPassClicked = function onPassClicked() {
+    if (isPlayerActive) {
+      moves.pass();
+      setSelectedCards([]);
+    }
+  };
+
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
@@ -69659,7 +69668,7 @@ var TichuBoard = function TichuBoard(props) {
     onReturnPass: handleReturnPass,
     onPassConfirmed: handlePassConfirmed,
     onAcceptConfirmed: handleAcceptConfirmed
-  }), phase === constants.phases.primaryPlay.name && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "Selected Play Type: ", selectedPlayType === null || selectedPlayType === void 0 ? void 0 : selectedPlayType.name, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), selectedPlayType !== null && selectedPlayType !== void 0 && selectedPlayType.isValid(selectedCards, G.currentTrick) ? "VALID" : "INVALID")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+  }), phase === constants.phases.primaryPlay.name && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "Selected Play Type: ", selectedPlayType === null || selectedPlayType === void 0 ? void 0 : selectedPlayType.name, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), isValidPlay(selectedCards, G.currentTrick) ? "VALID" : "INVALID")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-side"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Player__WEBPACK_IMPORTED_MODULE_2__["Player"], {
     playerID: playerIDs.right,
@@ -69689,12 +69698,17 @@ var TichuBoard = function TichuBoard(props) {
     color: "primary",
     className: "mx-1",
     onClick: onTakeClicked
-  }, "Take")), isPlayerActive && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_4__["Button"], {
+  }, "Take")), isPlayerActive && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_4__["FormGroup"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_4__["Button"], {
     color: "primary",
     className: "mx-1",
     onClick: onPlayClicked,
     disabled: !(selectedPlayType !== null && selectedPlayType !== void 0 && selectedPlayType.isValid(selectedCards, G.currentTrick))
-  }, "Play")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+  }, "Play"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_4__["Button"], {
+    color: "primary",
+    className: "mx-1",
+    onClick: onPassClicked,
+    disabled: !canPass(G.currentTrick)
+  }, "Pass"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-side"
   }, "Empty")));
 };
@@ -69899,7 +69913,8 @@ var _require5 = __webpack_require__(/*! ./PrimaryPlay */ "./src/PrimaryPlay.js")
     playCards = _require5.playCards,
     primaryPlayEndIf = _require5.primaryPlayEndIf,
     primaryPlayOnEnd = _require5.primaryPlayOnEnd,
-    primaryPlayTurnEndIfOut = _require5.primaryPlayTurnEndIfOut;
+    primaryPlayTurnEndIfOut = _require5.primaryPlayTurnEndIfOut,
+    primaryPlayPass = _require5.primaryPlayPass;
 
 var tichu = {
   setup: function setup() {
@@ -70009,7 +70024,8 @@ var tichu = {
         moveLimit: 1
       },
       moves: {
-        playCards: playCards
+        playCards: playCards,
+        pass: primaryPlayPass
       },
       endIf: primaryPlayEndIf,
       onEnd: primaryPlayOnEnd,
@@ -70501,7 +70517,8 @@ var _require4 = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boa
 
 var _require5 = __webpack_require__(/*! ./ValidPlays */ "./src/ValidPlays.js"),
     detectPlayType = _require5.detectPlayType,
-    validPlays = _require5.validPlays;
+    validPlays = _require5.validPlays,
+    canPass = _require5.canPass;
 
 function onHandStart(G, ctx) {
   console.debug("onHandStart");
@@ -70516,7 +70533,7 @@ function onTurnBegin(G, ctx) {
     if (G.currentTrick.plays[0].player === ctx.currentPlayer) {
       // Give the current player the cards in the trick.
       // TODO: Deal with giving away the dragon by sending the player to a "give away dragon" stage.
-      clearTable(G, ctx.receivingPlayerID); // Clear the current trick. It remains the current players hand.
+      clearTable(G, ctx.currentPlayer); // Clear the current trick. It remains the current players hand.
 
       G.currentTrick = null;
     }
@@ -70597,6 +70614,11 @@ function primaryPlayEndIf(G, ctx) {
 }
 
 function pass(G, ctx) {
+  if (!canPass(G.currentTrick)) {
+    console.debug("Invalid move: Player ".concat(ctx.currentPlayer, " tried to pass on the first play of a trick"));
+    return INVALID_MOVE;
+  }
+
   console.debug("Player ".concat(ctx.currentPlayer, " passes"));
 }
 
@@ -70642,7 +70664,8 @@ module.exports = {
   playCards: playCards,
   primaryPlayEndIf: primaryPlayEndIf,
   primaryPlayOnEnd: primaryPlayOnEnd,
-  primaryPlayTurnEndIfOut: primaryPlayTurnEndIfOut
+  primaryPlayTurnEndIfOut: primaryPlayTurnEndIfOut,
+  primaryPlayPass: pass
 };
 
 /***/ }),
@@ -70729,7 +70752,7 @@ var validPlays = {
 
 function detectPlayType(selectedCards) {
   if (!selectedCards || selectedCards.length === 0) {
-    return validPlays.invalid;
+    return "invalid";
   }
 
   return Object.keys(validPlays).find(function (playType) {
@@ -70738,17 +70761,13 @@ function detectPlayType(selectedCards) {
 }
 
 function isValidPlay(selectedCards, currentTrick) {
-  var type;
+  var selectedPlayType = detectPlayType(selectedCards);
 
-  if (currentTrick) {
-    type = currentTrick.type;
+  if (currentTrick && currentTrick.type !== selectedPlayType) {
+    return false;
   }
 
-  if (!type) {
-    type = detectPlayType(selectedCards);
-  }
-
-  return validPlays[type].isValid(selectedCards, currentTrick);
+  return validPlays[selectedPlayType].isValid(selectedCards, currentTrick);
 }
 
 function isValidSingle(selectedCards, currentTrick) {
@@ -71202,10 +71221,16 @@ function hasCurrent(currentTrick) {
   return currentTrick && currentTrick.plays && currentTrick.plays.length > 0;
 }
 
+function canPass(currentTrick) {
+  // TODO: Handle when a wish is active.
+  return hasCurrent(currentTrick);
+}
+
 module.exports = {
   validPlays: validPlays,
   isValidPlay: isValidPlay,
-  detectPlayType: detectPlayType
+  detectPlayType: detectPlayType,
+  canPass: canPass
 };
 /*
 const currentTrickExample = {

@@ -2,7 +2,7 @@ const { INVALID_MOVE } = require('boardgame.io/core');
 const { sortCards, removeFromHand, getPlayerIDs } = require('./Helpers');
 const { constants } = require('./Constants');
 const { Stage } = require('boardgame.io/core');
-const { detectPlayType, validPlays } = require('./ValidPlays');
+const { detectPlayType, validPlays, canPass } = require('./ValidPlays');
 
 function onHandStart(G, ctx) {
     console.debug("onHandStart");
@@ -19,7 +19,7 @@ function onTurnBegin(G, ctx) {
 
             // TODO: Deal with giving away the dragon by sending the player to a "give away dragon" stage.
 
-            clearTable(G, ctx.receivingPlayerID);
+            clearTable(G, ctx.currentPlayer);
 
             // Clear the current trick. It remains the current players hand.
             G.currentTrick = null;
@@ -97,6 +97,10 @@ function primaryPlayEndIf(G, ctx) {
 }
 
 function pass(G, ctx) {
+    if (!canPass(G.currentTrick)) {
+        console.debug(`Invalid move: Player ${ctx.currentPlayer} tried to pass on the first play of a trick`);
+        return INVALID_MOVE;
+    }
     console.debug(`Player ${ctx.currentPlayer} passes`);
 }
 
@@ -140,5 +144,6 @@ module.exports = {
     playCards: playCards,
     primaryPlayEndIf: primaryPlayEndIf,
     primaryPlayOnEnd: primaryPlayOnEnd,
-    primaryPlayTurnEndIfOut: primaryPlayTurnEndIfOut
+    primaryPlayTurnEndIfOut: primaryPlayTurnEndIfOut,
+    primaryPlayPass: pass
 }

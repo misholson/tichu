@@ -2,7 +2,7 @@ const { PlayerView } = require('boardgame.io/core');
 const { sortCards, dealCards } = require('./Helpers');
 const { constants } = require('./Constants');
 const { callGrand, takeCards, passCards, checkPlayersHavePassed, acceptPass } = require('./PreHand');
-const { onHandStart, onTurnBegin, findStartPlayer, playCards, primaryPlayEndIf, primaryPlayOnEnd, primaryPlayTurnEndIfOut } = require('./PrimaryPlay');
+const { onHandStart, onTurnBegin, findStartPlayer, playCards, primaryPlayEndIf, primaryPlayOnEnd, primaryPlayTurnEndIfOut, primaryPlayPass } = require('./PrimaryPlay');
 
 const tichu = {
     setup: () => ({
@@ -108,7 +108,8 @@ const tichu = {
                 moveLimit: 1
             },
             moves: {
-                playCards: playCards
+                playCards: playCards,
+                pass: primaryPlayPass
             },
             endIf: primaryPlayEndIf,
             onEnd: primaryPlayOnEnd,
