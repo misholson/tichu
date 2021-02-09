@@ -69896,7 +69896,10 @@ var _require5 = __webpack_require__(/*! ./PrimaryPlay */ "./src/PrimaryPlay.js")
     onHandStart = _require5.onHandStart,
     onTurnBegin = _require5.onTurnBegin,
     findStartPlayer = _require5.findStartPlayer,
-    playCards = _require5.playCards;
+    playCards = _require5.playCards,
+    primaryPlayEndIf = _require5.primaryPlayEndIf,
+    primaryPlayOnEnd = _require5.primaryPlayOnEnd,
+    primaryPlayTurnEndIfOut = _require5.primaryPlayTurnEndIfOut;
 
 var tichu = {
   setup: function setup() {
@@ -69990,14 +69993,13 @@ var tichu = {
       start: true
     },
     primaryPlay: {
-      onBegin: function onBegin(G, ctx) {
-        console.debug("Starting primary play phase");
-      },
+      onBegin: onHandStart,
       turn: {
         onEnd: function onEnd(G, ctx) {
           console.debug("Turn of ".concat(ctx.currentPlayer, " is ending"));
         },
         onBegin: onTurnBegin,
+        endIf: primaryPlayTurnEndIfOut,
         order: {
           first: findStartPlayer,
           next: function next(G, ctx) {
@@ -70008,7 +70010,10 @@ var tichu = {
       },
       moves: {
         playCards: playCards
-      }
+      },
+      endIf: primaryPlayEndIf,
+      onEnd: primaryPlayOnEnd,
+      next: constants.phases.preHand.name
     }
   },
   minPlayers: 4,
@@ -70504,6 +70509,18 @@ function onHandStart(G, ctx) {
 
 function onTurnBegin(G, ctx) {
   console.debug("Turn of ".concat(ctx.currentPlayer, " is beginning."));
+
+  if (G.currentTrick && G.currentTrick.plays && G.currentTrick.plays.length > 0) {
+    // If the most recent play was done by the current player, then the player takes all the cards in the current
+    // trick into their tricks, and current trick is cleared.
+    if (G.currentTrick.plays[0].player === ctx.currentPlayer) {
+      // Give the current player the cards in the trick.
+      // TODO: Deal with giving away the dragon by sending the player to a "give away dragon" stage.
+      clearTable(G, ctx.receivingPlayerID); // Clear the current trick. It remains the current players hand.
+
+      G.currentTrick = null;
+    }
+  }
 }
 
 function findStartPlayer(G, ctx) {
@@ -70567,17 +70584,65 @@ function playCards(G, ctx, cards) {
     return removeFromHand(G.players[ctx.currentPlayer].hand, c);
   });
   G["public"].players[ctx.currentPlayer].cards = G.players[ctx.currentPlayer].hand.length;
+  var publicPlayerInfo = G["public"].players[ctx.currentPlayer];
 
-  if (G["public"].players[ctx.currentPlayer].cards === 0) {
-    G["public"].players.out = true; // TODO: Manage what happens when a player goes out.
+  if (publicPlayerInfo.cards === 0) {
+    publicPlayerInfo.out = true;
+    publicPlayerInfo.outOrder = countOutPlayers(G, ctx);
   }
+}
+
+function primaryPlayEndIf(G, ctx) {
+  return countOutPlayers(G, ctx) === 3;
+}
+
+function pass(G, ctx) {
+  console.debug("Player ".concat(ctx.currentPlayer, " passes"));
+}
+
+function clearTable(G, receivingPlayerID) {
+  var player = G.players[receivingPlayerID];
+
+  if (!G.currentTrick || !G.currentTrick.plays || G.currentTrick.plays.length === 0) {
+    return;
+  }
+
+  player.cardsWon = player.cardsWon || [];
+  G.currentTrick.plays.forEach(function (play) {
+    play.cards.forEach(function (card) {
+      return player.cardsWon.push(card);
+    });
+  });
+}
+
+function countOutPlayers(G, ctx) {
+  var outPlayerCount = 0;
+
+  for (var i = 0; i < ctx.numPlayers; i++) {
+    if (G["public"].players[i].out) {
+      outPlayerCount++;
+    }
+  }
+
+  return outPlayerCount;
+}
+
+function primaryPlayOnEnd(G, ctx) {// Count score.
+}
+
+function primaryPlayTurnEndIfOut(G, ctx) {
+  // If the current player is out, play proceeds in regular turn order.
+  return G.players[ctx.currentPlayer].hand.length === 0;
 }
 
 module.exports = {
   onHandStart: onHandStart,
   onTurnBegin: onTurnBegin,
   findStartPlayer: findStartPlayer,
-  playCards: playCards
+  playCards: playCards,
+  primaryPlayEndIf: primaryPlayEndIf,
+  primaryPlayOnEnd: primaryPlayOnEnd,
+  primaryPlayTurnEndIfOut: primaryPlayTurnEndIfOut
 };
 
 /***/ }),

@@ -2,7 +2,7 @@ const { PlayerView } = require('boardgame.io/core');
 const { sortCards, dealCards } = require('./Helpers');
 const { constants } = require('./Constants');
 const { callGrand, takeCards, passCards, checkPlayersHavePassed, acceptPass } = require('./PreHand');
-const { onHandStart, onTurnBegin, findStartPlayer, playCards } = require('./PrimaryPlay');
+const { onHandStart, onTurnBegin, findStartPlayer, playCards, primaryPlayEndIf, primaryPlayOnEnd, primaryPlayTurnEndIfOut } = require('./PrimaryPlay');
 
 const tichu = {
     setup: () => ({
@@ -96,12 +96,11 @@ const tichu = {
             start: true
         },
         primaryPlay: {
-            onBegin: (G, ctx) => {
-                console.debug("Starting primary play phase");
-            },
+            onBegin: onHandStart,
             turn: {
                 onEnd: (G, ctx) => { console.debug(`Turn of ${ctx.currentPlayer} is ending`) },
                 onBegin: onTurnBegin,
+                endIf: primaryPlayTurnEndIfOut,
                 order: {
                     first: findStartPlayer,
                     next: (G, ctx) => (ctx.playOrderPos + 1) % ctx.numPlayers
@@ -110,7 +109,10 @@ const tichu = {
             },
             moves: {
                 playCards: playCards
-            }
+            },
+            endIf: primaryPlayEndIf,
+            onEnd: primaryPlayOnEnd,
+            next: constants.phases.preHand.name,
         }
     },
 
