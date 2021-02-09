@@ -129,6 +129,9 @@
     <Content Include="src\PassArea.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="src\PlayArea.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="src\Player.js">
       <SubType>Code</SubType>
     </Content>

@@ -29,6 +29,15 @@
     box-shadow: 1px 1px 5px #555;
 }
 
+.play-area .play {
+    height: 150px;
+    float: none;
+    width: 100%;
+}
+.play-area {
+    height: 800px;
+}
+
 .hand .selectedCard {
     padding-bottom: 20px;
 }

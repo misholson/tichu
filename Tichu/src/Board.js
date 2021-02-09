@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Hand, OpponentHand, PartnerHand } from './Hand';
 import { Player } from './Player';
 import { PassArea } from './PassArea';
+import { PlayArea } from './PlayArea';
 import { FormGroup, Button } from 'reactstrap';
 import 'bootstrap';
 const { sortCards, removeFromHand, getPlayerIDs, addToHand } = require('./Helpers');
@@ -142,7 +143,7 @@ export const TichuBoard = (props) => {
                 </div>
                 <div className="board-middle">
                     {phase === constants.phases.preHand.name && <PassArea selectedCards={stage === constants.phases.preHand.stages.passCards ? passedCards : receivedCards} stage={stage} readyToPlay={G.public.players[playerID].readyToPlay} onReturnPass={handleReturnPass} onPassConfirmed={handlePassConfirmed} onAcceptConfirmed={handleAcceptConfirmed} />}
-                    {phase === constants.phases.primaryPlay.name && <>Selected Play Type: {selectedPlayType?.name}<br />{isValidPlay(selectedCards, G.currentTrick) ? "VALID" : "INVALID"}</>}
+                    {phase === constants.phases.primaryPlay.name && <PlayArea currentTrick={G.currentTrick} />}
                 </div>
                 <div className="board-side">
                     <Player playerID={playerIDs.right} phase={phase} currentPlayer={ctx.currentPlayer} />
