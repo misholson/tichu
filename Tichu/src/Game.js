@@ -1,4 +1,5 @@
 const { PlayerView } = require('boardgame.io/core');
+const scenarios = require('../scenarios/scenarios');
 
 const tichu = {
     setup: (ctx) => {
@@ -100,5 +101,5 @@ function generateDeck(size) {
 }
 
 module.exports = {
-    Tichu: tichu
+    Tichu: scenarios.skipPreHandPhase(tichu)
 }

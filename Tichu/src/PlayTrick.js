@@ -217,7 +217,14 @@ function onTrickEnd(G, ctx) {
         G.currentTrick = null;
 
         console.debug(`ending the trick.`);
-        ctx.events.setPhase(constants.phases.playTrick.name);
+        var nextPhase = constants.phases.playTrick.name;
+
+        if (countOutPlayers(G, ctx) === 3) {
+            // Count score
+
+            nextPhase = constants.phases.preHand.name;
+        }
+        ctx.events.setPhase(nextPhase);
     }
 }
 

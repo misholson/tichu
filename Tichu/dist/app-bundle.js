@@ -69402,12 +69402,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
-
-var _require = __webpack_require__(/*! ../scenarios/scenarios */ "./scenarios/scenarios.js"),
-    skipPreHandPhase = _require.skipPreHandPhase;
-
 var TichuClient = Object(boardgame_io_react__WEBPACK_IMPORTED_MODULE_1__["Client"])({
-  game: skipPreHandPhase(_Game__WEBPACK_IMPORTED_MODULE_3__["Tichu"]),
+  game: _Game__WEBPACK_IMPORTED_MODULE_3__["Tichu"],
   board: _Board__WEBPACK_IMPORTED_MODULE_4__["TichuBoard"],
   numPlayers: 4,
   multiplayer: Object(boardgame_io_multiplayer__WEBPACK_IMPORTED_MODULE_2__["SocketIO"])({
@@ -69906,6 +69902,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 var _require = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boardgame.io/dist/esm/core.js"),
     PlayerView = _require.PlayerView;
 
+var scenarios = __webpack_require__(/*! ../scenarios/scenarios */ "./scenarios/scenarios.js");
+
 var tichu = {
   setup: function setup(ctx) {
     var score = {};
@@ -69995,7 +69993,7 @@ function generateDeck(size) {
 }
 
 module.exports = {
-  Tichu: tichu
+  Tichu: scenarios.skipPreHandPhase(tichu)
 };
 
 /***/ }),
@@ -70548,7 +70546,14 @@ function onTrickEnd(G, ctx) {
 
     G.currentTrick = null;
     console.debug("ending the trick.");
-    ctx.events.setPhase(constants.phases.playTrick.name);
+    var nextPhase = constants.phases.playTrick.name;
+
+    if (countOutPlayers(G, ctx) === 3) {
+      // Count score
+      nextPhase = constants.phases.preHand.name;
+    }
+
+    ctx.events.setPhase(nextPhase);
   }
 }
 
