@@ -4,8 +4,10 @@ const scenarios = require('../scenarios/scenarios');
 const tichu = {
     setup: (ctx) => {
         var score = {};
-        score[ctx.playOrder[0]] = 0;
-        score[ctx.playOrder[1]] = 0;
+        // Count score
+        for (var i = 0; i < ctx.numPlayers; i++) {
+            score[ctx.playOrder[i]] = 0;
+        }
 
         return {
             secret: {
@@ -38,6 +40,7 @@ const tichu = {
             },
 
             score: { ...score },
+            scoreHistory: [],
 
             players: {
                 "0": {
@@ -69,19 +72,19 @@ const tichu = {
     endIf: (G, ctx) => {
         // I don't know why G is sometimes passed in as a scalar or undefined,
         // but there's no reason for it to crash the game, at least not here.
-        //if (G instanceof Object) {
-        //    // Game ends when one team has a score greater than 0
-        //    console.log(G);
-        //    var team1score = G.score[ctx.playOrder[0]];
-        //    var team2score = G.score[ctx.playOrder[1]];
+        if (G && G instanceof Object) {
+            // Game ends when one team has a score greater than 0
+            //console.log(G);
+            var team1score = G.score[ctx.playOrder[0]] + G.score[ctx.playOrder[2]];
+            var team2score = G.score[ctx.playOrder[1]] + G.score[ctx.playOrder[3]];
 
-        //    console.debug(`Current score: ${team1score}-${team2score}`);
-        //    if (team1score !== team2score && (team1score >= 1000 || team2score >= 1000)) {
-        //        return G.score;
-        //    }
+            //console.debug(`Current score: ${team1score}-${team2score}`);
+            if (team1score !== team2score && (team1score >= 1000 || team2score >= 1000)) {
+                return G.score;
+            }
 
-        //    return null;
-        //}
+            return null;
+        }
 
         return null;
     },
@@ -101,5 +104,5 @@ function generateDeck(size) {
 }
 
 module.exports = {
-    Tichu: scenarios.skipPreHandPhase(tichu)
+    Tichu: tichu
 }

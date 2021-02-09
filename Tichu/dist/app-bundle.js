@@ -69845,12 +69845,32 @@ var generateCardDefinitions = function generateCardDefinitions() {
       } // This shouldn't be so complicated in js!
 
 
-      cards.push({
+      var cardDefinition = {
         isSpecial: false,
         rank: iRank,
         suit: suit.suit,
         image: "".concat(suit.imagePrefix).concat(imgNo, ".png")
-      });
+      };
+
+      switch (iRank) {
+        case 5:
+          cardDefinition.score = 5; // 5s are worth 5
+
+          break;
+
+        case 10:
+        case 13:
+          cardDefinition.score = 10; // K and 10 are worth 10
+
+          break;
+
+        default:
+          cardDefinition.score = 0; // Everything else is worth 0
+
+          break;
+      }
+
+      cards.push(cardDefinition);
     }
   } // Specials
 
@@ -69859,25 +69879,29 @@ var generateCardDefinitions = function generateCardDefinitions() {
     isSpecial: true,
     rank: 15,
     suit: "dragon",
-    image: "s_dragon.png"
+    image: "s_dragon.png",
+    score: 25
   });
   cards.push({
     isSpecial: true,
     rank: 14.5,
     suit: "phoenix",
-    image: "s_phoenix.png"
+    image: "s_phoenix.png",
+    score: -25
   });
   cards.push({
     isSpecial: true,
     rank: -1,
     suit: "dog",
-    image: "s_dog.png"
+    image: "s_dog.png",
+    score: 0
   });
   cards.push({
     isSpecial: true,
     rank: 1,
     suit: "mahjong",
-    image: "s_mahjong.png"
+    image: "s_mahjong.png",
+    score: 0
   });
   return cards;
 };
@@ -69906,9 +69930,12 @@ var scenarios = __webpack_require__(/*! ../scenarios/scenarios */ "./scenarios/s
 
 var tichu = {
   setup: function setup(ctx) {
-    var score = {};
-    score[ctx.playOrder[0]] = 0;
-    score[ctx.playOrder[1]] = 0;
+    var score = {}; // Count score
+
+    for (var i = 0; i < ctx.numPlayers; i++) {
+      score[ctx.playOrder[i]] = 0;
+    }
+
     return {
       secret: {
         deck: generateDeck(56)
@@ -69938,6 +69965,7 @@ var tichu = {
         }
       },
       score: _objectSpread({}, score),
+      scoreHistory: [],
       players: {
         "0": {
           hand: []
@@ -69965,17 +69993,19 @@ var tichu = {
   endIf: function endIf(G, ctx) {
     // I don't know why G is sometimes passed in as a scalar or undefined,
     // but there's no reason for it to crash the game, at least not here.
-    //if (G instanceof Object) {
-    //    // Game ends when one team has a score greater than 0
-    //    console.log(G);
-    //    var team1score = G.score[ctx.playOrder[0]];
-    //    var team2score = G.score[ctx.playOrder[1]];
-    //    console.debug(`Current score: ${team1score}-${team2score}`);
-    //    if (team1score !== team2score && (team1score >= 1000 || team2score >= 1000)) {
-    //        return G.score;
-    //    }
-    //    return null;
-    //}
+    if (G && G instanceof Object) {
+      // Game ends when one team has a score greater than 0
+      //console.log(G);
+      var team1score = G.score[ctx.playOrder[0]] + G.score[ctx.playOrder[2]];
+      var team2score = G.score[ctx.playOrder[1]] + G.score[ctx.playOrder[3]]; //console.debug(`Current score: ${team1score}-${team2score}`);
+
+      if (team1score !== team2score && (team1score >= 1000 || team2score >= 1000)) {
+        return G.score;
+      }
+
+      return null;
+    }
+
     return null;
   },
   minPlayers: 4,
@@ -69993,7 +70023,7 @@ function generateDeck(size) {
 }
 
 module.exports = {
-  Tichu: scenarios.skipPreHandPhase(tichu)
+  Tichu: tichu
 };
 
 /***/ }),
@@ -70323,8 +70353,12 @@ var _require5 = __webpack_require__(/*! ./ValidPlays */ "./src/ValidPlays.js"),
     canPass = _require5.canPass,
     getPreviousPlay = _require5.getPreviousPlay;
 
+var _require6 = __webpack_require__(/*! ./Deck */ "./src/Deck.js"),
+    cardDefinitions = _require6.cardDefinitions;
+
 function onPhaseBegin(G, ctx) {
-  console.debug("Begin Trick by clearing out G.currentTrick");
+  console.debug("");
+  console.debug("------Begin Trick------");
   G.currentTrick = null;
 }
 
@@ -70353,6 +70387,7 @@ function findStartPlayer(G, ctx) {
     var newIndex = ctx.playOrder.findIndex(function (pId) {
       return pId === newStartPlayer;
     });
+    newIndex = findNextPlayerNotOut(G, ctx, newIndex);
     console.debug("Previous trick winner was ".concat(newStartPlayer, " at position ").concat(newIndex));
     return newIndex;
   }
@@ -70364,20 +70399,34 @@ function findNextPlayer(G, ctx) {
 
   if (previousPlay) {
     if (previousPlay.cards.length === 1 && previousPlay.cards[0] === constants.specials.dog) {
-      nextPlayerPos++;
+      nextPlayerPos = (nextPlayerPos + 1) % ctx.numPlayers;
+      console.debug("Player ".concat(ctx.playOrder[ctx.playOrderPos], " played the dog, so play moves to player ").concat(ctx.playOrder[nextPlayerPos]));
     }
+  } // Find the next player who's not out.
+
+
+  nextPlayerPos = findNextPlayerNotOut(G, ctx, nextPlayerPos);
+  console.debug("Next player will be ".concat(ctx.playOrder[nextPlayerPos]));
+  return nextPlayerPos;
+}
+
+function findNextPlayerNotOut(G, ctx, nextPlayerPos) {
+  // If the next player has no cards, go one player further. Do this in a for loop so if there's a bug and
+  // all four players are out we don't see an infinite loop.
+  for (var i = 0; i < ctx.numPlayers && G.players[ctx.playOrder[nextPlayerPos]].hand.length === 0; i++) {
+    console.debug("Player ".concat(ctx.playOrder[nextPlayerPos], " has no cards, so play moves to player ").concat(ctx.playOrder[(nextPlayerPos + 1) % ctx.numPlayers]));
+    nextPlayerPos = (nextPlayerPos + 1) % ctx.numPlayers;
   }
 
   return nextPlayerPos;
 }
 
 function onTurnBegin(G, ctx) {
-  console.debug("Turn of ".concat(ctx.currentPlayer, " is beginning."));
-
-  if (G.players[ctx.currentPlayer].hand.length === 0) {
-    // If player is out, skip their turn.
-    ctx.events.endTurn();
-  }
+  console.debug("Turn of ".concat(ctx.currentPlayer, " is beginning.")); //if (G.players[ctx.currentPlayer].hand.length === 0) {
+  //    // If player is out, skip their turn.
+  //    console.debug(`Ending turn of ${ctx.currentPlayer} since they do not have any cards`);
+  //    ctx.events.endTurn();
+  //}
 
   var previousPlay = getPreviousPlay(G.currentTrick); // If the previous play was the dog, so clear out the trick before starting play.
 
@@ -70422,7 +70471,7 @@ function playCards(G, ctx, cards) {
 
 
   if (!G.currentTrick) {
-    console.debug("Creating trick of type: ".concat(type.name));
+    console.debug("Creating trick of type: ".concat(type));
     G.currentTrick = {
       type: type,
       plays: []
@@ -70493,28 +70542,60 @@ function clearTable(G, receivingPlayerID) {
 function trickEndIf(G, ctx) {
   // If the last player to play is also the current player.
   var winner = findTrickWinner(G, ctx);
-  return !!winner;
+
+  if (winner) {
+    var playerOutCount = countOutPlayers(G, ctx);
+
+    if (playerOutCount >= 3) {
+      console.debug("3 players are out. Hand will end.");
+      return {
+        next: constants.phases.preHand.name
+      };
+    } else {
+      console.debug("Trick will end with ".concat(playerOutCount, " players out. Winner is ").concat(winner));
+      return {
+        next: constants.phases.playTrick.name
+      };
+    }
+  }
+
+  return false;
 }
 
 function findTrickWinner(G, ctx) {
+  // Basic logic here is that if the player who most recently played cards is the current player, then everyone else passed
+  // and the current player is the winner.
+  // The logic can't be that simple here, because the framework calls phase endIf at the
+  // beginning and end of the turn, so right after you play this function gets called and it looks like you've won the trick
+  // However, if the first card in the history is a pass it means we've had at least one other person play and got back to you.
   if (G.currentTrick && G.currentTrick.plays && G.currentTrick.plays.length > 0) {
-    // If all but one player has passed, that player wins.
-    var trickOver = true;
-    var i;
+    // There needs to be at least one pass in the history, and the previous play must have been played by the current player.
+    if (G.currentTrick.plays[0].pass) {
+      // We need to check for pass because the framework checks trickEndIf at the beginning and end of your turn.
+      var previousPlay = getPreviousPlay(G.currentTrick);
 
-    for (i = 0; i < ctx.numPlayers - 1; i++) {
-      // If we find a player who hasn't passed, the trick isn't over.
-      if (!G.currentTrick.plays[i].pass) {
-        trickOver = false;
-        break;
+      if (previousPlay.player === ctx.currentPlayer) {
+        var winner = previousPlay.player;
+        console.debug("Checking for trick end. ".concat(winner, " is the winner"));
+        return winner;
       }
-    }
+    } //// If all but one player has passed, that player wins.
+    ////var outCount = countOutPlayers(G, ctx);
+    //var trickOver = true;
+    //var i;
+    //for (i = 0; i < ctx.numPlayers - 1; i++) {
+    //    // If we find a player who hasn't passed, the trick isn't over.
+    //    if (!G.currentTrick.plays[i].pass) {
+    //        trickOver = false;
+    //        break;
+    //    }
+    //}
+    //if (trickOver) {
+    //    var winner = G.currentTrick.plays[i].player;
+    //    console.debug(`Checking for trick end. ${i} players have passed. ${winner} is the winner`);
+    //    return winner;
+    //}
 
-    if (trickOver) {
-      var winner = G.currentTrick.plays[i].player;
-      console.debug("Checking for trick end. ".concat(i, " players have passed. ").concat(winner, " is the winner"));
-      return winner;
-    }
   }
 
   return null;
@@ -70534,6 +70615,8 @@ function countOutPlayers(G, ctx) {
 
 function onTrickEnd(G, ctx) {
   var winner = findTrickWinner(G, ctx);
+  console.debug("------End Trick------\n");
+  console.debug("------Begin Cleanup------\n");
   console.debug("Cleaning up trick. Winner: ".concat(winner));
 
   if (winner) {
@@ -70542,18 +70625,31 @@ function onTrickEnd(G, ctx) {
     clearTable(G, winner); // Save off the current trick to the log of previous tricks.
 
     G.previousTricks = G.previousTricks || [];
-    G.previousTricks.unshift(G.currentTrick); // Clear the current trick. It remains the current players hand.
-
-    G.currentTrick = null;
-    console.debug("ending the trick.");
+    G.previousTricks.unshift(G.currentTrick);
     var nextPhase = constants.phases.playTrick.name;
+    var playerOutCount = countOutPlayers(G, ctx);
 
-    if (countOutPlayers(G, ctx) === 3) {
-      // Count score
+    if (playerOutCount === 3) {
+      console.debug("\n---------- End Playing Tricks ----------\n"); // Set the out order of the last player.
+
+      Object.values(G["public"].players).find(function (player) {
+        return !player.out;
+      }).outOrder = 4; // Count score
+
+      console.debug("Counting score");
+      updateScore(G, ctx);
       nextPhase = constants.phases.preHand.name;
-    }
+      console.debug("\n-------------- End Hand --------------\n");
+    } else {
+      console.debug("There are ".concat(playerOutCount, " players out"));
+      console.debug("------End Cleanup------\n");
+    } // Clear the current trick. It remains the current players hand.
 
-    ctx.events.setPhase(nextPhase);
+
+    G.currentTrick = null; //console.debug(`Setting next phase to ${nextPhase}`);
+    //ctx.events.setPhase(nextPhase);
+  } else {
+    console.error("No winner was detected even though the trick is over");
   }
 }
 
@@ -70563,12 +70659,109 @@ function turnEndIf(G, ctx) {
   return G.players[ctx.currentPlayer].hand.length === 0;
 }
 
+function updateScore(G, ctx) {
+  if (G && G.score) {
+    // Give last player out tricks to first player out, cards to opponent.
+    var lastPlayerIndex = ctx.playOrder.findIndex(function (pId) {
+      return !G["public"].players[pId].out;
+    });
+    var lastPlayerID = ctx.playOrder[lastPlayerIndex];
+    var opponentPlayerID = ctx.playOrder[(lastPlayerIndex + 1) % ctx.numPlayers];
+    var firstOutPlayerID = Object.keys(G["public"].players).find(function (pId) {
+      return G["public"].players[pId].outOrder === 1;
+    }); // Give last player tricks to the first out.
+
+    if (G.players[lastPlayerID].cardsWon) {
+      G.players[firstOutPlayerID].cardsWon = G.players[firstOutPlayerID].cardsWon || [];
+      moveCardsBetweenArrays(G.players[lastPlayerID].cardsWon, G.players[firstOutPlayerID].cardsWon);
+    } // Give last player hand to an opponent.
+
+
+    if (G.players[lastPlayerID].hand) {
+      G.players[opponentPlayerID].cardsWon = G.players[opponentPlayerID].cardsWon || [];
+      moveCardsBetweenArrays(G.players[lastPlayerID].hand, G.players[opponentPlayerID].cardsWon);
+    } // Setup the score for this round.
+
+
+    var roundScore = {};
+
+    for (var i = 0; i < ctx.numPlayers; i++) {
+      roundScore[ctx.playOrder[i]] = 0;
+    } // Count score for this round.
+
+
+    if (isOneTwo(ctx.playOrder[0])) {
+      G.roundScore[ctx.playOrder[0]] = 200;
+    } else if (isOneTwo(ctx.playOrder[1])) {
+      G.roundScore[ctx.playOrder[1]] = 200;
+    } else {
+      for (var j = 0; j < ctx.numPlayers; j++) {
+        var playerID = ctx.playOrder[j];
+        var cardsWon = G.players[playerID].cardsWon;
+        roundScore[playerID] = cardsWon.reduce(function (totalScore, cardID) {
+          totalScore + score(cardID);
+        });
+      }
+    } // Process tichus
+
+
+    for (var k = 0; k < ctx.numPlayers; k++) {
+      var playerIDt = ctx.playOrder[k];
+      var player = G["public"].players[playerIDt];
+
+      if (player.tichu) {
+        var bet = 100;
+
+        if (player.grand) {
+          bet = 200;
+        }
+
+        if (player.outOrder === 1) {
+          roundScore[playerIDt] += bet;
+        } else {
+          roundScore[playerIDt] -= bet;
+        }
+      }
+    } // Clear out cards won
+
+
+    Object.values(G.players).forEach(function (player) {
+      player.cardsWon = [];
+    }); // Clear out public data as well.
+
+    Object.values(G["public"].players).forEach(function (publicData) {
+      publicData.cards = 0;
+      publicData.tichu = false;
+      publicData.grand = false;
+    }); // Store the new score.
+
+    G.scoreHistory.unshift(roundScore); // Calculate it into the global score.
+
+    Object.keys(G.score).forEach(function (pId) {
+      G.score[pId] += roundScore[pId];
+    });
+  }
+}
+
+function isOneTwo(G, playerID) {
+  return false;
+}
+
+function score(cardID) {
+  return cardDefinitions[cardID].score;
+}
+
+function moveCardsBetweenArrays(fromArray, toArray) {
+  while (fromArray.length > 0) {
+    var element = fromArray.pop();
+    toArray.push(element);
+  }
+}
+
 var playTrick = {
   onBegin: onPhaseBegin,
   turn: {
-    onEnd: function onEnd(G, ctx) {
-      console.debug("Turn of ".concat(ctx.currentPlayer, " is ending"));
-    },
+    //onEnd: (G, ctx) => { console.debug(`Turn of ${ctx.currentPlayer} is ending`) },
     onBegin: onTurnBegin,
     endIf: turnEndIf,
     order: _objectSpread(_objectSpread({}, TurnOrder.DEFAULT), {}, {
@@ -70582,8 +70775,7 @@ var playTrick = {
     pass: pass
   },
   endIf: trickEndIf,
-  onEnd: onTrickEnd,
-  next: constants.phases.playTrick.name
+  onEnd: onTrickEnd
 };
 module.exports = {
   playTrick: playTrick
@@ -70635,7 +70827,8 @@ var _require = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boar
 var _require2 = __webpack_require__(/*! ./Helpers */ "./src/Helpers.js"),
     sortCards = _require2.sortCards,
     removeFromHand = _require2.removeFromHand,
-    getPlayerIDs = _require2.getPlayerIDs;
+    getPlayerIDs = _require2.getPlayerIDs,
+    dealCards = _require2.dealCards;
 
 var _require3 = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
     constants = _require3.constants;
@@ -70767,15 +70960,17 @@ function acceptPass(G, ctx, playerID) {
     return publicPlayerData.readyToPlay;
   })) {
     console.debug("All players have accepted their pass. Ending phase.");
+    console.debug("\n------- End Pre-Hand -------\n");
+    console.debug("\n---------- Begin Playing Tricks ----------\n");
     ctx.events.endPhase();
   }
 }
 
 var preHand = {
   onBegin: function onBegin(G, ctx) {
-    console.log("first8 onBegin");
+    console.debug("\n-------------- Begin Hand --------------\n");
+    console.debug("\n------- Begin Pre-Hand -------\n");
     G.secret.deck = ctx.random.Shuffle(G.secret.deck);
-    console.debug("first8 done shuffling");
     dealCards(G, 8);
     ctx.events.setActivePlayers({
       all: constants.phases.preHand.stages.takeOrGrand

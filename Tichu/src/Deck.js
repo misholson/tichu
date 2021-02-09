@@ -33,12 +33,25 @@ const generateCardDefinitions = () => {
         for (let iRank = 2; iRank <= 14; iRank++) {
             let imgNo = iRank.toString();
             if (iRank < 10) { imgNo = '0' + imgNo; } // This shouldn't be so complicated in js!
-            cards.push({
+            var cardDefinition = {
                 isSpecial: false,
                 rank: iRank,
                 suit: suit.suit,
                 image: `${suit.imagePrefix}${imgNo}.png`
-            });
+            };
+            switch (iRank) {
+                case 5:
+                    cardDefinition.score = 5; // 5s are worth 5
+                    break;
+                case 10:
+                case 13:
+                    cardDefinition.score = 10; // K and 10 are worth 10
+                    break;
+                default:
+                    cardDefinition.score = 0; // Everything else is worth 0
+                    break;
+            }
+            cards.push(cardDefinition);
         }
     }
 
@@ -47,25 +60,29 @@ const generateCardDefinitions = () => {
         isSpecial: true,
         rank: 15,
         suit: "dragon",
-        image: "s_dragon.png"
+        image: "s_dragon.png",
+        score: 25
     });
     cards.push({
         isSpecial: true,
         rank: 14.5,
         suit: "phoenix",
-        image: "s_phoenix.png"
+        image: "s_phoenix.png",
+        score: -25
     });
     cards.push({
         isSpecial: true,
         rank: -1,
         suit: "dog",
-        image: "s_dog.png"
+        image: "s_dog.png",
+        score: 0
     });
     cards.push({
         isSpecial: true,
         rank: 1,
         suit: "mahjong",
-        image: "s_mahjong.png"
+        image: "s_mahjong.png",
+        score: 0
     });
 
     return cards;

@@ -1,5 +1,5 @@
 const { INVALID_MOVE } = require('boardgame.io/core');
-const { sortCards, removeFromHand, getPlayerIDs } = require('./Helpers');
+const { sortCards, removeFromHand, getPlayerIDs, dealCards } = require('./Helpers');
 const { constants } = require('./Constants');
 
 function callGrand(G, ctx, playerID) {
@@ -119,15 +119,17 @@ function acceptPass(G, ctx, playerID) {
 
     if (Object.values(G.public.players).every((publicPlayerData) => publicPlayerData.readyToPlay)) {
         console.debug("All players have accepted their pass. Ending phase.");
+        console.debug("\n------- End Pre-Hand -------\n");
+        console.debug("\n---------- Begin Playing Tricks ----------\n");
         ctx.events.endPhase();
     }
 }
 
 const preHand = {
     onBegin: (G, ctx) => {
-        console.log("first8 onBegin");
+        console.debug("\n-------------- Begin Hand --------------\n");
+        console.debug("\n------- Begin Pre-Hand -------\n");
         G.secret.deck = ctx.random.Shuffle(G.secret.deck);
-        console.debug("first8 done shuffling");
         dealCards(G, 8);
         ctx.events.setActivePlayers({ all: constants.phases.preHand.stages.takeOrGrand });
         return G;
