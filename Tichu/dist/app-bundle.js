@@ -69938,7 +69938,7 @@ var tichu = {
 
     return {
       secret: {
-        deck: generateDeck(56)
+        deck: []
       },
       "public": {
         players: {
@@ -70011,17 +70011,6 @@ var tichu = {
   minPlayers: 4,
   maxPlayers: 4
 };
-
-function generateDeck(size) {
-  var deck = [];
-
-  for (var i = 0; i < size; i++) {
-    deck.push(i);
-  }
-
-  return deck;
-}
-
 module.exports = {
   Tichu: tichu
 };
@@ -70423,58 +70412,13 @@ function findNextPlayerNotOut(G, ctx, nextPlayerPos) {
 
 function onTurnBegin(G, ctx) {
   console.debug("Turn of ".concat(ctx.currentPlayer, " is beginning."));
-  var previousPlay = getPreviousPlay(G.currentTrick); //if (previousPlay) {
-  //    console.debug(`Previous play made by ${previousPlay.player}`);
-  //    if (previousPlay.player === ctx.currentPlayer) {
-  //        console.debug("------End Trick------\n");
-  //        // If the last player to play was the current player, cleanup the trick.
-  //        var winner = findTrickWinner(G, ctx);
-  //        console.debug("------Begin Cleanup------\n");
-  //        console.debug(`Cleaning up trick. Winner: ${winner}`);
-  //        if (winner) {
-  //            // TODO: Deal with giving away the dragon by sending the player to a "give away dragon" stage.
-  //            G.currentTrick.winner = winner;
-  //            //clearTable(G, winner);
-  //            //// Save off the current trick to the log of previous tricks.
-  //            //G.previousTricks = G.previousTricks || [];
-  //            //G.previousTricks.unshift(G.currentTrick);
-  //            //var nextPhase = constants.phases.playTrick.name;
-  //            //var playerOutCount = countOutPlayers(G, ctx);
-  //            //if (playerOutCount === 3) {
-  //            //    console.debug("\n---------- End Playing Tricks ----------\n");
-  //            //    // Set the out order of the last player.
-  //            //    Object.values(G.public.players).find(player => !player.out).outOrder = 4;
-  //            //    // Count score
-  //            //    console.debug("Counting score");
-  //            //    updateScore(G, ctx);
-  //            //    nextPhase = constants.phases.preHand.name;
-  //            //    console.debug("\n-------------- End Hand --------------\n");
-  //            //} else {
-  //            //    console.debug(`There are ${playerOutCount} players out`);
-  //            //    console.debug("------End Cleanup------\n");
-  //            //}
-  //            //// Clear the current trick. It remains the current players hand.
-  //            //G.currentTrick = null;
-  //            //ctx.events.endTurn();
-  //            //console.debug(`Setting next phase to ${nextPhase}`);
-  //            //ctx.events.setPhase(nextPhase);
-  //        } else {
-  //            console.error("No winner was detected even though the trick is over");
-  //        }
-  //    }
-  //}
-  // If the previous play was the dog, so clear out the trick before starting play.
+  var previousPlay = getPreviousPlay(G.currentTrick); // If the previous play was the dog, so clear out the trick before starting play.
 
   if (previousPlay) {
     if (previousPlay.cards.length === 1 && previousPlay.cards[0] === constants.specials.dog) {
       G.currentTrick = null;
     }
-  } //if (G.players[ctx.currentPlayer].hand.length === 0) {
-  //    // If player is out, skip their turn.
-  //    console.debug(`Ending turn of ${ctx.currentPlayer} since they do not have any cards`);
-  //    ctx.events.endTurn();
-  //}
-
+  }
 }
 
 function playCards(G, ctx, cards) {
@@ -70501,14 +70445,7 @@ function playCards(G, ctx, cards) {
   if (!playType.isValid(cards, G.currentTrick)) {
     console.debug("Invalid play");
     return INVALID_MOVE;
-  } // Handle dog logic.
-  //if (type === "dog") {
-  //    var nextPlayer = getPartnerID(ctx, ctx.currentPlayer);
-  //    console.debug(`dog played, passing turn to player ${nextPlayer}`);
-  //    ctx.events.endTurn({ next: (ctx.playOrderPos + 2) % 4 });
-  //} else {
-  //}
-
+  }
 
   if (!G.currentTrick) {
     console.debug("Creating trick of type: ".concat(type));
@@ -70535,14 +70472,6 @@ function playCards(G, ctx, cards) {
     publicPlayerInfo.out = true;
     publicPlayerInfo.outOrder = countOutPlayers(G, ctx);
   }
-}
-
-function getPartnerID(ctx, playerID) {
-  var playerIndex = ctx.playOrder.findIndex(function (pId) {
-    return pId === playerID;
-  });
-  var partnerIndex = (playerIndex + 2) % 4;
-  return ctx.playOrder[partnerIndex];
 }
 
 function pass(G, ctx) {
@@ -70642,24 +70571,7 @@ function findTrickWinner(G, ctx) {
         console.debug("Trick is over. Winner is ".concat(previousPlayerID));
         return previousPlayerID;
       }
-    } // 
-    //for (var i = 0; i < G.currentTrick.plays.length; i++) {
-    //    if (!currentTrick.plays[i].pass) {
-    //        // When we get to the first play that's not a pass.
-    //        break;
-    //    }
-    //}
-    //// There needs to be at least one pass in the history, and the previous play must have been played by the current player.
-    //if (G.currentTrick.plays[0].pass) {
-    //    // We need to check for pass because the framework checks trickEndIf at the beginning and end of your turn.
-    //    var previousPlay = getPreviousPlay(G.currentTrick);
-    //    if (previousPlay.player === ctx.currentPlayer) {
-    //        var winner = previousPlay.player;
-    //        console.debug(`Checking for trick end. ${winner} is the winner`);
-    //        return winner;
-    //    }
-    //}
-
+    }
   }
 
   return null;
@@ -70725,12 +70637,7 @@ function turnEndIf(G, ctx) {
   return G.players[ctx.currentPlayer].hand.length === 0;
 }
 
-function onTurnEnd(G, ctx) {// On the end of a turn, try to identify if a trick has been won.
-  // If the last player to play is the NEXT player who will play, clean up the trick.
-  //var previousPlay = getPreviousPlay(G.currentTrick);
-  //if (previousPlay) {
-  //    var lastPlayerToPlay = previousPlay.player;
-  //}
+function onTurnEnd(G, ctx) {// On turn end
 }
 
 function updateScore(G, ctx) {
@@ -70771,10 +70678,10 @@ function updateScore(G, ctx) {
     } else {
       for (var j = 0; j < ctx.numPlayers; j++) {
         var playerID = ctx.playOrder[j];
-        var cardsWon = G.players[playerID].cardsWon;
+        var cardsWon = G.players[playerID].cardsWon || [];
         roundScore[playerID] = cardsWon.reduce(function (totalScore, cardID) {
           totalScore + score(cardID);
-        });
+        }, 0);
       }
     } // Process tichus
 
@@ -71044,7 +70951,7 @@ var preHand = {
   onBegin: function onBegin(G, ctx) {
     console.debug("\n-------------- Begin Hand --------------\n");
     console.debug("\n------- Begin Pre-Hand -------\n");
-    G.secret.deck = ctx.random.Shuffle(G.secret.deck);
+    G.secret.deck = ctx.random.Shuffle(generateDeck(56));
     dealCards(G, 8);
     ctx.events.setActivePlayers({
       all: constants.phases.preHand.stages.takeOrGrand
@@ -71080,6 +70987,17 @@ var preHand = {
   next: constants.phases.playTrick.name,
   start: true
 };
+
+function generateDeck(size) {
+  var deck = [];
+
+  for (var i = 0; i < size; i++) {
+    deck.push(i);
+  }
+
+  return deck;
+}
+
 module.exports = {
   preHand: preHand
 };

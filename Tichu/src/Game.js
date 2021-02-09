@@ -11,7 +11,7 @@ const tichu = {
 
         return {
             secret: {
-                deck: generateDeck(56)
+                deck: []
             },
 
             public: {
@@ -94,14 +94,6 @@ const tichu = {
 };
 
 
-function generateDeck(size) {
-    var deck = [];
-    for (var i = 0; i < size; i++) {
-        deck.push(i);
-    }
-
-    return deck;
-}
 
 module.exports = {
     Tichu: tichu

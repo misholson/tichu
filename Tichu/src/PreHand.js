@@ -129,7 +129,7 @@ const preHand = {
     onBegin: (G, ctx) => {
         console.debug("\n-------------- Begin Hand --------------\n");
         console.debug("\n------- Begin Pre-Hand -------\n");
-        G.secret.deck = ctx.random.Shuffle(G.secret.deck);
+        G.secret.deck = ctx.random.Shuffle(generateDeck(56));
         dealCards(G, 8);
         ctx.events.setActivePlayers({ all: constants.phases.preHand.stages.takeOrGrand });
         return G;
@@ -163,6 +163,15 @@ const preHand = {
     next: constants.phases.playTrick.name,
     start: true
 };
+
+function generateDeck(size) {
+    var deck = [];
+    for (var i = 0; i < size; i++) {
+        deck.push(i);
+    }
+
+    return deck;
+}
 
 module.exports = {
     preHand: preHand
