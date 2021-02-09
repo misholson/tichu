@@ -48,25 +48,22 @@ const validPlays = {
     }
 }
 
-module.exports = {
-    validPlays: validPlays,
-    isValidPlay: isValidPlay,
-    detectPlayType: detectPlayType
-}
-
 function detectPlayType(selectedCards) {
     if (!selectedCards || selectedCards.length === 0) { return validPlays.invalid; }
 
-    return Object.values(validPlays).find((playType) => playType.isValid(selectedCards)) || validPlays.invalid;
+    return Object.keys(validPlays).find((playType) => validPlays[playType].isValid(selectedCards)) || "invalid";
 }
 
 function isValidPlay(selectedCards, currentTrick) {
-    var type = currentTrick?.type;
+    var type;
+    if (currentTrick) {
+        type = currentTrick.type;
+    }
     if (!type) {
         type = detectPlayType(selectedCards);
     }
 
-    return type(selectedCards, currentTrick);
+    return validPlays[type].isValid(selectedCards, currentTrick);
 }
 
 function isValidSingle(selectedCards, currentTrick) {
@@ -82,7 +79,7 @@ function isValidSingle(selectedCards, currentTrick) {
     }
 
     // If nothing currently played, everything else is valid.
-    if (!currentTrick?.plays || currentTrick.plays.length === 0) {
+    if (!hasCurrent(currentTrick)) {
         return true;
     }
 
@@ -96,7 +93,7 @@ function isValidSingle(selectedCards, currentTrick) {
             return (cardDefinitions[selectedCards[0]].rank >= 2);
         } else {
             // Find the next card under the phoenix and make sure we beat that.
-            return (cardDefinitions[selectedCards[0]].rank > cardDefinitions[currentTrick.plays[1][0]].rank);
+            return (cardDefinitions[selectedCards[0]].rank > cardDefinitions[currentTrick.plays[1].cards[0]].rank);
         }
     }
 
@@ -495,6 +492,14 @@ function isNonPhoenixSpecial(card) {
 
 function hasCurrent(currentTrick) {
     return (currentTrick && currentTrick.plays && currentTrick.plays.length > 0);
+}
+
+
+
+module.exports = {
+    validPlays: validPlays,
+    isValidPlay: isValidPlay,
+    detectPlayType: detectPlayType
 }
 
 /*

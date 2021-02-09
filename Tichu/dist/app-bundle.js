@@ -69470,7 +69470,7 @@ var _require2 = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
     constants = _require2.constants;
 
 var _require3 = __webpack_require__(/*! ./ValidPlays */ "./src/ValidPlays.js"),
-    isValidPlay = _require3.isValidPlay,
+    validPlays = _require3.validPlays,
     detectPlayType = _require3.detectPlayType;
 
 var TichuBoard = function TichuBoard(props) {
@@ -69487,6 +69487,7 @@ var TichuBoard = function TichuBoard(props) {
 
   var phase = ctx.phase;
   var playerIDs = getPlayerIDs(ctx, playerID);
+  var isPlayerActive = phase === constants.phases.primaryPlay.name && playerID === ctx.currentPlayer;
 
   var _useState = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])([]),
       _useState2 = _slicedToArray(_useState, 2),
@@ -69517,7 +69518,7 @@ var TichuBoard = function TichuBoard(props) {
     setHand(function () {
       return _toConsumableArray(player.hand);
     });
-  }, [stage, readyToPlay]);
+  }, [stage, readyToPlay, isPlayerActive]);
 
   var selectCardToPass = function selectCardToPass(cardID) {
     if (passedCards.length < 3) {
@@ -69530,15 +69531,17 @@ var TichuBoard = function TichuBoard(props) {
   var selectCardForPlay = function selectCardForPlay(cardID) {
     console.debug("card clicked: ".concat(cardID));
 
+    var newSelection = _toConsumableArray(selectedCards);
+
     if (selectedCards.some(function (c) {
       return c === cardID;
     })) {
-      removeFromHand(selectedCards, cardID);
+      removeFromHand(newSelection, cardID);
     } else {
-      addToHand(selectedCards, cardID);
+      addToHand(newSelection, cardID);
     }
 
-    setSelectedCards(_toConsumableArray(selectedCards));
+    setSelectedCards(newSelection);
   };
 
   var handleCardClicked = function handleCardClicked(cardID) {
@@ -69550,7 +69553,7 @@ var TichuBoard = function TichuBoard(props) {
   }; // See what kind of play is selected.
 
 
-  var selectedPlayType = detectPlayType(selectedCards);
+  var selectedPlayType = validPlays[detectPlayType(selectedCards)];
 
   var handleReturnPass = function handleReturnPass(cardID) {
     setPassedCards(removeFromHand(passedCards, cardID)); // Add the card back into your hand.
@@ -69577,6 +69580,13 @@ var TichuBoard = function TichuBoard(props) {
     receivedCards.push(player.receivedPass[playerIDs.partner]);
     receivedCards.push(player.receivedPass[playerIDs.right]);
   }
+
+  var onPlayClicked = function onPlayClicked() {
+    if (isPlayerActive) {
+      moves.playCards(selectedCards);
+      setSelectedCards([]);
+    }
+  };
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board"
@@ -69613,7 +69623,7 @@ var TichuBoard = function TichuBoard(props) {
     onReturnPass: handleReturnPass,
     onPassConfirmed: handlePassConfirmed,
     onAcceptConfirmed: handleAcceptConfirmed
-  }), phase === constants.phases.primaryPlay.name && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "Selected Play Type: ", selectedPlayType === null || selectedPlayType === void 0 ? void 0 : selectedPlayType.name, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), selectedPlayType !== null && selectedPlayType !== void 0 && selectedPlayType.isValid(selectedCards) ? "VALID" : "INVALID")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+  }), phase === constants.phases.primaryPlay.name && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "Selected Play Type: ", selectedPlayType === null || selectedPlayType === void 0 ? void 0 : selectedPlayType.name, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), selectedPlayType !== null && selectedPlayType !== void 0 && selectedPlayType.isValid(selectedCards, G.currentTrick) ? "VALID" : "INVALID")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-side"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Player__WEBPACK_IMPORTED_MODULE_2__["Player"], {
     playerID: playerIDs.right,
@@ -69643,7 +69653,12 @@ var TichuBoard = function TichuBoard(props) {
     color: "primary",
     className: "mx-1",
     onClick: onTakeClicked
-  }, "Take"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+  }, "Take")), isPlayerActive && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_4__["Button"], {
+    color: "primary",
+    className: "mx-1",
+    onClick: onPlayClicked,
+    disabled: !(selectedPlayType !== null && selectedPlayType !== void 0 && selectedPlayType.isValid(selectedCards, G.currentTrick))
+  }, "Play")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-side"
   }, "Empty")));
 };
@@ -69843,7 +69858,8 @@ var _require4 = __webpack_require__(/*! ./PreHand */ "./src/PreHand.js"),
 var _require5 = __webpack_require__(/*! ./PrimaryPlay */ "./src/PrimaryPlay.js"),
     onHandStart = _require5.onHandStart,
     onTurnBegin = _require5.onTurnBegin,
-    findStartPlayer = _require5.findStartPlayer;
+    findStartPlayer = _require5.findStartPlayer,
+    playCards = _require5.playCards;
 
 var tichu = {
   setup: function setup() {
@@ -69933,20 +69949,34 @@ var tichu = {
         },
         onMove: checkPlayersHavePassed
       },
-      next: constants.phases.primaryPlay.name,
-      start: true
+      next: constants.phases.primaryPlay.name //start: true
+
     },
     primaryPlay: {
-      onBegin: onHandStart,
+      onBegin: function onBegin(G, ctx) {
+        console.log("TESTING ONLY: shuffle and deal from primary play phase");
+        G.secret.deck = ctx.random.Shuffle(G.secret.deck);
+        dealCards(G, 14);
+        return G;
+      },
       turn: {
         onEnd: function onEnd(G, ctx) {
           console.debug("Turn of ".concat(ctx.currentPlayer, " is ending"));
         },
         onBegin: onTurnBegin,
         order: {
-          first: findStartPlayer
-        }
-      }
+          first: findStartPlayer,
+          next: function next(G, ctx) {
+            return (ctx.playOrderPos + 1) % ctx.numPlayers;
+          }
+        },
+        moveLimit: 1
+      },
+      moves: {
+        playCards: playCards
+      },
+      start: true // For testing
+
     }
   },
   minPlayers: 4,
@@ -70417,16 +70447,23 @@ module.exports = {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _require = __webpack_require__(/*! ./Helpers */ "./src/Helpers.js"),
-    sortCards = _require.sortCards,
-    removeFromHand = _require.removeFromHand,
-    getPlayerIDs = _require.getPlayerIDs;
+var _require = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boardgame.io/dist/esm/core.js"),
+    INVALID_MOVE = _require.INVALID_MOVE;
 
-var _require2 = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
-    constants = _require2.constants;
+var _require2 = __webpack_require__(/*! ./Helpers */ "./src/Helpers.js"),
+    sortCards = _require2.sortCards,
+    removeFromHand = _require2.removeFromHand,
+    getPlayerIDs = _require2.getPlayerIDs;
 
-var _require3 = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boardgame.io/dist/esm/core.js"),
-    Stage = _require3.Stage;
+var _require3 = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
+    constants = _require3.constants;
+
+var _require4 = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boardgame.io/dist/esm/core.js"),
+    Stage = _require4.Stage;
+
+var _require5 = __webpack_require__(/*! ./ValidPlays */ "./src/ValidPlays.js"),
+    detectPlayType = _require5.detectPlayType,
+    validPlays = _require5.validPlays;
 
 function onHandStart(G, ctx) {
   console.debug("onHandStart");
@@ -70453,10 +70490,61 @@ function findStartPlayer(G, ctx) {
   }
 }
 
+function playCards(G, ctx, cards) {
+  console.debug("player ".concat(ctx.currentPlayer, " playing cards ").concat(JSON.stringify(cards)));
+
+  if (!cards || cards.length === 0 || cards.length > 14) {
+    console.debug("Invalid cards array");
+    return INVALID_MOVE;
+  }
+
+  var type;
+
+  if (G.currentTrick) {
+    type = G.currentTrick.type;
+  }
+
+  if (!type) {
+    type = detectPlayType(cards);
+  }
+
+  console.debug("Detected play type: ".concat(type));
+  var playType = validPlays[type];
+
+  if (!playType.isValid(cards, G.currentTrick)) {
+    console.debug("Invalid play");
+    return INVALID_MOVE;
+  }
+
+  if (!G.currentTrick) {
+    console.debug("Creating trick of type: ".concat(type.name));
+    G.currentTrick = {
+      type: type,
+      plays: []
+    };
+  }
+
+  console.debug("Adding play to current trick");
+  G.currentTrick.plays.unshift({
+    cards: cards,
+    player: ctx.currentPlayer
+  });
+  console.debug("Removing cards from player hand");
+  cards.forEach(function (c) {
+    return removeFromHand(G.players[ctx.currentPlayer].hand, c);
+  });
+  G["public"].players[ctx.currentPlayer].cards = G.players[ctx.currentPlayer].hand.length;
+
+  if (G["public"].players[ctx.currentPlayer].cards === 0) {
+    G["public"].players.out = true; // TODO: Manage what happens when a player goes out.
+  }
+}
+
 module.exports = {
   onHandStart: onHandStart,
   onTurnBegin: onTurnBegin,
-  findStartPlayer: findStartPlayer
+  findStartPlayer: findStartPlayer,
+  playCards: playCards
 };
 
 /***/ }),
@@ -70540,30 +70628,29 @@ var validPlays = {
     }
   }
 };
-module.exports = {
-  validPlays: validPlays,
-  isValidPlay: isValidPlay,
-  detectPlayType: detectPlayType
-};
 
 function detectPlayType(selectedCards) {
   if (!selectedCards || selectedCards.length === 0) {
     return validPlays.invalid;
   }
 
-  return Object.values(validPlays).find(function (playType) {
-    return playType.isValid(selectedCards);
-  }) || validPlays.invalid;
+  return Object.keys(validPlays).find(function (playType) {
+    return validPlays[playType].isValid(selectedCards);
+  }) || "invalid";
 }
 
 function isValidPlay(selectedCards, currentTrick) {
-  var type = currentTrick === null || currentTrick === void 0 ? void 0 : currentTrick.type;
+  var type;
+
+  if (currentTrick) {
+    type = currentTrick.type;
+  }
 
   if (!type) {
     type = detectPlayType(selectedCards);
   }
 
-  return type(selectedCards, currentTrick);
+  return validPlays[type].isValid(selectedCards, currentTrick);
 }
 
 function isValidSingle(selectedCards, currentTrick) {
@@ -70578,7 +70665,7 @@ function isValidSingle(selectedCards, currentTrick) {
   } // If nothing currently played, everything else is valid.
 
 
-  if (!(currentTrick !== null && currentTrick !== void 0 && currentTrick.plays) || currentTrick.plays.length === 0) {
+  if (!hasCurrent(currentTrick)) {
     return true;
   } // Otherwise, it has to be higher in rank than the most recent play.
 
@@ -70591,7 +70678,7 @@ function isValidSingle(selectedCards, currentTrick) {
       return cardDefinitions[selectedCards[0]].rank >= 2;
     } else {
       // Find the next card under the phoenix and make sure we beat that.
-      return cardDefinitions[selectedCards[0]].rank > cardDefinitions[currentTrick.plays[1][0]].rank;
+      return cardDefinitions[selectedCards[0]].rank > cardDefinitions[currentTrick.plays[1].cards[0]].rank;
     }
   } // If the card being played is a phoenix then it beats anything but a dragon.
 
@@ -71016,6 +71103,12 @@ function isNonPhoenixSpecial(card) {
 function hasCurrent(currentTrick) {
   return currentTrick && currentTrick.plays && currentTrick.plays.length > 0;
 }
+
+module.exports = {
+  validPlays: validPlays,
+  isValidPlay: isValidPlay,
+  detectPlayType: detectPlayType
+};
 /*
 const currentTrickExample = {
     type: "typeFunction",

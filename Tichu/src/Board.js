@@ -6,7 +6,7 @@ import { FormGroup, Button } from 'reactstrap';
 import 'bootstrap';
 const { sortCards, removeFromHand, getPlayerIDs, addToHand } = require('./Helpers');
 const { constants } = require('./Constants');
-const { isValidPlay, detectPlayType } = require('./ValidPlays');
+const { validPlays, detectPlayType } = require('./ValidPlays');
 
 export const TichuBoard = (props) => {
 
@@ -24,6 +24,7 @@ export const TichuBoard = (props) => {
     }
     var phase = ctx.phase;
     var playerIDs = getPlayerIDs(ctx, playerID);
+    var isPlayerActive = (phase === constants.phases.primaryPlay.name && playerID === ctx.currentPlayer)
 
     const [passedCards, setPassedCards] = useState([]);
     const [hand, setHand] = useState(player.hand);
@@ -44,8 +45,8 @@ export const TichuBoard = (props) => {
     useEffect(() => {
         setHand(() => {
             return [...player.hand];
-        })
-    }, [stage, readyToPlay]);
+        });
+    }, [stage, readyToPlay, isPlayerActive]);
 
     const selectCardToPass = (cardID) => {
         if (passedCards.length < 3) {
@@ -58,12 +59,13 @@ export const TichuBoard = (props) => {
 
     const selectCardForPlay = (cardID) => {
         console.debug(`card clicked: ${cardID}`);
+        var newSelection = [...selectedCards];
         if (selectedCards.some((c) => c === cardID)) {
-            removeFromHand(selectedCards, cardID);
+            removeFromHand(newSelection, cardID);
         } else {
-            addToHand(selectedCards, cardID);
+            addToHand(newSelection, cardID);
         }
-        setSelectedCards([...selectedCards]);
+        setSelectedCards(newSelection);
     }
 
     const handleCardClicked = (cardID) => {
@@ -75,7 +77,7 @@ export const TichuBoard = (props) => {
     }
 
     // See what kind of play is selected.
-    var selectedPlayType = detectPlayType(selectedCards);
+    var selectedPlayType = validPlays[detectPlayType(selectedCards)];
 
     const handleReturnPass = (cardID) => {
         setPassedCards(removeFromHand(passedCards, cardID));
@@ -104,6 +106,13 @@ export const TichuBoard = (props) => {
         receivedCards.push(player.receivedPass[playerIDs.right]);
     }
 
+    const onPlayClicked = () => {
+        if (isPlayerActive) {
+            moves.playCards(selectedCards);
+            setSelectedCards([]);
+        }
+    }
+
     return (
         <div className="board">
             <div className="board-row">
@@ -126,7 +135,7 @@ export const TichuBoard = (props) => {
                 </div>
                 <div className="board-middle">
                     {phase === constants.phases.preHand.name && <PassArea selectedCards={stage === constants.phases.preHand.stages.passCards ? passedCards : receivedCards} stage={stage} readyToPlay={G.public.players[playerID].readyToPlay} onReturnPass={handleReturnPass} onPassConfirmed={handlePassConfirmed} onAcceptConfirmed={handleAcceptConfirmed} />}
-                    {phase === constants.phases.primaryPlay.name && <>Selected Play Type: {selectedPlayType?.name}<br />{selectedPlayType?.isValid(selectedCards) ? "VALID" : "INVALID"}</>}
+                    {phase === constants.phases.primaryPlay.name && <>Selected Play Type: {selectedPlayType?.name}<br />{selectedPlayType?.isValid(selectedCards, G.currentTrick) ? "VALID" : "INVALID"}</>}
                 </div>
                 <div className="board-side">
                     <Player playerID={playerIDs.right} phase={phase} currentPlayer={ctx.currentPlayer} />
@@ -145,6 +154,9 @@ export const TichuBoard = (props) => {
                             <Button color="primary" className="mx-1" onClick={onGrandClicked}>Grand Tichu</Button>
                             <Button color="primary" className="mx-1" onClick={onTakeClicked}>Take</Button>
                         </FormGroup>
+                    }
+                    {isPlayerActive &&
+                        <Button color="primary" className="mx-1" onClick={onPlayClicked} disabled={!selectedPlayType?.isValid(selectedCards, G.currentTrick)}>Play</Button>
                     }
                 </div>
                 <div className="board-side">
