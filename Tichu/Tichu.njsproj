@@ -96,6 +96,9 @@
     <Content Include="index.html">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="scenarios\scenarios.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="server.js" />
     <Content Include="package.json" />
     <Content Include="README.md" />
@@ -153,6 +156,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="images\" />
+    <Folder Include="scenarios\" />
     <Folder Include="styles\" />
     <Folder Include="src\" />
   </ItemGroup>

@@ -4,7 +4,8 @@ module.exports = {
     sortCards: sortCards,
     removeFromHand: removeFromHand,
     getPlayerIDs: getPlayerIDs,
-    addToHand: addToHand
+    addToHand: addToHand,
+    dealCards: dealCards
 }
 
 function removeFromHand(hand, cardID) {
@@ -48,4 +49,18 @@ function cardComparison(a, b) {
         }
     }
     return 0;
+}
+
+
+
+function dealCards(G, number) {
+    Object.keys(G.players).forEach((playerNumber) => {
+        var hand = [];
+        for (var i = 0; i < number; i++) {
+            hand.push(G.secret.deck.pop());
+        }
+        sortCards(hand);
+        G.players[playerNumber].hand = hand;
+        G.public.players[playerNumber].cards = hand.length;
+    });
 }

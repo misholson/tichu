@@ -69330,6 +69330,38 @@ module.exports = yeast;
 
 /***/ }),
 
+/***/ "./scenarios/scenarios.js":
+/*!********************************!*\
+  !*** ./scenarios/scenarios.js ***!
+  \********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var _require = __webpack_require__(/*! ../src/Helpers */ "./src/Helpers.js"),
+    dealCards = _require.dealCards;
+
+function skipPreHandPhase(game) {
+  console.log(game);
+  game.phases.preHand.start = false;
+  game.phases.primaryPlay.start = true;
+
+  game.phases.primaryPlay.onBegin = function (G, ctx) {
+    console.log("TESTING ONLY: shuffle and deal from primary play phase");
+    G.secret.deck = ctx.random.Shuffle(G.secret.deck);
+    dealCards(G, 14);
+    return G;
+  };
+
+  console.log(game);
+  return game;
+}
+
+module.exports = {
+  skipPreHandPhase: skipPreHandPhase
+};
+
+/***/ }),
+
 /***/ "./src/App.js":
 /*!********************!*\
   !*** ./src/App.js ***!
@@ -69366,8 +69398,12 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
+
+var _require = __webpack_require__(/*! ../scenarios/scenarios */ "./scenarios/scenarios.js"),
+    skipPreHandPhase = _require.skipPreHandPhase;
+
 var TichuClient = Object(boardgame_io_react__WEBPACK_IMPORTED_MODULE_1__["Client"])({
-  game: _Game__WEBPACK_IMPORTED_MODULE_3__["Tichu"],
+  game: skipPreHandPhase(_Game__WEBPACK_IMPORTED_MODULE_3__["Tichu"]),
   board: _Board__WEBPACK_IMPORTED_MODULE_4__["TichuBoard"],
   numPlayers: 4,
   multiplayer: Object(boardgame_io_multiplayer__WEBPACK_IMPORTED_MODULE_2__["SocketIO"])({
@@ -69843,7 +69879,8 @@ var _require = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boar
     PlayerView = _require.PlayerView;
 
 var _require2 = __webpack_require__(/*! ./Helpers */ "./src/Helpers.js"),
-    sortCards = _require2.sortCards;
+    sortCards = _require2.sortCards,
+    dealCards = _require2.dealCards;
 
 var _require3 = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
     constants = _require3.constants;
@@ -69949,15 +69986,12 @@ var tichu = {
         },
         onMove: checkPlayersHavePassed
       },
-      next: constants.phases.primaryPlay.name //start: true
-
+      next: constants.phases.primaryPlay.name,
+      start: true
     },
     primaryPlay: {
       onBegin: function onBegin(G, ctx) {
-        console.log("TESTING ONLY: shuffle and deal from primary play phase");
-        G.secret.deck = ctx.random.Shuffle(G.secret.deck);
-        dealCards(G, 14);
-        return G;
+        console.debug("Starting primary play phase");
       },
       turn: {
         onEnd: function onEnd(G, ctx) {
@@ -69974,9 +70008,7 @@ var tichu = {
       },
       moves: {
         playCards: playCards
-      },
-      start: true // For testing
-
+      }
     }
   },
   minPlayers: 4,
@@ -69991,20 +70023,6 @@ function generateDeck(size) {
   }
 
   return deck;
-}
-
-function dealCards(G, number) {
-  Object.keys(G.players).forEach(function (playerNumber) {
-    var hand = [];
-
-    for (var i = 0; i < number; i++) {
-      hand.push(G.secret.deck.pop());
-    }
-
-    sortCards(hand);
-    G.players[playerNumber].hand = hand;
-    G["public"].players[playerNumber].cards = hand.length;
-  });
 }
 
 module.exports = {
@@ -70110,7 +70128,8 @@ module.exports = {
   sortCards: sortCards,
   removeFromHand: removeFromHand,
   getPlayerIDs: getPlayerIDs,
-  addToHand: addToHand
+  addToHand: addToHand,
+  dealCards: dealCards
 };
 
 function removeFromHand(hand, cardID) {
@@ -70159,6 +70178,20 @@ function cardComparison(a, b) {
   }
 
   return 0;
+}
+
+function dealCards(G, number) {
+  Object.keys(G.players).forEach(function (playerNumber) {
+    var hand = [];
+
+    for (var i = 0; i < number; i++) {
+      hand.push(G.secret.deck.pop());
+    }
+
+    sortCards(hand);
+    G.players[playerNumber].hand = hand;
+    G["public"].players[playerNumber].cards = hand.length;
+  });
 }
 
 /***/ }),
@@ -70470,7 +70503,7 @@ function onHandStart(G, ctx) {
 }
 
 function onTurnBegin(G, ctx) {
-  console.debug("Turn of ".concat(ctx.currentPlayer, " is beginning. Looking for start player: ").concat(G.lookingForStartPlayer));
+  console.debug("Turn of ".concat(ctx.currentPlayer, " is beginning."));
 }
 
 function findStartPlayer(G, ctx) {

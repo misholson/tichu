@@ -4,6 +4,7 @@ var express = require('express');
 var serve = require('koa-static');
 const Server = require('boardgame.io/server').Server;
 const Tichu = require('./src/Game').Tichu;
+const { skipPreHandPhase } = require('./scenarios/scenarios');
 
 
 //var app = express();
@@ -19,7 +20,7 @@ const Tichu = require('./src/Game').Tichu;
 //});
 
 
-const server = Server({ games: [Tichu] });
+const server = Server({ games: [skipPreHandPhase(Tichu)] });
 
 var staticPath = path.join(__dirname, '/');
 server.app.use(serve(staticPath));

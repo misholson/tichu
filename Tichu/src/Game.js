@@ -1,5 +1,5 @@
 const { PlayerView } = require('boardgame.io/core');
-const { sortCards } = require('./Helpers');
+const { sortCards, dealCards } = require('./Helpers');
 const { constants } = require('./Constants');
 const { callGrand, takeCards, passCards, checkPlayersHavePassed, acceptPass } = require('./PreHand');
 const { onHandStart, onTurnBegin, findStartPlayer, playCards } = require('./PrimaryPlay');
@@ -93,14 +93,11 @@ const tichu = {
                 onMove: checkPlayersHavePassed
             },
             next: constants.phases.primaryPlay.name,
-            //start: true
+            start: true
         },
         primaryPlay: {
             onBegin: (G, ctx) => {
-                console.log("TESTING ONLY: shuffle and deal from primary play phase");
-                G.secret.deck = ctx.random.Shuffle(G.secret.deck);
-                dealCards(G, 14);
-                return G;
+                console.debug("Starting primary play phase");
             },
             turn: {
                 onEnd: (G, ctx) => { console.debug(`Turn of ${ctx.currentPlayer} is ending`) },
@@ -113,8 +110,7 @@ const tichu = {
             },
             moves: {
                 playCards: playCards
-            },
-            start: true // For testing
+            }
         }
     },
 
@@ -130,18 +126,6 @@ function generateDeck(size) {
     }
 
     return deck;
-}
-
-function dealCards(G, number) {
-    Object.keys(G.players).forEach((playerNumber) => {
-        var hand = [];
-        for (var i = 0; i < number; i++) {
-            hand.push(G.secret.deck.pop());
-        }
-        sortCards(hand);
-        G.players[playerNumber].hand = hand;
-        G.public.players[playerNumber].cards = hand.length;
-    });
 }
 
 module.exports = {

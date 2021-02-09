@@ -4,9 +4,10 @@ import { SocketIO } from 'boardgame.io/multiplayer';
 import { Tichu } from './Game';
 import { TichuBoard } from './Board';
 import { Card, CardHeader, CardBody, Button } from 'reactstrap';
+const { skipPreHandPhase } = require('../scenarios/scenarios');
 
 const TichuClient = Client({
-    game: Tichu,
+    game: skipPreHandPhase(Tichu),
     board: TichuBoard,
     numPlayers: 4,
     multiplayer: SocketIO({ server: 'localhost:1337' })
