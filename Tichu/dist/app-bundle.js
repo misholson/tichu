@@ -69635,13 +69635,15 @@ var TichuBoard = function TichuBoard(props) {
     }
   };
 
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: "board-row"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Container"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], {
+    className: "board-row clearfix"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
+    md: 2,
     className: "board-side"
-  }, "Empty"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+  }, "\xA0"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
+    md: 8,
     className: "board-middle"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Player__WEBPACK_IMPORTED_MODULE_2__["Player"], {
     playerID: playerIDs.partner,
@@ -69649,19 +69651,22 @@ var TichuBoard = function TichuBoard(props) {
     currentPlayer: ctx.currentPlayer
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["PartnerHand"], {
     backs: G["public"].players[playerIDs.partner].cards
-  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
+    md: 2,
     className: "board-side"
-  }, "Empty")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: "board-row"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+  }, "\xA0")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], {
+    className: "board-row clearfix"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
+    md: 2,
     className: "board-side"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Player__WEBPACK_IMPORTED_MODULE_2__["Player"], {
     playerID: playerIDs.left,
     phase: phase,
     currentPlayer: ctx.currentPlayer
-  }), "Player: ", playerIDs.left, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
     backs: G["public"].players[playerIDs.left].cards
-  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
+    md: 8,
     className: "board-middle"
   }, phase === constants.phases.preHand.name && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_PassArea__WEBPACK_IMPORTED_MODULE_3__["PassArea"], {
     selectedCards: stage === constants.phases.preHand.stages.passCards ? passedCards : receivedCards,
@@ -69672,7 +69677,8 @@ var TichuBoard = function TichuBoard(props) {
     onAcceptConfirmed: handleAcceptConfirmed
   }), phase === constants.phases.playTrick.name && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_PlayArea__WEBPACK_IMPORTED_MODULE_4__["PlayArea"], {
     currentTrick: G.currentTrick
-  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
+    md: 2,
     className: "board-side"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Player__WEBPACK_IMPORTED_MODULE_2__["Player"], {
     playerID: playerIDs.right,
@@ -69680,11 +69686,13 @@ var TichuBoard = function TichuBoard(props) {
     currentPlayer: ctx.currentPlayer
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
     backs: G["public"].players[playerIDs.right].cards
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: "board-row"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], {
+    className: "board-row clearfix"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
+    md: 2,
     className: "board-side"
-  }, "Empty"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+  }, "\xA0"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
+    md: 8,
     className: "board-middle"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Player__WEBPACK_IMPORTED_MODULE_2__["Player"], {
     playerID: playerID,
@@ -69712,9 +69720,24 @@ var TichuBoard = function TichuBoard(props) {
     className: "mx-1",
     onClick: onPassClicked,
     disabled: !canPass(G.currentTrick) && hand.length > 0
-  }, "Pass"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+  }, "Pass")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
+    md: 2,
     className: "board-side"
-  }, "Empty")));
+  }, "\xA0")))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Sidebar, null));
+};
+
+var Sidebar = function Sidebar() {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "sidebar"
+  }, "Sidebar");
+};
+
+var Clear = function Clear() {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    style: {
+      clear: "both"
+    }
+  });
 };
 
 /***/ }),
@@ -69754,8 +69777,8 @@ var Card = function Card(_ref) {
     backgroundSize: "cover"
   };
 
-  if (selected) {
-    style.bottom = "20px";
+  if (!selected) {
+    style.marginTop = "20px";
   }
 
   var handleClick = function handleClick() {
@@ -69765,7 +69788,7 @@ var Card = function Card(_ref) {
   };
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: "card",
+    className: "card-front",
     style: style,
     onClick: handleClick
   });
@@ -70077,12 +70100,24 @@ var OpponentHand = function OpponentHand(_ref3) {
   var backs = _ref3.backs;
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("ul", {
     className: "hand-vertical hand"
-  }, backs && Array(backs).fill(null).map(function (_, i) {
+  }, backs && Array(Math.floor((14 - backs) / 2)).fill(null).map(function (_, i) {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", {
+      key: i
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      className: "card-spacer"
+    }, "\xA0"));
+  }), backs && Array(backs).fill(null).map(function (_, i) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", {
       key: i
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
       className: "card-back-rotated"
     }));
+  }), backs && Array(Math.ceil((14 - backs) / 2)).fill(null).map(function (_, i) {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", {
+      key: i
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      className: "card-spacer"
+    }, "\xA0"));
   }));
 };
 
@@ -70298,9 +70333,9 @@ var PlayArea = function PlayArea(_ref) {
     className: "play-area"
   }, "\xA0", currentTrick && currentTrick.plays && currentTrick.plays.map(function (play, ix) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-      className: "play",
+      className: play.pass ? "pass clearfix" : "play clearfix",
       key: ix
-    }, "Player ", play.player, " ", play.pass ? "Pass" : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
+    }, "Player ", play.player, " ", play.pass ? "Passed" : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
       hand: play.cards
     }));
   }));

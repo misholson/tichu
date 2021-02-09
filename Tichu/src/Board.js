@@ -3,7 +3,7 @@ import { Hand, OpponentHand, PartnerHand } from './Hand';
 import { Player } from './Player';
 import { PassArea } from './PassArea';
 import { PlayArea } from './PlayArea';
-import { FormGroup, Button } from 'reactstrap';
+import { FormGroup, Button, Container, Row, Col } from 'reactstrap';
 import 'bootstrap';
 const { sortCards, removeFromHand, getPlayerIDs, addToHand } = require('./Helpers');
 const { constants } = require('./Constants');
@@ -122,58 +122,93 @@ export const TichuBoard = (props) => {
     }
 
     return (
+        <>
         <div className="board">
-            <div className="board-row">
-                <div className="board-side">
-                    Empty
-                </div>
-                <div className="board-middle">
-                    <Player playerID={playerIDs.partner} phase={phase} currentPlayer={ctx.currentPlayer} />
-                    <PartnerHand backs={G.public.players[playerIDs.partner].cards} />
-                </div>
-                <div className="board-side">
-                    Empty
-                </div>
+            <Container>
+                <Row className="board-row clearfix">
+                    <Col md={2} className="board-side">
+                        &nbsp;
+                    </Col>
+                    <Col md={8} className="board-middle">
+                        <Player playerID={playerIDs.partner} phase={phase} currentPlayer={ctx.currentPlayer} />
+                        <PartnerHand backs={G.public.players[playerIDs.partner].cards} />
+                        <Clear />
+                    </Col>
+                    <Col md={2} className="board-side">
+                        &nbsp;
+                    </Col>
+                </Row>
+                <Row className="board-row clearfix">
+                    <Col md={2} className="board-side">
+                        <Player playerID={playerIDs.left} phase={phase} currentPlayer={ctx.currentPlayer} />
+                        <OpponentHand backs={G.public.players[playerIDs.left].cards} />
+                        <Clear />
+                    </Col>
+                    <Col md={8} className="board-middle">
+                        {phase === constants.phases.preHand.name && <PassArea selectedCards={stage === constants.phases.preHand.stages.passCards ? passedCards : receivedCards} stage={stage} readyToPlay={G.public.players[playerID].readyToPlay} onReturnPass={handleReturnPass} onPassConfirmed={handlePassConfirmed} onAcceptConfirmed={handleAcceptConfirmed} />}
+                        {phase === constants.phases.playTrick.name && <PlayArea currentTrick={G.currentTrick} />}
+                    </Col>
+                    <Col md={2} className="board-side">
+                        <Player playerID={playerIDs.right} phase={phase} currentPlayer={ctx.currentPlayer} />
+                        <OpponentHand backs={G.public.players[playerIDs.right].cards} />
+                        <Clear />
+                    </Col>
+                </Row>
+                <Row className="board-row clearfix">
+                    <Col md={2} className="board-side">
+                        &nbsp;
+                    </Col>
+                    <Col md={8} className="board-middle">
+                        <Player playerID={playerID} phase={phase} currentPlayer={ctx.currentPlayer} />
+                        <Hand hand={hand} selectedCards={selectedCards} onCardClicked={handleCardClicked} />
+                        {stage === constants.phases.preHand.stages.takeOrGrand &&
+                            <FormGroup>
+                                <Button color="primary" className="mx-1" onClick={onGrandClicked}>Grand Tichu</Button>
+                                <Button color="primary" className="mx-1" onClick={onTakeClicked}>Take</Button>
+                            </FormGroup>
+                        }
+                        {isPlayerActive &&
+                            <FormGroup>
+                                <Button color="primary" className="mx-1" onClick={onPlayClicked} disabled={!selectedPlayType?.isValid(selectedCards, G.currentTrick)}>Play</Button>
+                                <Button color="primary" className="mx-1" onClick={onPassClicked} disabled={!canPass(G.currentTrick) && hand.length > 0}>Pass</Button>
+                            </FormGroup>
+                        }
+                        <Clear />
+                    </Col>
+                    <Col md={2} className="board-side">
+                        &nbsp;
+                    </Col>
+                </Row>
+            </Container>
+        </div>
+            <Sidebar />
+        </>
+    );
+}
+
+const Sidebar = ({ G, ctx }) => {
+
+    return (
+        <div className="sidebar">
+            <div>
+                <h4>Score:</h4>
+
             </div>
-            <div className="board-row">
-                <div className="board-side">
-                    <Player playerID={playerIDs.left} phase={phase} currentPlayer={ctx.currentPlayer} />
-                    Player: {playerIDs.left}
-                    <OpponentHand backs={G.public.players[playerIDs.left].cards} />
-                </div>
-                <div className="board-middle">
-                    {phase === constants.phases.preHand.name && <PassArea selectedCards={stage === constants.phases.preHand.stages.passCards ? passedCards : receivedCards} stage={stage} readyToPlay={G.public.players[playerID].readyToPlay} onReturnPass={handleReturnPass} onPassConfirmed={handlePassConfirmed} onAcceptConfirmed={handleAcceptConfirmed} />}
-                    {phase === constants.phases.playTrick.name && <PlayArea currentTrick={G.currentTrick} />}
-                </div>
-                <div className="board-side">
-                    <Player playerID={playerIDs.right} phase={phase} currentPlayer={ctx.currentPlayer} />
-                    <OpponentHand backs={G.public.players[playerIDs.right].cards} />
-                </div>
+            <div>
+                <h4>History:</h4>
+
             </div>
-            <div className="board-row">
-                <div className="board-side">
-                    Empty
-                </div>
-                <div className="board-middle">
-                    <Player playerID={playerID} phase={phase} currentPlayer={ctx.currentPlayer} />
-                    <Hand hand={hand} selectedCards={selectedCards} onCardClicked={handleCardClicked} />
-                    {stage === constants.phases.preHand.stages.takeOrGrand &&
-                        <FormGroup>
-                            <Button color="primary" className="mx-1" onClick={onGrandClicked}>Grand Tichu</Button>
-                            <Button color="primary" className="mx-1" onClick={onTakeClicked}>Take</Button>
-                        </FormGroup>
-                    }
-                    {isPlayerActive &&
-                        <FormGroup>
-                            <Button color="primary" className="mx-1" onClick={onPlayClicked} disabled={!selectedPlayType?.isValid(selectedCards, G.currentTrick)}>Play</Button>
-                            <Button color="primary" className="mx-1" onClick={onPassClicked} disabled={!canPass(G.currentTrick) && hand.length > 0}>Pass</Button>
-                        </FormGroup>
-                    }
-                </div>
-                <div className="board-side">
-                    Empty
-                </div>
+            <div>
+                <h4>Chat:</h4>
+
             </div>
+        </div>
+    );
+}
+
+const Clear = () => {
+    return (
+        <div style={{ clear: "both" }}>
         </div>
     );
 }

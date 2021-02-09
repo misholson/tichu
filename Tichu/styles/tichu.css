@@ -1,4 +1,4 @@
-.hand .card {
+.hand .card-front {
     width: 80px;
     height: 120px;
     border: 1px solid black;
@@ -15,13 +15,23 @@
     border-radius: 5px;
     box-shadow: 1px 1px 5px #555;
     /*float: left;*/
-    margin-top: -40px;
+    margin-top: -50px;
     background-image: url("/images/back_rotated.jpg");
     background-position: center;
     background-size: cover;
 }
 
-.pass-area .card {
+.hand-vertical .card-spacer {
+    width: 120px;
+    height: 80px;
+    border: 0px;
+    margin-top: -50px;
+}
+
+.pass-area {
+}
+
+.pass-area .card-front {
     width: 80px;
     height: 120px;
     border: 1px solid black;
@@ -34,8 +44,15 @@
     float: none;
     width: 100%;
 }
+
+.play-area .pass {
+    float: none;
+    width: 100%;
+}
 .play-area {
-    height: 550px;
+    width: 100%;
+    overflow-y: auto;
+    height: 400px;
 }
 
 .hand .selectedCard {
@@ -50,24 +67,21 @@ ul.hand {
     border: 1px solid black;
     height: 800px; /* Can I make this more dynamic later?*/
     width: 1200px;
+    float: left;
 }
 
-.board-row {
-    height: 30%;
+.sidebar {
+    border: 1px solid black;
+    float: left;
+    height:800px;
+    width: 300px;
 }
 
 .board-row div {
     float: left;
 }
 
-.board-side {
-    width: 15%;
-}
-
-.board-middle {
-    width: 70%;
-}
-
 .board-middle table {
     margin: auto;
+    margin-top: 50px;
 }
