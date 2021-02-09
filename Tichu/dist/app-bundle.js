@@ -70422,19 +70422,59 @@ function findNextPlayerNotOut(G, ctx, nextPlayerPos) {
 }
 
 function onTurnBegin(G, ctx) {
-  console.debug("Turn of ".concat(ctx.currentPlayer, " is beginning.")); //if (G.players[ctx.currentPlayer].hand.length === 0) {
-  //    // If player is out, skip their turn.
-  //    console.debug(`Ending turn of ${ctx.currentPlayer} since they do not have any cards`);
-  //    ctx.events.endTurn();
+  console.debug("Turn of ".concat(ctx.currentPlayer, " is beginning."));
+  var previousPlay = getPreviousPlay(G.currentTrick); //if (previousPlay) {
+  //    console.debug(`Previous play made by ${previousPlay.player}`);
+  //    if (previousPlay.player === ctx.currentPlayer) {
+  //        console.debug("------End Trick------\n");
+  //        // If the last player to play was the current player, cleanup the trick.
+  //        var winner = findTrickWinner(G, ctx);
+  //        console.debug("------Begin Cleanup------\n");
+  //        console.debug(`Cleaning up trick. Winner: ${winner}`);
+  //        if (winner) {
+  //            // TODO: Deal with giving away the dragon by sending the player to a "give away dragon" stage.
+  //            G.currentTrick.winner = winner;
+  //            //clearTable(G, winner);
+  //            //// Save off the current trick to the log of previous tricks.
+  //            //G.previousTricks = G.previousTricks || [];
+  //            //G.previousTricks.unshift(G.currentTrick);
+  //            //var nextPhase = constants.phases.playTrick.name;
+  //            //var playerOutCount = countOutPlayers(G, ctx);
+  //            //if (playerOutCount === 3) {
+  //            //    console.debug("\n---------- End Playing Tricks ----------\n");
+  //            //    // Set the out order of the last player.
+  //            //    Object.values(G.public.players).find(player => !player.out).outOrder = 4;
+  //            //    // Count score
+  //            //    console.debug("Counting score");
+  //            //    updateScore(G, ctx);
+  //            //    nextPhase = constants.phases.preHand.name;
+  //            //    console.debug("\n-------------- End Hand --------------\n");
+  //            //} else {
+  //            //    console.debug(`There are ${playerOutCount} players out`);
+  //            //    console.debug("------End Cleanup------\n");
+  //            //}
+  //            //// Clear the current trick. It remains the current players hand.
+  //            //G.currentTrick = null;
+  //            //ctx.events.endTurn();
+  //            //console.debug(`Setting next phase to ${nextPhase}`);
+  //            //ctx.events.setPhase(nextPhase);
+  //        } else {
+  //            console.error("No winner was detected even though the trick is over");
+  //        }
+  //    }
   //}
-
-  var previousPlay = getPreviousPlay(G.currentTrick); // If the previous play was the dog, so clear out the trick before starting play.
+  // If the previous play was the dog, so clear out the trick before starting play.
 
   if (previousPlay) {
     if (previousPlay.cards.length === 1 && previousPlay.cards[0] === constants.specials.dog) {
       G.currentTrick = null;
     }
-  }
+  } //if (G.players[ctx.currentPlayer].hand.length === 0) {
+  //    // If player is out, skip their turn.
+  //    console.debug(`Ending turn of ${ctx.currentPlayer} since they do not have any cards`);
+  //    ctx.events.endTurn();
+  //}
+
 }
 
 function playCards(G, ctx, cards) {
@@ -70540,10 +70580,10 @@ function clearTable(G, receivingPlayerID) {
 }
 
 function trickEndIf(G, ctx) {
-  // If the last player to play is also the current player.
-  var winner = findTrickWinner(G, ctx);
+  var winner = findTrickWinner(G, ctx); // If the last player to play is also the current player.
 
   if (winner) {
+    console.debug("trick will end with winner ".concat(G.currentTrick.winner));
     var playerOutCount = countOutPlayers(G, ctx);
 
     if (playerOutCount >= 3) {
@@ -70552,7 +70592,6 @@ function trickEndIf(G, ctx) {
         next: constants.phases.preHand.name
       };
     } else {
-      console.debug("Trick will end with ".concat(playerOutCount, " players out. Winner is ").concat(winner));
       return {
         next: constants.phases.playTrick.name
       };
@@ -70569,31 +70608,56 @@ function findTrickWinner(G, ctx) {
   // beginning and end of the turn, so right after you play this function gets called and it looks like you've won the trick
   // However, if the first card in the history is a pass it means we've had at least one other person play and got back to you.
   if (G.currentTrick && G.currentTrick.plays && G.currentTrick.plays.length > 0) {
-    // There needs to be at least one pass in the history, and the previous play must have been played by the current player.
-    if (G.currentTrick.plays[0].pass) {
-      // We need to check for pass because the framework checks trickEndIf at the beginning and end of your turn.
-      var previousPlay = getPreviousPlay(G.currentTrick);
+    var previousPlayIndex = G.currentTrick.plays.findIndex(function (play) {
+      return !play.pass;
+    });
+    var previousPlay = G.currentTrick.plays[previousPlayIndex];
+    var previousPlayerID = previousPlay.player; // At least one player needs to have passed.
 
-      if (previousPlay.player === ctx.currentPlayer) {
-        var winner = previousPlay.player;
-        console.debug("Checking for trick end. ".concat(winner, " is the winner"));
-        return winner;
+    if (previousPlayIndex > 0) {
+      // Every other player should either be out or have passed.
+      var isTrickOver = ctx.playOrder.every(function (pId) {
+        if (pId === previousPlayerID) {
+          return true; // This player doesn't count because they could be the winner.
+        }
+
+        if (G.players[pId].hand.length === 0) {
+          return true; // This player neither played nor passed because they don't have any cards.
+        } // Check to see if this player passed after the previous play
+
+
+        for (var i = 0; i < previousPlayIndex; i++) {
+          var play = G.currentTrick.plays[i];
+
+          if (play.player === pId && play.pass) {
+            return true; // This player passed.
+          }
+        } // This player didn't pass and isn't out, so the trick isn't over yet.
+
+
+        return false;
+      });
+
+      if (isTrickOver) {
+        console.debug("Trick is over. Winner is ".concat(previousPlayerID));
+        return previousPlayerID;
       }
-    } //// If all but one player has passed, that player wins.
-    ////var outCount = countOutPlayers(G, ctx);
-    //var trickOver = true;
-    //var i;
-    //for (i = 0; i < ctx.numPlayers - 1; i++) {
-    //    // If we find a player who hasn't passed, the trick isn't over.
-    //    if (!G.currentTrick.plays[i].pass) {
-    //        trickOver = false;
+    } // 
+    //for (var i = 0; i < G.currentTrick.plays.length; i++) {
+    //    if (!currentTrick.plays[i].pass) {
+    //        // When we get to the first play that's not a pass.
     //        break;
     //    }
     //}
-    //if (trickOver) {
-    //    var winner = G.currentTrick.plays[i].player;
-    //    console.debug(`Checking for trick end. ${i} players have passed. ${winner} is the winner`);
-    //    return winner;
+    //// There needs to be at least one pass in the history, and the previous play must have been played by the current player.
+    //if (G.currentTrick.plays[0].pass) {
+    //    // We need to check for pass because the framework checks trickEndIf at the beginning and end of your turn.
+    //    var previousPlay = getPreviousPlay(G.currentTrick);
+    //    if (previousPlay.player === ctx.currentPlayer) {
+    //        var winner = previousPlay.player;
+    //        console.debug(`Checking for trick end. ${winner} is the winner`);
+    //        return winner;
+    //    }
     //}
 
   }
@@ -70626,7 +70690,6 @@ function onTrickEnd(G, ctx) {
 
     G.previousTricks = G.previousTricks || [];
     G.previousTricks.unshift(G.currentTrick);
-    var nextPhase = constants.phases.playTrick.name;
     var playerOutCount = countOutPlayers(G, ctx);
 
     if (playerOutCount === 3) {
@@ -70638,7 +70701,6 @@ function onTrickEnd(G, ctx) {
 
       console.debug("Counting score");
       updateScore(G, ctx);
-      nextPhase = constants.phases.preHand.name;
       console.debug("\n-------------- End Hand --------------\n");
     } else {
       console.debug("There are ".concat(playerOutCount, " players out"));
@@ -70646,17 +70708,29 @@ function onTrickEnd(G, ctx) {
     } // Clear the current trick. It remains the current players hand.
 
 
-    G.currentTrick = null; //console.debug(`Setting next phase to ${nextPhase}`);
-    //ctx.events.setPhase(nextPhase);
+    G.currentTrick = null;
   } else {
     console.error("No winner was detected even though the trick is over");
   }
 }
 
 function turnEndIf(G, ctx) {
-  // If the current player is out, play proceeds in regular turn order.
+  // If there's a winner for the trick, end the turn.
+  if (G.currentTrick.winner) {
+    return true;
+  } // If the current player is out, play proceeds in regular turn order.
+
+
   console.debug("Player ".concat(ctx.currentPlayer, " hand length is ").concat(G.players[ctx.currentPlayer].hand.length));
   return G.players[ctx.currentPlayer].hand.length === 0;
+}
+
+function onTurnEnd(G, ctx) {// On the end of a turn, try to identify if a trick has been won.
+  // If the last player to play is the NEXT player who will play, clean up the trick.
+  //var previousPlay = getPreviousPlay(G.currentTrick);
+  //if (previousPlay) {
+  //    var lastPlayerToPlay = previousPlay.player;
+  //}
 }
 
 function updateScore(G, ctx) {
@@ -70761,7 +70835,7 @@ function moveCardsBetweenArrays(fromArray, toArray) {
 var playTrick = {
   onBegin: onPhaseBegin,
   turn: {
-    //onEnd: (G, ctx) => { console.debug(`Turn of ${ctx.currentPlayer} is ending`) },
+    onEnd: onTurnEnd,
     onBegin: onTurnBegin,
     endIf: turnEndIf,
     order: _objectSpread(_objectSpread({}, TurnOrder.DEFAULT), {}, {
