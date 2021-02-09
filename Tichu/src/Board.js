@@ -166,7 +166,7 @@ export const TichuBoard = (props) => {
                     {isPlayerActive &&
                         <FormGroup>
                             <Button color="primary" className="mx-1" onClick={onPlayClicked} disabled={!selectedPlayType?.isValid(selectedCards, G.currentTrick)}>Play</Button>
-                            <Button color="primary" className="mx-1" onClick={onPassClicked} disabled={!canPass(G.currentTrick)}>Pass</Button>
+                            <Button color="primary" className="mx-1" onClick={onPassClicked} disabled={!canPass(G.currentTrick) && hand.length > 0}>Pass</Button>
                         </FormGroup>
                     }
                 </div>

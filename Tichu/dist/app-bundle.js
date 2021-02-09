@@ -69711,7 +69711,7 @@ var TichuBoard = function TichuBoard(props) {
     color: "primary",
     className: "mx-1",
     onClick: onPassClicked,
-    disabled: !canPass(G.currentTrick)
+    disabled: !canPass(G.currentTrick) && hand.length > 0
   }, "Pass"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-side"
   }, "Empty")));
@@ -69893,8 +69893,15 @@ module.exports.cardDefinitions = generateCardDefinitions();
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 var _require = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boardgame.io/dist/esm/core.js"),
-    PlayerView = _require.PlayerView;
+    PlayerView = _require.PlayerView,
+    TurnOrder = _require.TurnOrder;
 
 var _require2 = __webpack_require__(/*! ./Helpers */ "./src/Helpers.js"),
     sortCards = _require2.sortCards,
@@ -69921,7 +69928,10 @@ var _require5 = __webpack_require__(/*! ./PrimaryPlay */ "./src/PrimaryPlay.js")
     primaryPlayPass = _require5.primaryPlayPass;
 
 var tichu = {
-  setup: function setup() {
+  setup: function setup(ctx) {
+    var score = {};
+    score[ctx.playOrder[0]] = 0;
+    score[ctx.playOrder[1]] = 0;
     return {
       secret: {
         deck: generateDeck(56)
@@ -69950,6 +69960,7 @@ var tichu = {
           }
         }
       },
+      score: _objectSpread({}, score),
       players: {
         "0": {
           hand: []
@@ -70019,12 +70030,9 @@ var tichu = {
         },
         onBegin: onTurnBegin,
         endIf: primaryPlayTurnEndIfOut,
-        order: {
-          first: findStartPlayer,
-          next: function next(G, ctx) {
-            return (ctx.playOrderPos + 1) % ctx.numPlayers;
-          }
-        },
+        order: _objectSpread(_objectSpread({}, TurnOrder.DEFAULT), {}, {
+          first: findStartPlayer
+        }),
         moveLimit: 1
       },
       moves: {
@@ -70035,6 +70043,19 @@ var tichu = {
       onEnd: primaryPlayOnEnd,
       next: constants.phases.preHand.name
     }
+  },
+  endIf: function endIf(G, ctx) {
+    // Game ends when one team has a score greater than 0
+    console.log(G);
+    var team1score = G.score[ctx.playOrder[0]];
+    var team2score = G.score[ctx.playOrder[1]];
+    console.debug("Current score: ".concat(team1score, "-").concat(team2score));
+
+    if (team1score !== team2score && (team1score >= 1000 || team2score >= 1000)) {
+      return G.score;
+    }
+
+    return null;
   },
   minPlayers: 4,
   maxPlayers: 4
@@ -70571,15 +70592,24 @@ function onTurnBegin(G, ctx) {
   console.debug("Turn of ".concat(ctx.currentPlayer, " is beginning."));
 
   if (G.currentTrick && G.currentTrick.plays && G.currentTrick.plays.length > 0) {
-    // If the most recent play was done by the current player, then the player takes all the cards in the current
+    console.log(G.currentTrick); // If the most recent play was done by the current player, then the player takes all the cards in the current
     // trick into their tricks, and current trick is cleared.
+
     if (G.currentTrick.plays[0].player === ctx.currentPlayer) {
-      // Give the current player the cards in the trick.
+      console.debug("player ".concat(ctx.currentPlayer, " has won the trick")); // Give the current player the cards in the trick.
       // TODO: Deal with giving away the dragon by sending the player to a "give away dragon" stage.
+
       clearTable(G, ctx.currentPlayer); // Clear the current trick. It remains the current players hand.
 
+      console.debug("ending the turn of player ".concat(ctx.currentPlayer));
       G.currentTrick = null;
+      ctx.events.endTurn();
     }
+  }
+
+  if (G.players[ctx.currentPlayer].hand.length === 0) {
+    // If player is out, skip their turn.
+    ctx.events.endTurn();
   }
 }
 
@@ -70624,21 +70654,31 @@ function playCards(G, ctx, cards) {
   if (!playType.isValid(cards, G.currentTrick)) {
     console.debug("Invalid play");
     return INVALID_MOVE;
+  } // Handle dog logic.
+
+
+  if (type === "dog") {
+    var nextPlayer = getPartnerID(ctx, ctx.currentPlayer);
+    console.debug("dog played, passing turn to player ".concat(nextPlayer));
+    ctx.events.endTurn({
+      next: (ctx.playOrderPos + 2) % 4
+    });
+  } else {
+    if (!G.currentTrick) {
+      console.debug("Creating trick of type: ".concat(type.name));
+      G.currentTrick = {
+        type: type,
+        plays: []
+      };
+    }
+
+    console.debug("Adding play to current trick");
+    G.currentTrick.plays.unshift({
+      cards: cards,
+      player: ctx.currentPlayer
+    });
   }
 
-  if (!G.currentTrick) {
-    console.debug("Creating trick of type: ".concat(type.name));
-    G.currentTrick = {
-      type: type,
-      plays: []
-    };
-  }
-
-  console.debug("Adding play to current trick");
-  G.currentTrick.plays.unshift({
-    cards: cards,
-    player: ctx.currentPlayer
-  });
   console.debug("Removing cards from player hand");
   cards.forEach(function (c) {
     return removeFromHand(G.players[ctx.currentPlayer].hand, c);
@@ -70652,11 +70692,24 @@ function playCards(G, ctx, cards) {
   }
 }
 
+function getPartnerID(ctx, playerID) {
+  var playerIndex = ctx.playOrder.findIndex(function (pId) {
+    return pId === playerID;
+  });
+  var partnerIndex = (playerIndex + 2) % 4;
+  return ctx.playOrder[partnerIndex];
+}
+
 function primaryPlayEndIf(G, ctx) {
   return countOutPlayers(G, ctx) === 3;
 }
 
 function pass(G, ctx) {
+  // Put this in here in case the logic to auto-pass when are out isn't working right.
+  if (G.players[ctx.currentPlayer].hand.length === 0) {
+    return true;
+  }
+
   if (!canPass(G.currentTrick)) {
     console.debug("Invalid move: Player ".concat(ctx.currentPlayer, " tried to pass on the first play of a trick"));
     return INVALID_MOVE;
@@ -70697,6 +70750,7 @@ function primaryPlayOnEnd(G, ctx) {// Count score.
 
 function primaryPlayTurnEndIfOut(G, ctx) {
   // If the current player is out, play proceeds in regular turn order.
+  console.debug("Player ".concat(ctx.currentPlayer, " hand length is ").concat(G.players[ctx.currentPlayer].hand.length));
   return G.players[ctx.currentPlayer].hand.length === 0;
 }
 

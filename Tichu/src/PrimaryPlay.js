@@ -12,9 +12,11 @@ function onTurnBegin(G, ctx) {
     console.debug(`Turn of ${ctx.currentPlayer} is beginning.`);
 
     if (G.currentTrick && G.currentTrick.plays && G.currentTrick.plays.length > 0) {
+        console.log(G.currentTrick);
         // If the most recent play was done by the current player, then the player takes all the cards in the current
         // trick into their tricks, and current trick is cleared.
         if (G.currentTrick.plays[0].player === ctx.currentPlayer) {
+            console.debug(`player ${ctx.currentPlayer} has won the trick`);
             // Give the current player the cards in the trick.
 
             // TODO: Deal with giving away the dragon by sending the player to a "give away dragon" stage.
@@ -22,9 +24,16 @@ function onTurnBegin(G, ctx) {
             clearTable(G, ctx.currentPlayer);
 
             // Clear the current trick. It remains the current players hand.
+            console.debug(`ending the turn of player ${ctx.currentPlayer}`);
             G.currentTrick = null;
+            ctx.events.endTurn();
 
         }
+    }
+
+    if (G.players[ctx.currentPlayer].hand.length === 0) {
+        // If player is out, skip their turn.
+        ctx.events.endTurn();
     }
 }
 
@@ -67,19 +76,26 @@ function playCards(G, ctx, cards) {
         return INVALID_MOVE;
     }
 
-    if (!G.currentTrick) {
-        console.debug(`Creating trick of type: ${type.name}`);
-        G.currentTrick = {
-            type: type,
-            plays: []
-        };
-    }
+    // Handle dog logic.
+    if (type === "dog") {
+        var nextPlayer = getPartnerID(ctx, ctx.currentPlayer);
+        console.debug(`dog played, passing turn to player ${nextPlayer}`);
+        ctx.events.endTurn({ next: (ctx.playOrderPos + 2) % 4 });
+    } else {
+        if (!G.currentTrick) {
+            console.debug(`Creating trick of type: ${type.name}`);
+            G.currentTrick = {
+                type: type,
+                plays: []
+            };
+        }
 
-    console.debug(`Adding play to current trick`);
-    G.currentTrick.plays.unshift({
-        cards: cards,
-        player: ctx.currentPlayer
-    });
+        console.debug(`Adding play to current trick`);
+        G.currentTrick.plays.unshift({
+            cards: cards,
+            player: ctx.currentPlayer
+        });
+    }
 
     console.debug(`Removing cards from player hand`);
     cards.forEach((c) => removeFromHand(G.players[ctx.currentPlayer].hand, c));
@@ -92,11 +108,20 @@ function playCards(G, ctx, cards) {
     }
 }
 
+function getPartnerID(ctx, playerID) {
+    var playerIndex = ctx.playOrder.findIndex((pId) => pId === playerID);
+    var partnerIndex = (playerIndex + 2) % 4;
+    return ctx.playOrder[partnerIndex];
+}
+
 function primaryPlayEndIf(G, ctx) {
     return countOutPlayers(G, ctx) === 3;
 }
 
 function pass(G, ctx) {
+    // Put this in here in case the logic to auto-pass when are out isn't working right.
+    if (G.players[ctx.currentPlayer].hand.length === 0) { return true; }
+
     if (!canPass(G.currentTrick)) {
         console.debug(`Invalid move: Player ${ctx.currentPlayer} tried to pass on the first play of a trick`);
         return INVALID_MOVE;
@@ -134,6 +159,7 @@ function primaryPlayOnEnd(G, ctx) {
 
 function primaryPlayTurnEndIfOut(G, ctx) {
     // If the current player is out, play proceeds in regular turn order.
+    console.debug(`Player ${ctx.currentPlayer} hand length is ${G.players[ctx.currentPlayer].hand.length}`);
     return G.players[ctx.currentPlayer].hand.length === 0;
 }
 

@@ -1,56 +1,64 @@
-const { PlayerView } = require('boardgame.io/core');
+const { PlayerView, TurnOrder } = require('boardgame.io/core');
 const { sortCards, dealCards } = require('./Helpers');
 const { constants } = require('./Constants');
 const { callGrand, takeCards, passCards, checkPlayersHavePassed, acceptPass } = require('./PreHand');
 const { onHandStart, onTurnBegin, findStartPlayer, playCards, primaryPlayEndIf, primaryPlayOnEnd, primaryPlayTurnEndIfOut, primaryPlayPass } = require('./PrimaryPlay');
 
 const tichu = {
-    setup: () => ({
-        secret: {
-            deck: generateDeck(56)
-        },
+    setup: (ctx) => {
+        var score = {};
+        score[ctx.playOrder[0]] = 0;
+        score[ctx.playOrder[1]] = 0;
 
-        public: {
+        return {
+            secret: {
+                deck: generateDeck(56)
+            },
+
+            public: {
+                players: {
+                    "0": {
+                        cards: 0,
+                        tichu: false,
+                        grand: false
+                    },
+                    "1": {
+                        cards: 0,
+                        tichu: false,
+                        grand: false
+                    },
+                    "2": {
+                        cards: 0,
+                        tichu: false,
+                        grand: false
+                    },
+                    "3": {
+                        cards: 0,
+                        tichu: false,
+                        grand: false
+                    }
+                },
+            },
+
+            score: { ...score },
+
             players: {
                 "0": {
-                    cards: 0,
-                    tichu: false,
-                    grand: false
+                    hand: []
                 },
                 "1": {
-                    cards: 0,
-                    tichu: false,
-                    grand: false
+                    hand: []
                 },
                 "2": {
-                    cards: 0,
-                    tichu: false,
-                    grand: false
+                    hand: []
                 },
                 "3": {
-                    cards: 0,
-                    tichu: false,
-                    grand: false
+                    hand: []
                 }
             },
-        },
-
-        players: {
-            "0": {
-                hand: []
-            },
-            "1": {
-                hand: []
-            },
-            "2": {
-                hand: []
-            },
-            "3": {
-                hand: []
-            }
-        },
-        playerView: PlayerView.STRIP_SECRETS,
-    }),
+            playerView: PlayerView.STRIP_SECRETS,
+        }
+    },
 
     turn: {
         moveLimit: 1
@@ -102,8 +110,8 @@ const tichu = {
                 onBegin: onTurnBegin,
                 endIf: primaryPlayTurnEndIfOut,
                 order: {
-                    first: findStartPlayer,
-                    next: (G, ctx) => (ctx.playOrderPos + 1) % ctx.numPlayers
+                    ...TurnOrder.DEFAULT,
+                    first: findStartPlayer
                 },
                 moveLimit: 1
             },
@@ -115,6 +123,20 @@ const tichu = {
             onEnd: primaryPlayOnEnd,
             next: constants.phases.preHand.name,
         }
+    },
+
+    endIf: (G, ctx) => {
+        // Game ends when one team has a score greater than 0
+        console.log(G);
+        var team1score = G.score[ctx.playOrder[0]];
+        var team2score = G.score[ctx.playOrder[1]];
+
+        console.debug(`Current score: ${team1score}-${team2score}`);
+        if (team1score !== team2score && (team1score >= 1000 || team2score >= 1000)) {
+            return G.score;
+        }
+
+        return null;
     },
 
     minPlayers: 4,
