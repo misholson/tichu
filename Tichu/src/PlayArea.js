@@ -10,7 +10,7 @@ export const PlayArea = ({ currentTrick }) => {
             &nbsp;
             {currentTrick && currentTrick.plays &&
                 currentTrick.plays.map((play, ix) => (
-                    <div className="play" key={ix}>Player { play.player } <Hand hand={ play.cards } /></div>
+                    <div className="play" key={ix}>Player { play.player} {play.pass ? "Pass" : <Hand hand={ play.cards } />}</div>
                     ))
             }
         </div>

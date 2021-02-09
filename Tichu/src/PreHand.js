@@ -123,10 +123,45 @@ function acceptPass(G, ctx, playerID) {
     }
 }
 
+const preHand = {
+    onBegin: (G, ctx) => {
+        console.log("first8 onBegin");
+        G.secret.deck = ctx.random.Shuffle(G.secret.deck);
+        console.debug("first8 done shuffling");
+        dealCards(G, 8);
+        ctx.events.setActivePlayers({ all: constants.phases.preHand.stages.takeOrGrand });
+        return G;
+    },
+    turn: {
+        stages: {
+            takeOrGrand: {
+                moves: {
+                    callGrand: callGrand,
+                    takeCards: takeCards
+                },
+                next: constants.phases.preHand.stages.passCards
+            },
+            passCards: {
+                moves: {
+                    passCards: passCards
+                },
+                next: constants.phases.preHand.stages.waitForPass
+            },
+            waitForPass: {
+                next: constants.phases.preHand.stages.acceptPass
+            },
+            acceptPass: {
+                moves: {
+                    acceptPass: acceptPass
+                }
+            }
+        },
+        onMove: checkPlayersHavePassed
+    },
+    next: constants.phases.playTrick.name,
+    start: true
+};
+
 module.exports = {
-    callGrand: callGrand,
-    takeCards: takeCards,
-    passCards: passCards,
-    checkPlayersHavePassed: checkPlayersHavePassed,
-    acceptPass: acceptPass
+    preHand: preHand
 }

@@ -69343,13 +69343,17 @@ var _require = __webpack_require__(/*! ../src/Helpers */ "./src/Helpers.js"),
 function skipPreHandPhase(game) {
   console.log(game);
   game.phases.preHand.start = false;
-  game.phases.primaryPlay.start = true;
+  game.phases.playTrick.start = true;
 
-  game.phases.primaryPlay.onBegin = function (G, ctx) {
+  game.phases.playTrick.onBegin = function (G, ctx) {
     console.log("TESTING ONLY: shuffle and deal from primary play phase");
-    G.secret.deck = ctx.random.Shuffle(G.secret.deck);
-    dealCards(G, 14);
-    return G;
+
+    if (!G.previousTricks) {
+      G.secret.deck = ctx.random.Shuffle(G.secret.deck);
+      dealCards(G, 14);
+    } else {
+      G.currentTrick = null;
+    }
   };
 
   console.log(game);
@@ -69527,7 +69531,7 @@ var TichuBoard = function TichuBoard(props) {
 
   var phase = ctx.phase;
   var playerIDs = getPlayerIDs(ctx, playerID);
-  var isPlayerActive = phase === constants.phases.primaryPlay.name && playerID === ctx.currentPlayer;
+  var isPlayerActive = phase === constants.phases.playTrick.name && playerID === ctx.currentPlayer;
 
   var _useState = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])([]),
       _useState2 = _slicedToArray(_useState, 2),
@@ -69587,7 +69591,7 @@ var TichuBoard = function TichuBoard(props) {
   var handleCardClicked = function handleCardClicked(cardID) {
     if (phase === constants.phases.preHand.name && stage === constants.phases.preHand.stages.passCards) {
       selectCardToPass(cardID);
-    } else if (phase === constants.phases.primaryPlay.name && playerID === ctx.currentPlayer) {
+    } else if (phase === constants.phases.playTrick.name && playerID === ctx.currentPlayer) {
       selectCardForPlay(cardID);
     }
   }; // See what kind of play is selected.
@@ -69670,7 +69674,7 @@ var TichuBoard = function TichuBoard(props) {
     onReturnPass: handleReturnPass,
     onPassConfirmed: handlePassConfirmed,
     onAcceptConfirmed: handleAcceptConfirmed
-  }), phase === constants.phases.primaryPlay.name && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_PlayArea__WEBPACK_IMPORTED_MODULE_4__["PlayArea"], {
+  }), phase === constants.phases.playTrick.name && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_PlayArea__WEBPACK_IMPORTED_MODULE_4__["PlayArea"], {
     currentTrick: G.currentTrick
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board-side"
@@ -69791,8 +69795,8 @@ module.exports.constants = {
         acceptPass: "acceptPass"
       }
     },
-    primaryPlay: {
-      name: "primaryPlay",
+    playTrick: {
+      name: "playTrick",
       stages: {}
     }
   },
@@ -69900,32 +69904,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var _require = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boardgame.io/dist/esm/core.js"),
-    PlayerView = _require.PlayerView,
-    TurnOrder = _require.TurnOrder;
-
-var _require2 = __webpack_require__(/*! ./Helpers */ "./src/Helpers.js"),
-    sortCards = _require2.sortCards,
-    dealCards = _require2.dealCards;
-
-var _require3 = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
-    constants = _require3.constants;
-
-var _require4 = __webpack_require__(/*! ./PreHand */ "./src/PreHand.js"),
-    callGrand = _require4.callGrand,
-    takeCards = _require4.takeCards,
-    passCards = _require4.passCards,
-    checkPlayersHavePassed = _require4.checkPlayersHavePassed,
-    acceptPass = _require4.acceptPass;
-
-var _require5 = __webpack_require__(/*! ./PrimaryPlay */ "./src/PrimaryPlay.js"),
-    onHandStart = _require5.onHandStart,
-    onTurnBegin = _require5.onTurnBegin,
-    findStartPlayer = _require5.findStartPlayer,
-    playCards = _require5.playCards,
-    primaryPlayEndIf = _require5.primaryPlayEndIf,
-    primaryPlayOnEnd = _require5.primaryPlayOnEnd,
-    primaryPlayTurnEndIfOut = _require5.primaryPlayTurnEndIfOut,
-    primaryPlayPass = _require5.primaryPlayPass;
+    PlayerView = _require.PlayerView;
 
 var tichu = {
   setup: function setup(ctx) {
@@ -69982,79 +69961,23 @@ var tichu = {
     moveLimit: 1
   },
   phases: {
-    preHand: {
-      onBegin: function onBegin(G, ctx) {
-        console.log("first8 onBegin");
-        G.secret.deck = ctx.random.Shuffle(G.secret.deck);
-        console.debug("first8 done shuffling");
-        dealCards(G, 8);
-        ctx.events.setActivePlayers({
-          all: constants.phases.preHand.stages.takeOrGrand
-        });
-        return G;
-      },
-      turn: {
-        stages: {
-          takeOrGrand: {
-            moves: {
-              callGrand: callGrand,
-              takeCards: takeCards
-            },
-            next: constants.phases.preHand.stages.passCards
-          },
-          passCards: {
-            moves: {
-              passCards: passCards
-            },
-            next: constants.phases.preHand.stages.waitForPass
-          },
-          waitForPass: {
-            next: constants.phases.preHand.stages.acceptPass
-          },
-          acceptPass: {
-            moves: {
-              acceptPass: acceptPass
-            }
-          }
-        },
-        onMove: checkPlayersHavePassed
-      },
-      next: constants.phases.primaryPlay.name,
-      start: true
-    },
-    primaryPlay: {
-      onBegin: onHandStart,
-      turn: {
-        onEnd: function onEnd(G, ctx) {
-          console.debug("Turn of ".concat(ctx.currentPlayer, " is ending"));
-        },
-        onBegin: onTurnBegin,
-        endIf: primaryPlayTurnEndIfOut,
-        order: _objectSpread(_objectSpread({}, TurnOrder.DEFAULT), {}, {
-          first: findStartPlayer
-        }),
-        moveLimit: 1
-      },
-      moves: {
-        playCards: playCards,
-        pass: primaryPlayPass
-      },
-      endIf: primaryPlayEndIf,
-      onEnd: primaryPlayOnEnd,
-      next: constants.phases.preHand.name
-    }
+    preHand: __webpack_require__(/*! ./PreHand */ "./src/PreHand.js").preHand,
+    playTrick: __webpack_require__(/*! ./PlayTrick */ "./src/PlayTrick.js").playTrick
   },
   endIf: function endIf(G, ctx) {
-    // Game ends when one team has a score greater than 0
-    console.log(G);
-    var team1score = G.score[ctx.playOrder[0]];
-    var team2score = G.score[ctx.playOrder[1]];
-    console.debug("Current score: ".concat(team1score, "-").concat(team2score));
-
-    if (team1score !== team2score && (team1score >= 1000 || team2score >= 1000)) {
-      return G.score;
-    }
-
+    // I don't know why G is sometimes passed in as a scalar or undefined,
+    // but there's no reason for it to crash the game, at least not here.
+    //if (G instanceof Object) {
+    //    // Game ends when one team has a score greater than 0
+    //    console.log(G);
+    //    var team1score = G.score[ctx.playOrder[0]];
+    //    var team2score = G.score[ctx.playOrder[1]];
+    //    console.debug(`Current score: ${team1score}-${team2score}`);
+    //    if (team1score !== team2score && (team1score >= 1000 || team2score >= 1000)) {
+    //        return G.score;
+    //    }
+    //    return null;
+    //}
     return null;
   },
   minPlayers: 4,
@@ -70360,10 +70283,305 @@ var PlayArea = function PlayArea(_ref) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
       className: "play",
       key: ix
-    }, "Player ", play.player, " ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
+    }, "Player ", play.player, " ", play.pass ? "Pass" : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
       hand: play.cards
     }));
   }));
+};
+
+/***/ }),
+
+/***/ "./src/PlayTrick.js":
+/*!**************************!*\
+  !*** ./src/PlayTrick.js ***!
+  \**************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var _require = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boardgame.io/dist/esm/core.js"),
+    INVALID_MOVE = _require.INVALID_MOVE,
+    TurnOrder = _require.TurnOrder;
+
+var _require2 = __webpack_require__(/*! ./Helpers */ "./src/Helpers.js"),
+    sortCards = _require2.sortCards,
+    removeFromHand = _require2.removeFromHand,
+    getPlayerIDs = _require2.getPlayerIDs;
+
+var _require3 = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
+    constants = _require3.constants;
+
+var _require4 = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boardgame.io/dist/esm/core.js"),
+    Stage = _require4.Stage;
+
+var _require5 = __webpack_require__(/*! ./ValidPlays */ "./src/ValidPlays.js"),
+    detectPlayType = _require5.detectPlayType,
+    validPlays = _require5.validPlays,
+    canPass = _require5.canPass,
+    getPreviousPlay = _require5.getPreviousPlay;
+
+function onPhaseBegin(G, ctx) {
+  console.debug("Begin Trick by clearing out G.currentTrick");
+  G.currentTrick = null;
+}
+
+function findStartPlayer(G, ctx) {
+  console.debug("Finding trick start player. G.currentTrick: ".concat(JSON.stringify(G.currentTrick)));
+
+  if (!G.previousTricks || G.previousTricks.length === 0) {
+    // If there are no previous tricks in this hand, find the player with the mahjong.
+    console.debug("finding the start player for this hand");
+
+    for (var i = 0; i < ctx.playOrder.length; i++) {
+      var playerID = ctx.playOrder[i];
+      console.debug("checking hand of player: ".concat(playerID));
+      console.log(G.players[playerID].hand);
+
+      if (G.players[playerID].hand.some(function (cardID) {
+        return cardID === constants.specials.mahjong;
+      })) {
+        console.debug("mahjong is in the hand of player ".concat(playerID, ". Current player: ").concat(ctx.currentPlayer));
+        return i;
+      }
+    }
+  } else {
+    // Find the player who won the previous trick.
+    var newStartPlayer = G.previousTricks[0].winner;
+    var newIndex = ctx.playOrder.findIndex(function (pId) {
+      return pId === newStartPlayer;
+    });
+    console.debug("Previous trick winner was ".concat(newStartPlayer, " at position ").concat(newIndex));
+    return newIndex;
+  }
+}
+
+function findNextPlayer(G, ctx) {
+  var previousPlay = getPreviousPlay(G.currentTrick);
+  var nextPlayerPos = (ctx.playOrderPos + 1) % ctx.numPlayers; // If the previous play was the dog, go one player further.
+
+  if (previousPlay) {
+    if (previousPlay.cards.length === 1 && previousPlay.cards[0] === constants.specials.dog) {
+      nextPlayerPos++;
+    }
+  }
+
+  return nextPlayerPos;
+}
+
+function onTurnBegin(G, ctx) {
+  console.debug("Turn of ".concat(ctx.currentPlayer, " is beginning."));
+
+  if (G.players[ctx.currentPlayer].hand.length === 0) {
+    // If player is out, skip their turn.
+    ctx.events.endTurn();
+  }
+
+  var previousPlay = getPreviousPlay(G.currentTrick); // If the previous play was the dog, so clear out the trick before starting play.
+
+  if (previousPlay) {
+    if (previousPlay.cards.length === 1 && previousPlay.cards[0] === constants.specials.dog) {
+      G.currentTrick = null;
+    }
+  }
+}
+
+function playCards(G, ctx, cards) {
+  console.debug("player ".concat(ctx.currentPlayer, " playing cards ").concat(JSON.stringify(cards)));
+
+  if (!cards || cards.length === 0 || cards.length > 14) {
+    console.debug("Invalid cards array");
+    return INVALID_MOVE;
+  }
+
+  var type;
+
+  if (G.currentTrick) {
+    type = G.currentTrick.type;
+  }
+
+  if (!type) {
+    type = detectPlayType(cards);
+  }
+
+  console.debug("Detected play type: ".concat(type));
+  var playType = validPlays[type];
+
+  if (!playType.isValid(cards, G.currentTrick)) {
+    console.debug("Invalid play");
+    return INVALID_MOVE;
+  } // Handle dog logic.
+  //if (type === "dog") {
+  //    var nextPlayer = getPartnerID(ctx, ctx.currentPlayer);
+  //    console.debug(`dog played, passing turn to player ${nextPlayer}`);
+  //    ctx.events.endTurn({ next: (ctx.playOrderPos + 2) % 4 });
+  //} else {
+  //}
+
+
+  if (!G.currentTrick) {
+    console.debug("Creating trick of type: ".concat(type.name));
+    G.currentTrick = {
+      type: type,
+      plays: []
+    };
+  }
+
+  console.debug("Adding play to current trick");
+  G.currentTrick.plays.unshift({
+    cards: cards,
+    player: ctx.currentPlayer,
+    pass: false
+  });
+  console.debug("Removing cards from player hand");
+  cards.forEach(function (c) {
+    return removeFromHand(G.players[ctx.currentPlayer].hand, c);
+  });
+  G["public"].players[ctx.currentPlayer].cards = G.players[ctx.currentPlayer].hand.length;
+  var publicPlayerInfo = G["public"].players[ctx.currentPlayer];
+
+  if (publicPlayerInfo.cards === 0) {
+    publicPlayerInfo.out = true;
+    publicPlayerInfo.outOrder = countOutPlayers(G, ctx);
+  }
+}
+
+function getPartnerID(ctx, playerID) {
+  var playerIndex = ctx.playOrder.findIndex(function (pId) {
+    return pId === playerID;
+  });
+  var partnerIndex = (playerIndex + 2) % 4;
+  return ctx.playOrder[partnerIndex];
+}
+
+function pass(G, ctx) {
+  // Put this in here in case the logic to auto-pass when are out isn't working right.
+  if (G.players[ctx.currentPlayer].hand.length === 0) {
+    return true;
+  }
+
+  if (!canPass(G.currentTrick)) {
+    console.debug("Invalid move: Player ".concat(ctx.currentPlayer, " tried to pass on the first play of a trick"));
+    return INVALID_MOVE;
+  }
+
+  console.debug("Player ".concat(ctx.currentPlayer, " passes"));
+  G.currentTrick.plays.unshift({
+    cards: [],
+    player: ctx.currentPlayer,
+    pass: true
+  });
+}
+
+function clearTable(G, receivingPlayerID) {
+  var player = G.players[receivingPlayerID];
+
+  if (!G.currentTrick || !G.currentTrick.plays || G.currentTrick.plays.length === 0) {
+    return;
+  }
+
+  player.cardsWon = player.cardsWon || [];
+  G.currentTrick.plays.forEach(function (play) {
+    play.cards.forEach(function (card) {
+      return player.cardsWon.push(card);
+    });
+  });
+}
+
+function trickEndIf(G, ctx) {
+  // If the last player to play is also the current player.
+  var winner = findTrickWinner(G, ctx);
+  return !!winner;
+}
+
+function findTrickWinner(G, ctx) {
+  if (G.currentTrick && G.currentTrick.plays && G.currentTrick.plays.length > 0) {
+    // If all but one player has passed, that player wins.
+    var trickOver = true;
+    var i;
+
+    for (i = 0; i < ctx.numPlayers - 1; i++) {
+      // If we find a player who hasn't passed, the trick isn't over.
+      if (!G.currentTrick.plays[i].pass) {
+        trickOver = false;
+        break;
+      }
+    }
+
+    if (trickOver) {
+      var winner = G.currentTrick.plays[i].player;
+      console.debug("Checking for trick end. ".concat(i, " players have passed. ").concat(winner, " is the winner"));
+      return winner;
+    }
+  }
+
+  return null;
+}
+
+function countOutPlayers(G, ctx) {
+  var outPlayerCount = 0;
+
+  for (var i = 0; i < ctx.numPlayers; i++) {
+    if (G["public"].players[i].out) {
+      outPlayerCount++;
+    }
+  }
+
+  return outPlayerCount;
+}
+
+function onTrickEnd(G, ctx) {
+  var winner = findTrickWinner(G, ctx);
+  console.debug("Cleaning up trick. Winner: ".concat(winner));
+
+  if (winner) {
+    // TODO: Deal with giving away the dragon by sending the player to a "give away dragon" stage.
+    G.currentTrick.winner = winner;
+    clearTable(G, winner); // Save off the current trick to the log of previous tricks.
+
+    G.previousTricks = G.previousTricks || [];
+    G.previousTricks.unshift(G.currentTrick); // Clear the current trick. It remains the current players hand.
+
+    G.currentTrick = null;
+    console.debug("ending the trick.");
+    ctx.events.setPhase(constants.phases.playTrick.name);
+  }
+}
+
+function turnEndIf(G, ctx) {
+  // If the current player is out, play proceeds in regular turn order.
+  console.debug("Player ".concat(ctx.currentPlayer, " hand length is ").concat(G.players[ctx.currentPlayer].hand.length));
+  return G.players[ctx.currentPlayer].hand.length === 0;
+}
+
+var playTrick = {
+  onBegin: onPhaseBegin,
+  turn: {
+    onEnd: function onEnd(G, ctx) {
+      console.debug("Turn of ".concat(ctx.currentPlayer, " is ending"));
+    },
+    onBegin: onTurnBegin,
+    endIf: turnEndIf,
+    order: _objectSpread(_objectSpread({}, TurnOrder.DEFAULT), {}, {
+      first: findStartPlayer,
+      next: findNextPlayer
+    }),
+    moveLimit: 1
+  },
+  moves: {
+    playCards: playCards,
+    pass: pass
+  },
+  endIf: trickEndIf,
+  onEnd: onTrickEnd,
+  next: constants.phases.playTrick.name
+};
+module.exports = {
+  playTrick: playTrick
 };
 
 /***/ }),
@@ -70389,7 +70607,7 @@ var Player = function Player(_ref) {
   var playerID = _ref.playerID,
       phase = _ref.phase,
       currentPlayer = _ref.currentPlayer;
-  var displayIsActive = phase === constants.phases.primaryPlay.name && playerID === currentPlayer;
+  var displayIsActive = phase === constants.phases.playTrick.name && playerID === currentPlayer;
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     style: {
       "float": "none"
@@ -70548,221 +70766,48 @@ function acceptPass(G, ctx, playerID) {
   }
 }
 
-module.exports = {
-  callGrand: callGrand,
-  takeCards: takeCards,
-  passCards: passCards,
-  checkPlayersHavePassed: checkPlayersHavePassed,
-  acceptPass: acceptPass
+var preHand = {
+  onBegin: function onBegin(G, ctx) {
+    console.log("first8 onBegin");
+    G.secret.deck = ctx.random.Shuffle(G.secret.deck);
+    console.debug("first8 done shuffling");
+    dealCards(G, 8);
+    ctx.events.setActivePlayers({
+      all: constants.phases.preHand.stages.takeOrGrand
+    });
+    return G;
+  },
+  turn: {
+    stages: {
+      takeOrGrand: {
+        moves: {
+          callGrand: callGrand,
+          takeCards: takeCards
+        },
+        next: constants.phases.preHand.stages.passCards
+      },
+      passCards: {
+        moves: {
+          passCards: passCards
+        },
+        next: constants.phases.preHand.stages.waitForPass
+      },
+      waitForPass: {
+        next: constants.phases.preHand.stages.acceptPass
+      },
+      acceptPass: {
+        moves: {
+          acceptPass: acceptPass
+        }
+      }
+    },
+    onMove: checkPlayersHavePassed
+  },
+  next: constants.phases.playTrick.name,
+  start: true
 };
-
-/***/ }),
-
-/***/ "./src/PrimaryPlay.js":
-/*!****************************!*\
-  !*** ./src/PrimaryPlay.js ***!
-  \****************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-var _require = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boardgame.io/dist/esm/core.js"),
-    INVALID_MOVE = _require.INVALID_MOVE;
-
-var _require2 = __webpack_require__(/*! ./Helpers */ "./src/Helpers.js"),
-    sortCards = _require2.sortCards,
-    removeFromHand = _require2.removeFromHand,
-    getPlayerIDs = _require2.getPlayerIDs;
-
-var _require3 = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
-    constants = _require3.constants;
-
-var _require4 = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boardgame.io/dist/esm/core.js"),
-    Stage = _require4.Stage;
-
-var _require5 = __webpack_require__(/*! ./ValidPlays */ "./src/ValidPlays.js"),
-    detectPlayType = _require5.detectPlayType,
-    validPlays = _require5.validPlays,
-    canPass = _require5.canPass;
-
-function onHandStart(G, ctx) {
-  console.debug("onHandStart");
-}
-
-function onTurnBegin(G, ctx) {
-  console.debug("Turn of ".concat(ctx.currentPlayer, " is beginning."));
-
-  if (G.currentTrick && G.currentTrick.plays && G.currentTrick.plays.length > 0) {
-    console.log(G.currentTrick); // If the most recent play was done by the current player, then the player takes all the cards in the current
-    // trick into their tricks, and current trick is cleared.
-
-    if (G.currentTrick.plays[0].player === ctx.currentPlayer) {
-      console.debug("player ".concat(ctx.currentPlayer, " has won the trick")); // Give the current player the cards in the trick.
-      // TODO: Deal with giving away the dragon by sending the player to a "give away dragon" stage.
-
-      clearTable(G, ctx.currentPlayer); // Clear the current trick. It remains the current players hand.
-
-      console.debug("ending the turn of player ".concat(ctx.currentPlayer));
-      G.currentTrick = null;
-      ctx.events.endTurn();
-    }
-  }
-
-  if (G.players[ctx.currentPlayer].hand.length === 0) {
-    // If player is out, skip their turn.
-    ctx.events.endTurn();
-  }
-}
-
-function findStartPlayer(G, ctx) {
-  console.debug("finding start player at the beginning of phase ".concat(ctx.phase));
-
-  for (var i = 0; i < ctx.playOrder.length; i++) {
-    var playerID = ctx.playOrder[i];
-    console.debug("checking hand of player: ".concat(playerID));
-    console.log(G.players[playerID].hand);
-
-    if (G.players[playerID].hand.some(function (cardID) {
-      return cardID === constants.specials.mahjong;
-    })) {
-      console.debug("mahjong is in the hand of player ".concat(playerID, ". Current player: ").concat(ctx.currentPlayer));
-      return i;
-    }
-  }
-}
-
-function playCards(G, ctx, cards) {
-  console.debug("player ".concat(ctx.currentPlayer, " playing cards ").concat(JSON.stringify(cards)));
-
-  if (!cards || cards.length === 0 || cards.length > 14) {
-    console.debug("Invalid cards array");
-    return INVALID_MOVE;
-  }
-
-  var type;
-
-  if (G.currentTrick) {
-    type = G.currentTrick.type;
-  }
-
-  if (!type) {
-    type = detectPlayType(cards);
-  }
-
-  console.debug("Detected play type: ".concat(type));
-  var playType = validPlays[type];
-
-  if (!playType.isValid(cards, G.currentTrick)) {
-    console.debug("Invalid play");
-    return INVALID_MOVE;
-  } // Handle dog logic.
-
-
-  if (type === "dog") {
-    var nextPlayer = getPartnerID(ctx, ctx.currentPlayer);
-    console.debug("dog played, passing turn to player ".concat(nextPlayer));
-    ctx.events.endTurn({
-      next: (ctx.playOrderPos + 2) % 4
-    });
-  } else {
-    if (!G.currentTrick) {
-      console.debug("Creating trick of type: ".concat(type.name));
-      G.currentTrick = {
-        type: type,
-        plays: []
-      };
-    }
-
-    console.debug("Adding play to current trick");
-    G.currentTrick.plays.unshift({
-      cards: cards,
-      player: ctx.currentPlayer
-    });
-  }
-
-  console.debug("Removing cards from player hand");
-  cards.forEach(function (c) {
-    return removeFromHand(G.players[ctx.currentPlayer].hand, c);
-  });
-  G["public"].players[ctx.currentPlayer].cards = G.players[ctx.currentPlayer].hand.length;
-  var publicPlayerInfo = G["public"].players[ctx.currentPlayer];
-
-  if (publicPlayerInfo.cards === 0) {
-    publicPlayerInfo.out = true;
-    publicPlayerInfo.outOrder = countOutPlayers(G, ctx);
-  }
-}
-
-function getPartnerID(ctx, playerID) {
-  var playerIndex = ctx.playOrder.findIndex(function (pId) {
-    return pId === playerID;
-  });
-  var partnerIndex = (playerIndex + 2) % 4;
-  return ctx.playOrder[partnerIndex];
-}
-
-function primaryPlayEndIf(G, ctx) {
-  return countOutPlayers(G, ctx) === 3;
-}
-
-function pass(G, ctx) {
-  // Put this in here in case the logic to auto-pass when are out isn't working right.
-  if (G.players[ctx.currentPlayer].hand.length === 0) {
-    return true;
-  }
-
-  if (!canPass(G.currentTrick)) {
-    console.debug("Invalid move: Player ".concat(ctx.currentPlayer, " tried to pass on the first play of a trick"));
-    return INVALID_MOVE;
-  }
-
-  console.debug("Player ".concat(ctx.currentPlayer, " passes"));
-}
-
-function clearTable(G, receivingPlayerID) {
-  var player = G.players[receivingPlayerID];
-
-  if (!G.currentTrick || !G.currentTrick.plays || G.currentTrick.plays.length === 0) {
-    return;
-  }
-
-  player.cardsWon = player.cardsWon || [];
-  G.currentTrick.plays.forEach(function (play) {
-    play.cards.forEach(function (card) {
-      return player.cardsWon.push(card);
-    });
-  });
-}
-
-function countOutPlayers(G, ctx) {
-  var outPlayerCount = 0;
-
-  for (var i = 0; i < ctx.numPlayers; i++) {
-    if (G["public"].players[i].out) {
-      outPlayerCount++;
-    }
-  }
-
-  return outPlayerCount;
-}
-
-function primaryPlayOnEnd(G, ctx) {// Count score.
-}
-
-function primaryPlayTurnEndIfOut(G, ctx) {
-  // If the current player is out, play proceeds in regular turn order.
-  console.debug("Player ".concat(ctx.currentPlayer, " hand length is ").concat(G.players[ctx.currentPlayer].hand.length));
-  return G.players[ctx.currentPlayer].hand.length === 0;
-}
-
 module.exports = {
-  onHandStart: onHandStart,
-  onTurnBegin: onTurnBegin,
-  findStartPlayer: findStartPlayer,
-  playCards: playCards,
-  primaryPlayEndIf: primaryPlayEndIf,
-  primaryPlayOnEnd: primaryPlayOnEnd,
-  primaryPlayTurnEndIfOut: primaryPlayTurnEndIfOut,
-  primaryPlayPass: pass
+  preHand: preHand
 };
 
 /***/ }),
@@ -70884,21 +70929,22 @@ function isValidSingle(selectedCards, currentTrick) {
   } // Otherwise, it has to be higher in rank than the most recent play.
 
 
-  var currentHighest = currentTrick.plays[0].cards[0]; // If the current highest is a phoenix then we need to beat the next highest card.
+  var currentHighest = getPreviousPlay(currentTrick).cards[0]; // If the current highest is a phoenix then we need to beat the next highest card.
 
   if (currentHighest === constants.specials.phoenix) {
-    // The phoenix is the only card played, so a 2 beats it.
-    if (currentTrick.plays.length === 1) {
+    var twoPlaysAgo = getPreviousPlay(currentTrick, 1); // The phoenix is the only card played, so a 2 beats it.
+
+    if (twoPlaysAgo === null) {
       return cardDefinitions[selectedCards[0]].rank >= 2;
     } else {
       // Find the next card under the phoenix and make sure we beat that.
-      return cardDefinitions[selectedCards[0]].rank > cardDefinitions[currentTrick.plays[1].cards[0]].rank;
+      return cardDefinitions[selectedCards[0]].rank > cardDefinitions[twoPlaysAgo.cards[0]].rank;
     }
   } // If the card being played is a phoenix then it beats anything but a dragon.
 
 
   if (selectedCards[0] === constants.specials.phoenix) {
-    return currentTrick.plays[0].cards[0] !== constants.specials.dragon;
+    return getPreviousPlay(currentTrick).cards[0] !== constants.specials.dragon;
   } // It's not a phoenix, so we can just check the rank.
 
 
@@ -70971,7 +71017,7 @@ function isValidMultiCardSet(selectedCards, currentTrick, length) {
     return true;
   }
 
-  var previousPlay = currentTrick.plays[0].cards;
+  var previousPlay = getPreviousPlay(currentTrick).cards;
 
   if (length !== 4) {
     if (previousPlay.length !== selectedCards.length) {
@@ -71051,7 +71097,7 @@ function isValidSteppedPairs(selectedCards, currentTrick) {
     return true;
   }
 
-  var previousPlay = currentTrick.plays[0].cards; // They need to be the same number of cards.
+  var previousPlay = getPreviousPlay(currentTrick).cards; // They need to be the same number of cards.
 
   if (selectedCards.length !== previousPlay.length) {
     return false;
@@ -71076,7 +71122,7 @@ function isValidFullHouse(selectedCards, currentTrick) {
   } // Get the value of the 3 of a kind in the previous play.
 
 
-  var previousThreesRank = getFullHouseThreesRank(currentTrick.plays[0].cards); // Check that the new play is higher than the previous.
+  var previousThreesRank = getFullHouseThreesRank(getPreviousPlay(currentTrick).cards); // Check that the new play is higher than the previous.
 
   return threesRank > previousThreesRank;
 }
@@ -71152,7 +71198,7 @@ function isValidStraight(selectedCards, currentTrick) {
     return true;
   }
 
-  var previousPlay = currentTrick.plays[0].cards; // Check that it's the same number of cards as the previous straight.
+  var previousPlay = getPreviousPlay(currentTrick).cards; // Check that it's the same number of cards as the previous straight.
 
   if (selectedCards.length !== previousPlay.length) {
     return false;
@@ -71200,7 +71246,7 @@ function isValidStraightBomb(selectedCards, currentTrick) {
     return true;
   }
 
-  var previousPlay = currentTrick.plays[0].cards;
+  var previousPlay = getPreviousPlay(currentTrick).cards;
 
   if (!isBomb(previousPlay)) {
     // If the previous play was not a bomb then you're 
@@ -71318,6 +71364,27 @@ function hasCurrent(currentTrick) {
   return currentTrick && currentTrick.plays && currentTrick.plays.length > 0;
 }
 
+function getPreviousPlay(currentTrick) {
+  var playsBack = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+  if (!currentTrick || !currentTrick.plays || currentTrick.plays.length === 0) {
+    return null;
+  }
+
+  var previousPlay = null; // Loop over the previous plays to find ones that aren't passes.
+
+  for (var i = 0; i < currentTrick.plays.length && playsBack >= 0; i++) {
+    // If this play was not a pass set it as the previous play.
+    if (!currentTrick.plays[i].pass) {
+      previousPlay = currentTrick.plays[i]; // If we are asking for one farther back than the most recent then this will keep decrementing.
+
+      playsBack--;
+    }
+  }
+
+  return previousPlay;
+}
+
 function canPass(currentTrick) {
   // TODO: Handle when a wish is active.
   return hasCurrent(currentTrick);
@@ -71327,7 +71394,8 @@ module.exports = {
   validPlays: validPlays,
   isValidPlay: isValidPlay,
   detectPlayType: detectPlayType,
-  canPass: canPass
+  canPass: canPass,
+  getPreviousPlay: getPreviousPlay
 };
 /*
 const currentTrickExample = {

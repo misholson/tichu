@@ -81,22 +81,23 @@ function isValidSingle(selectedCards, currentTrick) {
     }
 
     // Otherwise, it has to be higher in rank than the most recent play.
-    var currentHighest = currentTrick.plays[0].cards[0];
+    var currentHighest = getPreviousPlay(currentTrick).cards[0];
 
     // If the current highest is a phoenix then we need to beat the next highest card.
     if (currentHighest === constants.specials.phoenix) {
+        var twoPlaysAgo = getPreviousPlay(currentTrick, 1);
         // The phoenix is the only card played, so a 2 beats it.
-        if (currentTrick.plays.length === 1) {
+        if (twoPlaysAgo === null) {
             return (cardDefinitions[selectedCards[0]].rank >= 2);
         } else {
             // Find the next card under the phoenix and make sure we beat that.
-            return (cardDefinitions[selectedCards[0]].rank > cardDefinitions[currentTrick.plays[1].cards[0]].rank);
+            return (cardDefinitions[selectedCards[0]].rank > cardDefinitions[twoPlaysAgo.cards[0]].rank);
         }
     }
 
     // If the card being played is a phoenix then it beats anything but a dragon.
     if (selectedCards[0] === constants.specials.phoenix) {
-        return currentTrick.plays[0].cards[0] !== constants.specials.dragon;
+        return getPreviousPlay(currentTrick).cards[0] !== constants.specials.dragon;
     }
 
     // It's not a phoenix, so we can just check the rank.
@@ -163,7 +164,7 @@ function isValidMultiCardSet(selectedCards, currentTrick, length) {
         return true;
     }
 
-    var previousPlay = currentTrick.plays[0].cards;
+    var previousPlay = getPreviousPlay(currentTrick).cards;
 
     if (length !== 4) {
         if (previousPlay.length !== selectedCards.length) {
@@ -244,7 +245,7 @@ function isValidSteppedPairs(selectedCards, currentTrick) {
         return true;
     }
 
-    var previousPlay = currentTrick.plays[0].cards;
+    var previousPlay = getPreviousPlay(currentTrick).cards;
 
     // They need to be the same number of cards.
     if (selectedCards.length !== previousPlay.length) {
@@ -270,7 +271,7 @@ function isValidFullHouse(selectedCards, currentTrick) {
     }
 
     // Get the value of the 3 of a kind in the previous play.
-    var previousThreesRank = getFullHouseThreesRank(currentTrick.plays[0].cards);
+    var previousThreesRank = getFullHouseThreesRank(getPreviousPlay(currentTrick).cards);
 
     // Check that the new play is higher than the previous.
     return (threesRank > previousThreesRank);
@@ -338,7 +339,7 @@ function isValidStraight(selectedCards, currentTrick) {
         return true;
     }
 
-    var previousPlay = currentTrick.plays[0].cards;
+    var previousPlay = getPreviousPlay(currentTrick).cards;
 
     // Check that it's the same number of cards as the previous straight.
     if (selectedCards.length !== previousPlay.length) { return false; }
@@ -379,7 +380,7 @@ function isValidStraightBomb(selectedCards, currentTrick) {
         return true;
     }
 
-    var previousPlay = currentTrick.plays[0].cards;
+    var previousPlay = getPreviousPlay(currentTrick).cards;
     if (!isBomb(previousPlay)) {
         // If the previous play was not a bomb then you're 
         return true;
@@ -491,6 +492,25 @@ function hasCurrent(currentTrick) {
     return (currentTrick && currentTrick.plays && currentTrick.plays.length > 0);
 }
 
+function getPreviousPlay(currentTrick, playsBack = 0) {
+    if (!currentTrick || !currentTrick.plays || currentTrick.plays.length === 0) {
+        return null;
+    }
+
+    var previousPlay = null;
+    // Loop over the previous plays to find ones that aren't passes.
+    for (var i = 0; i < currentTrick.plays.length && playsBack >= 0; i++) {
+        // If this play was not a pass set it as the previous play.
+        if (!currentTrick.plays[i].pass) {
+            previousPlay = currentTrick.plays[i];
+
+            // If we are asking for one farther back than the most recent then this will keep decrementing.
+            playsBack--;
+        }
+    }
+    return previousPlay;
+}
+
 function canPass(currentTrick) {
     // TODO: Handle when a wish is active.
     return hasCurrent(currentTrick);
@@ -501,7 +521,8 @@ module.exports = {
     validPlays: validPlays,
     isValidPlay: isValidPlay,
     detectPlayType: detectPlayType,
-    canPass: canPass
+    canPass: canPass,
+    getPreviousPlay: getPreviousPlay
 }
 
 /*

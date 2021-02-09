@@ -135,6 +135,9 @@
     <Content Include="src\Player.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="src\PlayTrick.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="src\PreHand.js">
       <SubType>Code</SubType>
     </Content>

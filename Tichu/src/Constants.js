@@ -10,8 +10,8 @@ module.exports.constants = {
                 acceptPass: "acceptPass"
             }
         },
-        primaryPlay: {
-            name: "primaryPlay",
+        playTrick: {
+            name: "playTrick",
             stages: {
 
             }

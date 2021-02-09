@@ -1,4 +1,4 @@
-const { INVALID_MOVE } = require('boardgame.io/core');
+const { INVALID_MOVE, TurnOrder } = require('boardgame.io/core');
 const { sortCards, removeFromHand, getPlayerIDs } = require('./Helpers');
 const { constants } = require('./Constants');
 const { Stage } = require('boardgame.io/core');
@@ -163,13 +163,27 @@ function primaryPlayTurnEndIfOut(G, ctx) {
     return G.players[ctx.currentPlayer].hand.length === 0;
 }
 
+const primaryPlay = {
+    onBegin: onHandStart,
+    turn: {
+        onEnd: (G, ctx) => { console.debug(`Turn of ${ctx.currentPlayer} is ending`) },
+        onBegin: onTurnBegin,
+        endIf: primaryPlayTurnEndIfOut,
+        order: {
+            ...TurnOrder.DEFAULT,
+            first: findStartPlayer
+        },
+        moveLimit: 1
+    },
+    moves: {
+        playCards: playCards,
+        pass: pass
+    },
+    endIf: primaryPlayEndIf,
+    onEnd: primaryPlayOnEnd,
+    next: constants.phases.preHand.name,
+};
+
 module.exports = {
-    onHandStart: onHandStart,
-    onTurnBegin: onTurnBegin,
-    findStartPlayer: findStartPlayer,
-    playCards: playCards,
-    primaryPlayEndIf: primaryPlayEndIf,
-    primaryPlayOnEnd: primaryPlayOnEnd,
-    primaryPlayTurnEndIfOut: primaryPlayTurnEndIfOut,
-    primaryPlayPass: pass
+    primaryPlay: primaryPlay
 }

@@ -25,7 +25,7 @@ export const TichuBoard = (props) => {
     }
     var phase = ctx.phase;
     var playerIDs = getPlayerIDs(ctx, playerID);
-    var isPlayerActive = (phase === constants.phases.primaryPlay.name && playerID === ctx.currentPlayer)
+    var isPlayerActive = (phase === constants.phases.playTrick.name && playerID === ctx.currentPlayer)
 
     const [passedCards, setPassedCards] = useState([]);
     const [hand, setHand] = useState(player.hand);
@@ -72,7 +72,7 @@ export const TichuBoard = (props) => {
     const handleCardClicked = (cardID) => {
         if (phase === constants.phases.preHand.name && stage === constants.phases.preHand.stages.passCards) {
             selectCardToPass(cardID);
-        } else if (phase === constants.phases.primaryPlay.name && playerID === ctx.currentPlayer) {
+        } else if (phase === constants.phases.playTrick.name && playerID === ctx.currentPlayer) {
             selectCardForPlay(cardID);
         }
     }
@@ -143,7 +143,7 @@ export const TichuBoard = (props) => {
                 </div>
                 <div className="board-middle">
                     {phase === constants.phases.preHand.name && <PassArea selectedCards={stage === constants.phases.preHand.stages.passCards ? passedCards : receivedCards} stage={stage} readyToPlay={G.public.players[playerID].readyToPlay} onReturnPass={handleReturnPass} onPassConfirmed={handlePassConfirmed} onAcceptConfirmed={handleAcceptConfirmed} />}
-                    {phase === constants.phases.primaryPlay.name && <PlayArea currentTrick={G.currentTrick} />}
+                    {phase === constants.phases.playTrick.name && <PlayArea currentTrick={G.currentTrick} />}
                 </div>
                 <div className="board-side">
                     <Player playerID={playerIDs.right} phase={phase} currentPlayer={ctx.currentPlayer} />

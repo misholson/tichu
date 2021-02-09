@@ -1,8 +1,4 @@
-const { PlayerView, TurnOrder } = require('boardgame.io/core');
-const { sortCards, dealCards } = require('./Helpers');
-const { constants } = require('./Constants');
-const { callGrand, takeCards, passCards, checkPlayersHavePassed, acceptPass } = require('./PreHand');
-const { onHandStart, onTurnBegin, findStartPlayer, playCards, primaryPlayEndIf, primaryPlayOnEnd, primaryPlayTurnEndIfOut, primaryPlayPass } = require('./PrimaryPlay');
+const { PlayerView } = require('boardgame.io/core');
 
 const tichu = {
     setup: (ctx) => {
@@ -65,76 +61,26 @@ const tichu = {
     },
 
     phases: {
-        preHand: {
-            onBegin: (G, ctx) => {
-                console.log("first8 onBegin");
-                G.secret.deck = ctx.random.Shuffle(G.secret.deck);
-                console.debug("first8 done shuffling");
-                dealCards(G, 8);
-                ctx.events.setActivePlayers({ all: constants.phases.preHand.stages.takeOrGrand });
-                return G;
-            },
-            turn: {
-                stages: {
-                    takeOrGrand: {
-                        moves: {
-                            callGrand: callGrand,
-                            takeCards: takeCards
-                        },
-                        next: constants.phases.preHand.stages.passCards
-                    },
-                    passCards: {
-                        moves: {
-                            passCards: passCards
-                        },
-                        next: constants.phases.preHand.stages.waitForPass
-                    },
-                    waitForPass: {
-                        next: constants.phases.preHand.stages.acceptPass
-                    },
-                    acceptPass: {
-                        moves: {
-                            acceptPass: acceptPass
-                        }
-                    }
-                },
-                onMove: checkPlayersHavePassed
-            },
-            next: constants.phases.primaryPlay.name,
-            start: true
-        },
-        primaryPlay: {
-            onBegin: onHandStart,
-            turn: {
-                onEnd: (G, ctx) => { console.debug(`Turn of ${ctx.currentPlayer} is ending`) },
-                onBegin: onTurnBegin,
-                endIf: primaryPlayTurnEndIfOut,
-                order: {
-                    ...TurnOrder.DEFAULT,
-                    first: findStartPlayer
-                },
-                moveLimit: 1
-            },
-            moves: {
-                playCards: playCards,
-                pass: primaryPlayPass
-            },
-            endIf: primaryPlayEndIf,
-            onEnd: primaryPlayOnEnd,
-            next: constants.phases.preHand.name,
-        }
+        preHand: require('./PreHand').preHand,
+        playTrick: require('./PlayTrick').playTrick
     },
 
     endIf: (G, ctx) => {
-        // Game ends when one team has a score greater than 0
-        console.log(G);
-        var team1score = G.score[ctx.playOrder[0]];
-        var team2score = G.score[ctx.playOrder[1]];
+        // I don't know why G is sometimes passed in as a scalar or undefined,
+        // but there's no reason for it to crash the game, at least not here.
+        //if (G instanceof Object) {
+        //    // Game ends when one team has a score greater than 0
+        //    console.log(G);
+        //    var team1score = G.score[ctx.playOrder[0]];
+        //    var team2score = G.score[ctx.playOrder[1]];
 
-        console.debug(`Current score: ${team1score}-${team2score}`);
-        if (team1score !== team2score && (team1score >= 1000 || team2score >= 1000)) {
-            return G.score;
-        }
+        //    console.debug(`Current score: ${team1score}-${team2score}`);
+        //    if (team1score !== team2score && (team1score >= 1000 || team2score >= 1000)) {
+        //        return G.score;
+        //    }
+
+        //    return null;
+        //}
 
         return null;
     },
