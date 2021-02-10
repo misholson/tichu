@@ -69387,6 +69387,52 @@ function firstPlayerStartsWithFullHouse(game) {
   return game;
 }
 
+function handAlmostFinished(game) {
+  console.log(game);
+  game.phases.preHand.start = false;
+  game.phases.playTrick.start = true;
+
+  game.phases.playTrick.onBegin = function (G, ctx) {
+    console.debug("TESTING ONLY: Simulate a hand almost finished for testing scoring");
+
+    if (!G.previousTricks) {
+      console.debug("Setting up hand that is almost empty");
+      console.log(G);
+      G.secret.deck = [];
+      G.players["0"].hand = [55];
+      G.players["0"].cardsWon = [50, 37, 11, 22, 45, 19, 6, 17, 16, 15, 40, 39, 0];
+      G.players["1"].hand = [38];
+      G.players["1"].cardsWon = [25, 24, 36, 23, 48, 46, 32, 44, 43, 29, 3, 27, 54];
+      G.players["2"].hand = [13];
+      G.players["2"].cardsWon = [52, 53, 12, 10, 9, 47, 8, 7, 31, 18, 4, 2, 1];
+      G.players["3"].hand = [26];
+      G.players["3"].cardsWon = [51, 49, 35, 34, 21, 33, 20, 5, 30, 42, 41, 28, 14];
+      G["public"].players["0"].cards = 1;
+      G["public"].players["1"].cards = 1;
+      G["public"].players["2"].cards = 1;
+      G["public"].players["3"].cards = 1;
+      G.previousTricks = [{
+        player: "0",
+        cards: [50, 37, 11, 22],
+        winner: "0",
+        pass: false
+      }];
+      G.currentTrick = {
+        plays: [],
+        player: "0",
+        cards: [22, 45, 19],
+        winner: "0",
+        pass: false
+      };
+    } else {
+      G.currentTrick = null;
+    }
+  };
+
+  console.log(game);
+  return game;
+}
+
 function generateDeck(size) {
   var deck = [];
 
@@ -69399,7 +69445,8 @@ function generateDeck(size) {
 
 module.exports = {
   skipPreHandPhase: skipPreHandPhase,
-  firstPlayerStartsWithFullHouse: firstPlayerStartsWithFullHouse
+  firstPlayerStartsWithFullHouse: firstPlayerStartsWithFullHouse,
+  handAlmostFinished: handAlmostFinished
 };
 
 /***/ }),
@@ -69597,7 +69644,7 @@ var TichuBoard = function TichuBoard(props) {
     setHand(function () {
       return _toConsumableArray(player.hand);
     });
-  }, [stage, readyToPlay, isPlayerActive, currentTrick]);
+  }, [stage, readyToPlay, isPlayerActive, currentTrick]); // Could I just change this to the player hand? Duh.
 
   var selectCardToPass = function selectCardToPass(cardID) {
     if (passedCards.length < 3) {
@@ -70077,7 +70124,7 @@ var tichu = {
   maxPlayers: 4
 };
 module.exports = {
-  Tichu: tichu
+  Tichu: scenarios.handAlmostFinished(tichu)
 };
 
 /***/ }),
@@ -70479,6 +70526,10 @@ function findNextPlayer(G, ctx) {
 function findNextPlayerNotOut(G, ctx, nextPlayerPos) {
   // If the next player has no cards, go one player further. Do this in a for loop so if there's a bug and
   // all four players are out we don't see an infinite loop.
+  console.log(G);
+  console.log(ctx);
+  console.debug("nextPlayerPos: ".concat(nextPlayerPos, ", ctx.playOrder[nextPlayerPos]: ").concat(ctx.playOrder[nextPlayerPos])); //if (numPlayerPos < 0) { numPlayerPos = 0; } // This is happening in a test scenario, not sure why.
+
   for (var i = 0; i < ctx.numPlayers && G.players[ctx.playOrder[nextPlayerPos]].hand.length === 0; i++) {
     console.debug("Player ".concat(ctx.playOrder[nextPlayerPos], " has no cards, so play moves to player ").concat(ctx.playOrder[(nextPlayerPos + 1) % ctx.numPlayers]));
     nextPlayerPos = (nextPlayerPos + 1) % ctx.numPlayers;
@@ -70719,7 +70770,8 @@ function onTurnEnd(G, ctx) {// On turn end
 
 function updateScore(G, ctx) {
   if (G && G.score) {
-    // Give last player out tricks to first player out, cards to opponent.
+    console.debug("Counting score"); // Give last player out tricks to first player out, cards to opponent.
+
     var lastPlayerIndex = ctx.playOrder.findIndex(function (pId) {
       return !G["public"].players[pId].out;
     });
@@ -70727,15 +70779,18 @@ function updateScore(G, ctx) {
     var opponentPlayerID = ctx.playOrder[(lastPlayerIndex + 1) % ctx.numPlayers];
     var firstOutPlayerID = Object.keys(G["public"].players).find(function (pId) {
       return G["public"].players[pId].outOrder === 1;
-    }); // Give last player tricks to the first out.
+    });
+    console.debug("Last player: ".concat(lastPlayerID, ", Opponent player: ").concat(opponentPlayerID, ", First player out: ").concat(firstOutPlayerID)); // Give last player tricks to the first out.
 
     if (G.players[lastPlayerID].cardsWon) {
+      console.debug("Giving tricks won by player ".concat(lastPlayerID, " to player ").concat(firstOutPlayerID));
       G.players[firstOutPlayerID].cardsWon = G.players[firstOutPlayerID].cardsWon || [];
       moveCardsBetweenArrays(G.players[lastPlayerID].cardsWon, G.players[firstOutPlayerID].cardsWon);
     } // Give last player hand to an opponent.
 
 
     if (G.players[lastPlayerID].hand) {
+      console.debug("Giving remaining hand of ".concat(lastPlayerID, " to player ").concat(opponentPlayerID));
       G.players[opponentPlayerID].cardsWon = G.players[opponentPlayerID].cardsWon || [];
       moveCardsBetweenArrays(G.players[lastPlayerID].hand, G.players[opponentPlayerID].cardsWon);
     } // Setup the score for this round.
@@ -70749,16 +70804,23 @@ function updateScore(G, ctx) {
 
 
     if (isOneTwo(ctx.playOrder[0])) {
+      console.debug("Team ".concat(ctx.playOrder[0], "-").concat(ctx.playOrder[2], " went one-two (first if)"));
       G.roundScore[ctx.playOrder[0]] = 200;
     } else if (isOneTwo(ctx.playOrder[1])) {
+      console.debug("Team ".concat(ctx.playOrder[1], "-").concat(ctx.playOrder[3], " went one-two (second if)"));
       G.roundScore[ctx.playOrder[1]] = 200;
     } else {
       for (var j = 0; j < ctx.numPlayers; j++) {
         var playerID = ctx.playOrder[j];
         var cardsWon = G.players[playerID].cardsWon || [];
-        roundScore[playerID] = cardsWon.reduce(function (totalScore, cardID) {
-          totalScore + score(cardID);
-        }, 0);
+        console.debug("calculating score for player ".concat(playerID, " with the following cards: ").concat(JSON.stringify(cardsWon)));
+        var totalScore = 0;
+        cardsWon.forEach(function (cardID) {
+          return totalScore += score(cardID);
+        });
+        roundScore[playerID] = totalScore; //roundScore[playerID] = cardsWon.reduce((totalScore, cardID) => { totalScore + score(cardID) }, 0);
+
+        console.debug("score for player ".concat(playerID, " is ").concat(totalScore));
       }
     } // Process tichus
 
@@ -70775,13 +70837,16 @@ function updateScore(G, ctx) {
         }
 
         if (player.outOrder === 1) {
+          console.debug("player ".concat(playerIDt, " went out first and won their ").concat(player.grand ? 'grand ' : '', "tichu"));
           roundScore[playerIDt] += bet;
         } else {
+          console.debug("player ".concat(playerIDt, " went out ").concat(player.outOrder, " and lost their ").concat(player.grand ? 'grand ' : '', "tichu"));
           roundScore[playerIDt] -= bet;
         }
       }
-    } // Clear out cards won
+    }
 
+    console.debug("Total scores for this round: ".concat(JSON.stringify(roundScore))); // Clear out cards won
 
     Object.values(G.players).forEach(function (player) {
       player.cardsWon = [];
@@ -70798,6 +70863,9 @@ function updateScore(G, ctx) {
     Object.keys(G.score).forEach(function (pId) {
       G.score[pId] += roundScore[pId];
     });
+    var team1score = G.score[ctx.playOrder[0]] + G.score[ctx.playOrder[2]];
+    var team2score = G.score[ctx.playOrder[1]] + G.score[ctx.playOrder[3]];
+    console.debug("Score: Team ".concat(ctx.playOrder[0], "-").concat(ctx.playOrder[2], ": ").concat(team1score, "; Team ").concat(ctx.playOrder[1], "-").concat(ctx.playOrder[3], ": ").concat(team2score, ";"));
   }
 }
 

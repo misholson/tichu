@@ -96,5 +96,5 @@ const tichu = {
 
 
 module.exports = {
-    Tichu: tichu
+    Tichu: scenarios.handAlmostFinished(tichu)
 }

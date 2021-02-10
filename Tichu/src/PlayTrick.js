@@ -295,20 +295,25 @@ function onTurnEnd(G, ctx) {
 
 function updateScore(G, ctx) {
     if (G && G.score) {
+        console.debug("Counting score");
         // Give last player out tricks to first player out, cards to opponent.
         var lastPlayerIndex = ctx.playOrder.findIndex((pId) => !G.public.players[pId].out);
         var lastPlayerID = ctx.playOrder[lastPlayerIndex];
         var opponentPlayerID = ctx.playOrder[(lastPlayerIndex + 1) % ctx.numPlayers];
         var firstOutPlayerID = Object.keys(G.public.players).find(pId => G.public.players[pId].outOrder === 1);
 
+        console.debug(`Last player: ${lastPlayerID}, Opponent player: ${opponentPlayerID}, First player out: ${firstOutPlayerID}`);
+
         // Give last player tricks to the first out.
         if (G.players[lastPlayerID].cardsWon) {
+            console.debug(`Giving tricks won by player ${lastPlayerID} to player ${firstOutPlayerID}`);
             G.players[firstOutPlayerID].cardsWon = G.players[firstOutPlayerID].cardsWon || [];
             moveCardsBetweenArrays(G.players[lastPlayerID].cardsWon, G.players[firstOutPlayerID].cardsWon);
         }
 
         // Give last player hand to an opponent.
         if (G.players[lastPlayerID].hand) {
+            console.debug(`Giving remaining hand of ${lastPlayerID} to player ${opponentPlayerID}`);
             G.players[opponentPlayerID].cardsWon = G.players[opponentPlayerID].cardsWon || [];
             moveCardsBetweenArrays(G.players[lastPlayerID].hand, G.players[opponentPlayerID].cardsWon);
         }
@@ -321,15 +326,22 @@ function updateScore(G, ctx) {
 
         // Count score for this round.
         if (isOneTwo(ctx.playOrder[0])) {
+            console.debug(`Team ${ctx.playOrder[0]}-${ctx.playOrder[2]} went one-two (first if)`);
             G.roundScore[ctx.playOrder[0]] = 200;
         } else if (isOneTwo(ctx.playOrder[1])) {
+            console.debug(`Team ${ctx.playOrder[1]}-${ctx.playOrder[3]} went one-two (second if)`);
             G.roundScore[ctx.playOrder[1]] = 200;
         } else {
             for (var j = 0; j < ctx.numPlayers; j++) {
                 var playerID = ctx.playOrder[j];
                 var cardsWon = G.players[playerID].cardsWon || [];
 
-                roundScore[playerID] = cardsWon.reduce((totalScore, cardID) => { totalScore + score(cardID) }, 0);
+                console.debug(`calculating score for player ${playerID} with the following cards: ${JSON.stringify(cardsWon)}`);
+                var totalScore = 0;
+                cardsWon.forEach((cardID) => totalScore += score(cardID));
+                roundScore[playerID] = totalScore;
+                //roundScore[playerID] = cardsWon.reduce((totalScore, cardID) => { totalScore + score(cardID) }, 0);
+                console.debug(`score for player ${playerID} is ${totalScore}`);
             }
         }
 
@@ -344,12 +356,16 @@ function updateScore(G, ctx) {
                 if (player.grand) { bet = 200; }
 
                 if (player.outOrder === 1) {
+                    console.debug(`player ${playerIDt} went out first and won their ${player.grand ? 'grand ' : ''}tichu`);
                     roundScore[playerIDt] += bet;
                 } else {
+                    console.debug(`player ${playerIDt} went out ${player.outOrder} and lost their ${player.grand ? 'grand ' : ''}tichu`);
                     roundScore[playerIDt] -= bet;
                 }
             }
         }
+
+        console.debug(`Total scores for this round: ${JSON.stringify(roundScore)}`);
 
         // Clear out cards won
         Object.values(G.players).forEach((player) => {
@@ -370,6 +386,10 @@ function updateScore(G, ctx) {
         Object.keys(G.score).forEach((pId) => {
             G.score[pId] += roundScore[pId];
         });
+
+        var team1score = G.score[ctx.playOrder[0]] + G.score[ctx.playOrder[2]];
+        var team2score = G.score[ctx.playOrder[1]] + G.score[ctx.playOrder[3]];
+        console.debug(`Score: Team ${ctx.playOrder[0]}-${ctx.playOrder[2]}: ${team1score}; Team ${ctx.playOrder[1]}-${ctx.playOrder[3]}: ${team2score};`)
     }
 }
 
