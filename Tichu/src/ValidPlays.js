@@ -308,16 +308,14 @@ function getFullHouseThreesRank(selectedCards) {
         if (isValidThreeOfAKind(selectedCards.slice(0, 3)) && isValidPair(selectedCards.slice(3, 5))) {
             // This is a valid full house where the first three are the three of a kind.
             // The first card might be a phoenix, so for rank purposes use the second card.
-            threesRank = rank(selectedCards[1]);
+            return rank(selectedCards[1]);
         } else if (isValidPair(selectedCards.slice(0, 2)) && isValidThreeOfAKind(selectedCards.slice(2, 5))) {
             // This is a valid full house where the first 2 
-            threesRank = rank(selectedCards[4])
+            return rank(selectedCards[4])
         } else {
             return null;
         }
     }
-
-    return null;
 }
 
 function isValidStraight(selectedCards, currentTrick) {

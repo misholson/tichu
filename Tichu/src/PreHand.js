@@ -174,5 +174,6 @@ function generateDeck(size) {
 }
 
 module.exports = {
-    preHand: preHand
+    preHand: preHand,
+    generateDeck: generateDeck
 }
