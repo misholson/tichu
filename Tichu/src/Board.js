@@ -41,13 +41,14 @@ export const TichuBoard = (props) => {
     }
 
     var readyToPlay = G.public.players[playerID].readyToPlay;
+    var currentTrick = G.currentTrick;
 
     // If the game stage or phase changes, refresh the hand from the game state.
     useEffect(() => {
         setHand(() => {
             return [...player.hand];
         });
-    }, [stage, readyToPlay, isPlayerActive]);
+    }, [stage, readyToPlay, isPlayerActive, currentTrick]); // Could I just change this to the player hand? Duh.
 
     const selectCardToPass = (cardID) => {
         if (passedCards.length < 3) {
@@ -92,6 +93,7 @@ export const TichuBoard = (props) => {
     const handlePassConfirmed = () => {
         if (stage === constants.phases.preHand.stages.passCards && passedCards.length === 3) {
             moves.passCards(playerID, passedCards);
+            setPassedCards([]);
         }
     }
 

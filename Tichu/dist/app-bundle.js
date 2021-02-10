@@ -69590,13 +69590,14 @@ var TichuBoard = function TichuBoard(props) {
     moves.takeCards(playerID);
   };
 
-  var readyToPlay = G["public"].players[playerID].readyToPlay; // If the game stage or phase changes, refresh the hand from the game state.
+  var readyToPlay = G["public"].players[playerID].readyToPlay;
+  var currentTrick = G.currentTrick; // If the game stage or phase changes, refresh the hand from the game state.
 
   Object(react__WEBPACK_IMPORTED_MODULE_0__["useEffect"])(function () {
     setHand(function () {
       return _toConsumableArray(player.hand);
     });
-  }, [stage, readyToPlay, isPlayerActive]);
+  }, [stage, readyToPlay, isPlayerActive, currentTrick]);
 
   var selectCardToPass = function selectCardToPass(cardID) {
     if (passedCards.length < 3) {
@@ -69644,6 +69645,7 @@ var TichuBoard = function TichuBoard(props) {
   var handlePassConfirmed = function handlePassConfirmed() {
     if (stage === constants.phases.preHand.stages.passCards && passedCards.length === 3) {
       moves.passCards(playerID, passedCards);
+      setPassedCards([]);
     }
   };
 
@@ -70075,7 +70077,7 @@ var tichu = {
   maxPlayers: 4
 };
 module.exports = {
-  Tichu: scenarios.firstPlayerStartsWithFullHouse(tichu)
+  Tichu: tichu
 };
 
 /***/ }),
@@ -71439,8 +71441,6 @@ function getFullHouseThreesRank(selectedCards) {
       return null;
     }
   }
-
-  return null;
 }
 
 function isValidStraight(selectedCards, currentTrick) {
