@@ -6,45 +6,55 @@ var { cardDefinitions } = require('./Deck');
 const validPlays = {
     single: {
         name: "Single",
-        isValid: isValidSingle
+        isValid: isValidSingle,
+        getHighestPlayWithWish: getHighestPlayWithWishSingle
     },
     pair: {
         name: "Pair",
-        isValid: isValidPair
+        isValid: isValidPair,
+        getHighestPlayWithWish: getHighestPlayWithWishPair
     },
     threeOfAKind: {
         name: "Three of a Kind",
-        isValid: isValidThreeOfAKind
+        isValid: isValidThreeOfAKind,
+        getHighestPlayWithWish: getHighestPlayWithWishThreeOfAKind
     },
     steppedPairs: {
         name: "Stepped Pairs",
-        isValid: isValidSteppedPairs
+        isValid: isValidSteppedPairs,
+        getHighestPlayWithWish: getHighestPlayWithWishSteppedPairs
     },
     fullHouse: {
         name: "Full House",
-        isValid: isValidFullHouse
+        isValid: isValidFullHouse,
+        getHighestPlayWithWish: getHighestPlayWithWishSteppedPairs
     },
     straightFlush: {
         name: "Straight Flush Bomb",
         isValid: isValidStraightBomb,
+        getHighestPlayWithWish: () => null, // TODO
         isBomb: true
     },
     straight: {
         name: "Straight",
-        isValid: isValidStraight
+        isValid: isValidStraight,
+        getHighestPlayWithWish: getHighestPlayWithWishStraight
     },
     fourOfAKind: {
         name: "4 Bomb",
         isValid: isValid4Bomb,
+        getHighestPlayWithWish: getHighestPlayWithWish4Bomb,
         isBomb: true
     },
     dog: {
         name: "Dog",
-        isValid: isValidDog
+        isValid: isValidDog,
+        getHighestPlayWithWish: () => null
     },
     invalid: {
         name: "Invalid",
-        isValid: () => false
+        isValid: () => false,
+        getHighestPlayWithWish: () => null
     }
 }
 
@@ -54,13 +64,18 @@ function detectPlayType(selectedCards) {
     return Object.keys(validPlays).find((playType) => validPlays[playType].isValid(selectedCards)) || "invalid";
 }
 
-function isValidPlay(selectedCards, currentTrick) {
+function isValidPlay(selectedCards, currentTrick, wish) {
     var selectedPlayType = detectPlayType(selectedCards);
     if (currentTrick && currentTrick.type !== selectedPlayType) {
         return false;
     }
 
-    return validPlays[selectedPlayType].isValid(selectedCards, currentTrick);
+    // This is not a valid play of the selected type or it doesn't beat the current highest play.
+    if (!validPlays[selectedPlayType].isValid(selectedCards, currentTrick)) {
+        return false;
+    }
+
+    return true;
 }
 
 function isValidSingle(selectedCards, currentTrick) {
@@ -104,6 +119,16 @@ function isValidSingle(selectedCards, currentTrick) {
     return cardDefinitions[selectedCards[0]].rank > cardDefinitions[currentHighest].rank;
 }
 
+function getHighestPlayWithWishSingle(hand, currentTrick, wish) {
+    var card = hand.find((cardID) => rank(cardID) === wish);
+
+    if (card !== undefined) {
+        return [card];
+    }
+
+    return null;
+}
+
 function isValidDog(selectedCards, currentTrick) {
     if (!selectedCards || selectedCards.length !== 1) { return false; }
 
@@ -120,12 +145,24 @@ function isValidPair(selectedCards, currentTrick) {
     return isValidMultiCardSet(selectedCards, currentTrick, 2);
 }
 
+function getHighestPlayWithWishPair(hand, currentTrick, wish) {
+    return getHighestPlayWithWishMultiCard(hand, currentTrick, wish, 2);
+}
+
 function isValidThreeOfAKind(selectedCards, currentTrick) {
     return isValidMultiCardSet(selectedCards, currentTrick, 3);
 }
 
+function getHighestPlayWithWishThreeOfAKind(hand, currentTrick, wish) {
+    return getHighestPlayWithWishMultiCard(hand, currentTrick, wish, 3);
+}
+
 function isValid4Bomb(selectedCards, currentTrick) {
     return isValidMultiCardSet(selectedCards, currentTrick, 4);
+}
+
+function getHighestPlayWithWish4Bomb(hand, currentTrick, wish) {
+    return getHighestPlayWithWishMultiCard(hand, currentTrick, wish, 4);
 }
 
 function isValidMultiCardSet(selectedCards, currentTrick, length) {
@@ -184,6 +221,27 @@ function isValidMultiCardSet(selectedCards, currentTrick, length) {
     // Check it's higher than the current trick.
     var currentTrickRank = rank(previousPlay[length - 1]);
     return (checkRank > currentTrickRank);
+}
+
+function getHighestPlayWithWishMultiCard(hand, currentTrick, wish, length) {
+    var cards = [];
+
+    const isValidPhoenix = (cID) => {
+        if (length === 4) { return false; } // Phoenix not valid for 4-bombs
+        return (cID === constants.specials.phoenix);
+    }
+
+    // Count the number of cards matching that rank.
+    for (var i = 0; i < hand.length; i++) {
+        if (isValidPhoenix(hand[i]) || rank(hand[i]) === wish) {
+            cards.push[cardID];
+            if (cards.length >= length) {
+                return cards;
+            }
+        }
+    }
+
+    return null;
 }
 
 function isValidSteppedPairs(selectedCards, currentTrick) {
@@ -258,6 +316,78 @@ function isValidSteppedPairs(selectedCards, currentTrick) {
     return (rank(selectedCards[selectedCards.length - 1]) >= previousPlayRank);
 }
 
+function getHighestPlayWithWishSteppedPairs(hand, currentTrick, wish) {
+    var lengthNeeded = currentTrick.plays[0].length;
+    var numPairsNeeded = lengthNeeded / 2;
+
+    // First thing to do is see if we even have the pair we need.
+    var wishPair = getHighestPlayWithWishPair(hand, currentTrick, wish);
+    if (!wishPair) { return null; }
+
+    // Get the count values for each possible rank.
+    var ranks = Array(15).fill(0);
+    for (var i = 0; i < hand.length; i++) {
+        var countRank = rank[hand(i)];
+        if (countRank >= 2 && countRank <= 14) {
+            if (ranks[countRank] < 2) {
+                ranks[countRank]++; // Don't go any higher than 2.
+            }
+        }
+    }
+
+    var hasPhoenix = hand.some((cardID) => cardID === constants.specials.phoenix);
+
+    // Now we have an array like [1, 2, 0, 0, 2, 1, 2, 2, ...]
+    // If we have n 2's in a row then we can do it.
+    // Or, if we have n-1 2's, one 1, and the phoenix we can also do it.
+    // Basically if there is a window of n elements in the rank array whose sum is at least 2*n (or 2*n-1 if we have the phoenix)
+    // then that window will work.
+
+    // Note that the start rank can't go past the highest and lowest ranks.
+    var startRankBegin = Math.min(wish + (numPairsNeeded - 1), 14); // The highest rank can't be lower than 14.
+    var startRankEnd = Math.max(wish, 2 + (numPairsNeeded - 1)); // The lowest rank can't be lower than 2, so 2 + (numPairs - 1) is the lowest possible start.
+
+    // Now loop over the window we've defined of possible ranks a stepped pairs hand could be.
+    for (var startRank = startRankBegin; startRank >= startRankEnd; startRank--) {
+        // Start window at the highest card needed for wish to work. Work its way down until the wish card is the highest rank.
+        var total = 0;
+        for (var windowPosition = 0; windowPosition < numPairsNeeded; windowPosition++) {
+            total += ranks[windowPosition];
+        }
+
+        if (total === lengthNeeded || (hasPhoenix && total === lengthNeeded - 1)) {
+            // We can make the play 
+
+            // Get the actual hand.
+            var cards = [];
+            var index = hand.find((cID) => rank(cID) === startRank);
+            var currentRank = startRank;
+            while (cards.length < lengthNeeded || index === hand.length || currentRank === 0) {
+                if (ranks[currentRank] === 0) {
+                    // there are no more cards with this rank
+                    currentRank--;
+                } else if (rank(hand[index]) === currentRank) {
+                    cards.push(hand[index]);
+                    index++;
+                    ranks[currentRank]--; // Reduce the count on the current rank.
+                } else {
+                    // The current spot in the hand no longer matches the current rank, so move along in the hand.
+                    index++;
+                }
+            }
+
+            if (cards.length === lengthNeeded - 1) {
+                // Add the phoenix back in
+                cards.unshift(constants.specials.phoenix);
+            }
+
+            return cards;
+        } 
+    }
+
+    return null;
+}
+
 function isValidFullHouse(selectedCards, currentTrick) {
     // If we've made it this far then we have a threes rank to check.
     var threesRank = getFullHouseThreesRank(selectedCards);
@@ -318,6 +448,15 @@ function getFullHouseThreesRank(selectedCards) {
     }
 }
 
+function getHighestPlayWithWishSteppedPairs(hand, currentTrick, wish) {
+    // In a full house the wish can be the highest pair or highest three of a kind.
+    // So maybe search for the highest 3 of a kind and the highest pair, then see if there's
+    // any other cards?
+
+    // TODO
+    return null;
+}
+
 function isValidStraight(selectedCards, currentTrick) {
 
     var ranks = getStraightRankArray(selectedCards);
@@ -351,6 +490,83 @@ function isValidStraight(selectedCards, currentTrick) {
     }
 
     return (ranks[0] > previousRanks[0]);
+}
+
+function getHighestPlayWithWishStraight(hand, currentTrick, wish) {
+    var neededLength = currentTrick.plays[0].length;
+
+    var hasPhoenix = hand.some((cardID) => { cardID === constants.specials.phoenix });
+
+    // Get a sorted array of all the unique ranks without specials
+    var rankArray = hand.rankCount(1);
+
+    var windowStart = Math.min(wish + (neededLength - 1), 14);
+    var windowEnd = Math.max(wish, 2 + (numPairsNeeded - 1));;
+
+    for (var startRank = windowStart; startRank >= windowEnd; startRank--) {
+        var total = 0;
+        for (var windowPosition = 0; windowPosition < neededLength; windowPosition++) {
+            total += ranks[windowPosition];
+        }
+
+        if (total === neededLength || (total === (neededLength - 1) && hasPhoenix)) {
+            // We got one, no we have to actually get the cards.
+
+            // Get the actual hand.
+            var cards = [];
+            var index = hand.find((cID) => rank(cID) === startRank);
+            var currentRank = startRank;
+            while (cards.length < lengthNeeded || index === hand.length || currentRank === 0) {
+                if (ranks[currentRank] === 0) {
+                    // there are no more cards with this rank
+                    currentRank--;
+                } else if (rank(hand[index]) === currentRank) {
+                    cards.push(hand[index]);
+                    index++;
+                    ranks[currentRank]--; // Reduce the count on the current rank.
+                } else {
+                    // The current spot in the hand no longer matches the current rank, so move along in the hand.
+                    index++;
+                }
+            }
+
+            if (cards.length === lengthNeeded - 1) {
+                // Add the phoenix back in
+                cards.unshift(constants.specials.phoenix);
+            }
+
+            return cards;
+        }
+    }
+
+    return null;
+}
+
+Array.prototype.getUnique = function () {
+    var u = {}, a = [];
+    for (var i = 0, l = this.length; i < l; ++i) {
+        if (u.hasOwnProperty(this[i])) {
+            continue;
+        }
+        a.push(this[i]);
+        u[this[i]] = 1;
+    }
+    return a;
+}
+
+Array.prototype.rankCount = function (max) {
+    // Get the count values for each possible rank.
+    var ranks = Array(15).fill(0);
+    for (var i = 0; i < this.length; i++) {
+        var countRank = rank[this(i)];
+        if (countRank >= 2 && countRank <= 14) {
+            if (!max || ranks[countRank] < max) {
+                ranks[countRank]++;
+            }
+        }
+    }
+
+    return ranks;
 }
 
 function isValidStraightBomb(selectedCards, currentTrick) {
@@ -509,9 +725,29 @@ function getPreviousPlay(currentTrick, playsBack = 0) {
     return previousPlay;
 }
 
-function canPass(currentTrick) {
-    // TODO: Handle when a wish is active.
-    return hasCurrent(currentTrick);
+function canPass(G, ctx) {
+    var currentTrick = G.currentTrick;
+    var hand = G.players[ctx.currentPlayer].hand;
+    var wish = G.wish;
+
+    // Can't pass on the first card of the hand.
+    if (!hasCurrent(currentTrick)) { return false; }
+
+    // Check if a wish is active.
+    if (wish >= 2 && wish <= 14) {
+        // Check if a player has a card that fulfills the wish.
+        if (hand.some((cardID) => rank(cardID) === wish)) {
+            console.debug(`Player has a card that matches fulfills wish ${wish}`);
+
+            // Now check if the player has any valid play that contains the wished card.
+            var wishPlay = validPlays[currentTrick.type].getHighestPlayWithWish(hand, currentTrick, wish);
+            if (isValidPlay(wishPlay, currentTrick)) {
+                return false; // If you can make a valid move with the wish you must.
+            }
+        }
+    }
+
+    return true;
 }
 
 
@@ -520,7 +756,8 @@ module.exports = {
     isValidPlay: isValidPlay,
     detectPlayType: detectPlayType,
     canPass: canPass,
-    getPreviousPlay: getPreviousPlay
+    getPreviousPlay: getPreviousPlay,
+    rank: rank
 }
 
 /*

@@ -60,10 +60,6 @@ const tichu = {
         }
     },
 
-    turn: {
-        moveLimit: 1
-    },
-
     phases: {
         preHand: require('./PreHand').preHand,
         playTrick: require('./PlayTrick').playTrick
@@ -96,5 +92,5 @@ const tichu = {
 
 
 module.exports = {
-    Tichu: scenarios.handAlmostFinished(tichu)
+    Tichu: scenarios.skipPreHandPhase(tichu)
 }

@@ -2,7 +2,7 @@ const { INVALID_MOVE, TurnOrder } = require('boardgame.io/core');
 const { sortCards, removeFromHand, getPlayerIDs } = require('./Helpers');
 const { constants } = require('./Constants');
 const { Stage } = require('boardgame.io/core');
-const { detectPlayType, validPlays, canPass, getPreviousPlay } = require('./ValidPlays');
+const { detectPlayType, validPlays, canPass, getPreviousPlay, rank } = require('./ValidPlays');
 const { cardDefinitions } = require('./Deck');
 
 function onPhaseBegin(G, ctx) {
@@ -105,6 +105,20 @@ function playCards(G, ctx, cards) {
         return INVALID_MOVE;
     }
 
+    // Check if the player can fulfill a wish.
+    if (G.wish) {
+        var bestWishPlay = playType.getHighestPlayWithWish(G.players[ctx.currentPlayer].hand, G.currentTrick, G.wish);
+        if (bestWishPlay && bestWishPlay.length > 0) {
+            // The current player CAN play a wish.
+            if (!cards.some((cardID) => rank(cardID) === G.wish)) {
+                console.debug(`Tried to play when it was possible to fulfill wish ${G.wish}`);
+                console.debug(`Cards attempted to play: ${JSON.stringify(cards)} (ranks: ${JSON.stringify(cards.map((c) => rank(c)))})`);
+                console.debug(`Possible wish play: ${JSON.stringify(bestWishPlay)} (ranks: ${JSON.stringify(bestWishPlay.map((c) => rank(c)))})`);
+                return INVALID_MOVE;
+            }
+        }
+    }
+
     if (!G.currentTrick) {
         console.debug(`Creating trick of type: ${type}`);
         G.currentTrick = {
@@ -129,22 +143,50 @@ function playCards(G, ctx, cards) {
         publicPlayerInfo.out = true;
         publicPlayerInfo.outOrder = countOutPlayers(G, ctx);
     }
+
+    // Clear the wish if it is fulfilled.
+    if (G.wish >= 2 && cards.some((cID) => rank(cID) === G.wish)) {
+        G.wish = null;
+    }
+
+    // If the play contains the mahjong, send the current player into the Wish stage.
+    if (cards.some((cardID) => cardID === constants.specials.mahjong)) {
+        console.debug("Setting current player stage to makeWish");
+        ctx.events.setActivePlayers({
+            currentPlayer: constants.phases.playTrick.stages.makeWish,
+            moveLimit: 1
+        })
+    } else {
+        ctx.events.endTurn();
+    }
+}
+
+function makeWish(G, ctx, wish) {
+    if (wish < 2 || wish > 14) {
+        return INVALID_MOVE;
+    }
+
+    console.debug(`Setting active wish to ${wish}`);
+    G.wish = wish;
+    ctx.events.endTurn();
 }
 
 function pass(G, ctx) {
     // Put this in here in case the logic to auto-pass when are out isn't working right.
     if (G.players[ctx.currentPlayer].hand.length === 0) { return true; }
 
-    if (!canPass(G.currentTrick)) {
-        console.debug(`Invalid move: Player ${ctx.currentPlayer} tried to pass on the first play of a trick`);
+    if (!canPass(G, ctx)) {
+        console.debug(`Invalid move: Player ${ctx.currentPlayer} tried to pass on the first play of a trick or player must play due to a wish`);
         return INVALID_MOVE;
     }
+
     console.debug(`Player ${ctx.currentPlayer} passes`);
     G.currentTrick.plays.unshift({
         cards: [],
         player: ctx.currentPlayer,
         pass: true
     })
+    ctx.events.endTurn();
 }
 
 function clearTable(G, receivingPlayerID) {
@@ -413,13 +455,19 @@ const playTrick = {
     turn: {
         onEnd: onTurnEnd,
         onBegin: onTurnBegin,
-        endIf: turnEndIf,
+        //endIf: turnEndIf,
         order: {
             ...TurnOrder.DEFAULT,
             first: findStartPlayer,
             next: findNextPlayer
         },
-        moveLimit: 1
+        stages: {
+            makeWish: {
+                moves: {
+                    makeWish: makeWish
+                }
+            }
+        }
     },
     moves: {
         playCards: playCards,

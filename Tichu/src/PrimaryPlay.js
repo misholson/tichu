@@ -120,9 +120,10 @@ function primaryPlayEndIf(G, ctx) {
 
 function pass(G, ctx) {
     // Put this in here in case the logic to auto-pass when are out isn't working right.
-    if (G.players[ctx.currentPlayer].hand.length === 0) { return true; }
+    var hand = G.players[ctx.currentPlayer].hand;
+    if (hand.length === 0) { return true; }
 
-    if (!canPass(G.currentTrick)) {
+    if (!canPass(hand, G.currentTrick)) {
         console.debug(`Invalid move: Player ${ctx.currentPlayer} tried to pass on the first play of a trick`);
         return INVALID_MOVE;
     }

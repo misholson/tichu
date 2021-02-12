@@ -28,6 +28,14 @@
     margin-top: -50px;
 }
 
+.under-hand-buttons {
+    width: 100%;
+}
+
+.under-hand-buttons .form-group {
+    margin: auto;
+}
+
 .pass-area {
 }
 

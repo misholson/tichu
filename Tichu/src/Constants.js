@@ -13,7 +13,9 @@ module.exports.constants = {
         playTrick: {
             name: "playTrick",
             stages: {
-
+                makeWish: "makeWish",
+                passDragon: "passDragon",
+                bomb: "bomb"
             }
         }
     },

@@ -78,9 +78,6 @@ export const TichuBoard = (props) => {
         }
     }
 
-    // See what kind of play is selected.
-    var selectedPlayType = validPlays[detectPlayType(selectedCards)];
-
     const handleReturnPass = (cardID) => {
         setPassedCards(removeFromHand(passedCards, cardID));
 
@@ -123,6 +120,27 @@ export const TichuBoard = (props) => {
         }
     }
 
+    const onWish = (rank) => {
+        moves.makeWish(rank);
+    }
+
+    const wishRank = (rank) => {
+        switch (rank) {
+            case 11:
+                return "J";
+            case 12:
+                return "Q";
+            case 13:
+                return "K";
+            case 14:
+                return "A";
+            default:
+                return rank;
+        }
+    }
+
+    // TODO: Figure out if the player must play due to a wish.
+
     return (
         <>
         <div className="board">
@@ -158,22 +176,32 @@ export const TichuBoard = (props) => {
                 </Row>
                 <Row className="board-row clearfix">
                     <Col md={2} className="board-side">
-                        &nbsp;
+                            &nbsp;{G.wish && <>Wish: {G.wish}</>}
                     </Col>
                     <Col md={8} className="board-middle">
                         <Player playerID={playerID} phase={phase} currentPlayer={ctx.currentPlayer} />
                         <Hand hand={hand} selectedCards={selectedCards} onCardClicked={handleCardClicked} />
                         {stage === constants.phases.preHand.stages.takeOrGrand &&
-                            <FormGroup>
+                            <FormGroup className="under-hand-buttons">
                                 <Button color="primary" className="mx-1" onClick={onGrandClicked}>Grand Tichu</Button>
                                 <Button color="primary" className="mx-1" onClick={onTakeClicked}>Take</Button>
                             </FormGroup>
                         }
-                        {isPlayerActive &&
-                            <FormGroup>
-                                <Button color="primary" className="mx-1" onClick={onPlayClicked} disabled={!selectedPlayType?.isValid(selectedCards, G.currentTrick)}>Play</Button>
-                                <Button color="primary" className="mx-1" onClick={onPassClicked} disabled={!canPass(G.currentTrick) && hand.length > 0}>Pass</Button>
+                        {isPlayerActive && stage === null &&
+                            <FormGroup className="under-hand">
+                                <Button color="primary" className="mx-1" onClick={onPlayClicked} disabled={!isValidPlay(selectedCards, G.currentTrick)}>Play</Button>
+                                <Button color="primary" className="mx-1" onClick={onPassClicked} disabled={!canPass(G, ctx) && hand.length > 0}>Pass</Button>
                             </FormGroup>
+                        }
+                        {isPlayerActive && stage === constants.phases.playTrick.stages.makeWish &&
+                            <>
+                                <Clear />
+                                    <FormGroup className="under-hand">
+                                    {Array(13).fill(null).map((_, ix) =>
+                                        <Button key={ix} color="primary" className="mx-1" onClick={() => onWish(14-ix)}>{wishRank(14-ix)}</Button>
+                                    )}
+                                </FormGroup>
+                            </>
                         }
                         <Clear />
                     </Col>

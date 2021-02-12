@@ -132,6 +132,7 @@ const preHand = {
         G.secret.deck = ctx.random.Shuffle(generateDeck(56));
         dealCards(G, 8);
         ctx.events.setActivePlayers({ all: constants.phases.preHand.stages.takeOrGrand });
+        G.wish = null; // reset wish
         return G;
     },
     turn: {
