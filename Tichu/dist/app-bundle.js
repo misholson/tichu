@@ -71304,10 +71304,7 @@ var validPlays = {
   straightFlush: {
     name: "Straight Flush Bomb",
     isValid: isValidStraightBomb,
-    getHighestPlayWithWish: function getHighestPlayWithWish() {
-      return null;
-    },
-    // TODO
+    getHighestPlayWithWish: getHighestPlayWithWishStraightBomb,
     isBomb: true
   },
   straight: {
@@ -72080,6 +72077,67 @@ function getStraightRankArray(selectedCards) {
   return ranks;
 }
 
+function getHighestPlayWithWishStraightBomb(hand, currentTrick, wish) {
+  var minLengthNeeded = 5;
+
+  if (hasCurrent(currentTrick) && currentTrick.type === validPlays.straightFlush.name) {
+    // If this bomb needs to respond to another straight bomb, it needs to match its length.
+    minLengthNeeded = currentTrick.plays[0].cards.length;
+  }
+
+  var longestStraightCount = 0;
+  var longestStraightSuit = -1;
+
+  for (var suitType = 0; suitType < 4; suitType++) {
+    // Get all the cards in this suit.
+    var cardsInSuit = hand.filter(function (cID) {
+      return suit(cID) === suitType;
+    }); // Get a sorted array of all the unique ranks without specials
+
+    var ranks = cardsInSuit.rankCount(1); // How far up can we go from the wish.
+
+    var currentRankUp = wish;
+
+    while (currentRankUp <= 14 && ranks[currentRankUp] === 1) {
+      currentRankUp++;
+    } // How far down can we go from the wish
+
+
+    var currentRankDown = wish;
+
+    while (currentRankDown >= 2 && ranks[currentRankDown] === 1) {
+      currentRankDown--;
+    } // Current rank up and current rank down are the first ranks that AREN'T part of the straight flush.
+    // So we have something like 2-3-4-5-6-7-8-9. currentRankDown = 2, currentRankUp = 9, that means 3-8 is a
+    // valid 6 card bomb, so it's 9 - 2 - 1 = 6, hence:
+    // currentRankUp - currentRankDown - 1 is the length.
+
+
+    var currentLength = currentRankUp - currentRankDown - 1;
+
+    if (currentLength > longestStraightCount) {
+      longestStraightCount = currentLength;
+      longestStraightSuit = suitType;
+    }
+  }
+
+  if (longestStraightCount >= 5) {
+    // Get the straight out of the suit we found it in.
+    var suitWithStraight = hand.filter(function (cID) {
+      return suit(cID) === longestStraightSuit;
+    });
+    var placeholderTrick = {
+      plays: [{
+        cards: Array(longestStraightCount).fill(0) // Only the length matters, the actual cards are irrelevant.
+
+      }]
+    };
+    return getHighestPlayWithWishStraight(suitWithStraight, placeholderTrick, wish);
+  }
+
+  return null;
+}
+
 function isBomb(selectedCards) {
   return isValid4Bomb(selectedCards) || isValidStraightBomb(selectedCards);
 }
@@ -72393,6 +72451,61 @@ var tests = {
     var wish = 7;
     var wishPlay = validPlays.fullHouse.getHighestPlayWithWish(hand, currentTrick, wish);
     assertFalsy(wishPlay);
+  },
+  straightBombWish: function straightBombWish() {
+    var currentTrick = {
+      plays: [{
+        cards: [6, 5, 4, 3, 2, 1, 0] // 2-3-4-5-6-7-8 pagodas
+
+      }]
+    };
+    var hand = [51, 37, 22, 34, 33, 32, 31, 30, 29, 28, 26, 39]; // 4-5-6-7-8-9-10 swords
+
+    sortCards(hand);
+    var wish = 7;
+    var wishPlay = validPlays.straightFlush.getHighestPlayWithWish(hand, currentTrick, wish);
+    assertHandEqual([34, 33, 32, 31, 30, 29, 28], wishPlay);
+  },
+  straightBombWishHasBombWithoutWish: function straightBombWishHasBombWithoutWish() {
+    var currentTrick = {
+      plays: [{
+        cards: [6, 5, 4, 3, 2, 1, 0] // 2-3-4-5-6-7-8 pagodas
+
+      }]
+    };
+    var hand = [51, 37, 22, 34, 33, 32, 31, 30, 29, 28, 26, 39]; // 4-5-6-7-8-9-10 swords
+
+    sortCards(hand);
+    var wish = 3;
+    var wishPlay = validPlays.straightFlush.getHighestPlayWithWish(hand, currentTrick, wish);
+    assertFalsy(wishPlay);
+  },
+  straightBombWishHasBombNoPreviousTrick: function straightBombWishHasBombNoPreviousTrick() {
+    var currentTrick = null;
+    var hand = [51, 37, 22, 34, 33, 32, 31, 30, 29, 28, 26, 39]; // 4-5-6-7-8-9-10 swords
+
+    sortCards(hand);
+    var wish = 7;
+    var wishPlay = validPlays.straightFlush.getHighestPlayWithWish(hand, currentTrick, wish);
+    assertHandEqual([34, 33, 32, 31, 30], wishPlay);
+  },
+  straightBombWishNoBomb: function straightBombWishNoBomb() {
+    var currentTrick = null;
+    var hand = [51, 37, 22, 34, 33, 32, 31, 29, 28, 26, 39]; // 4-5- -7-8-9-10 swords
+
+    sortCards(hand);
+    var wish = 7;
+    var wishPlay = validPlays.straightFlush.getHighestPlayWithWish(hand, currentTrick, wish);
+    assertFalsy(wishPlay);
+  },
+  straightBombWishNonBombStraight: function straightBombWishNonBombStraight() {
+    var currentTrick = null;
+    var hand = [51, 37, 22, 34, 33, 32, 31, 17, 29, 28, 26, 39]; // 4-5-7-8-9-10 swords, 6 is jade
+
+    sortCards(hand);
+    var wish = 7;
+    var wishPlay = validPlays.straightFlush.getHighestPlayWithWish(hand, currentTrick, wish);
+    assertFalsy(wishPlay);
   }
 };
 /*
@@ -72472,7 +72585,7 @@ function assertFalse(a, message) {
 
 function assertFalsy(a, message) {
   if (!message) {
-    message = "assertTruthy failed: ".concat(a);
+    message = "assertFalsy failed: ".concat(a);
   }
 
   if (a) {

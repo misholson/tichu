@@ -32,7 +32,7 @@ const validPlays = {
     straightFlush: {
         name: "Straight Flush Bomb",
         isValid: isValidStraightBomb,
-        getHighestPlayWithWish: () => null, // TODO
+        getHighestPlayWithWish: getHighestPlayWithWishStraightBomb,
         isBomb: true
     },
     straight: {
@@ -744,6 +744,60 @@ function getStraightRankArray(selectedCards) {
     }
 
     return ranks;
+}
+
+function getHighestPlayWithWishStraightBomb(hand, currentTrick, wish) {
+    var minLengthNeeded = 5;
+    if (hasCurrent(currentTrick) && currentTrick.type === validPlays.straightFlush.name) {
+        // If this bomb needs to respond to another straight bomb, it needs to match its length.
+        minLengthNeeded = currentTrick.plays[0].cards.length;
+    }
+
+    var longestStraightCount = 0;
+    var longestStraightSuit = -1;
+
+    for (var suitType = 0; suitType < 4; suitType++) {
+        // Get all the cards in this suit.
+        var cardsInSuit = hand.filter((cID) => suit(cID) === suitType);
+        // Get a sorted array of all the unique ranks without specials
+        var ranks = cardsInSuit.rankCount(1);
+
+        // How far up can we go from the wish.
+        var currentRankUp = wish;
+        while (currentRankUp <= 14 && ranks[currentRankUp] === 1) {
+            currentRankUp++;
+        }
+
+        // How far down can we go from the wish
+        var currentRankDown = wish;
+        while (currentRankDown >= 2 && ranks[currentRankDown] === 1) {
+            currentRankDown--;
+        }
+
+        // Current rank up and current rank down are the first ranks that AREN'T part of the straight flush.
+        // So we have something like 2-3-4-5-6-7-8-9. currentRankDown = 2, currentRankUp = 9, that means 3-8 is a
+        // valid 6 card bomb, so it's 9 - 2 - 1 = 6, hence:
+        // currentRankUp - currentRankDown - 1 is the length.
+        var currentLength = currentRankUp - currentRankDown - 1;
+        if (currentLength > longestStraightCount) {
+            longestStraightCount = currentLength;
+            longestStraightSuit = suitType;
+        }
+    }
+
+    if (longestStraightCount >= 5) {
+        // Get the straight out of the suit we found it in.
+        var suitWithStraight = hand.filter((cID) => suit(cID) === longestStraightSuit);
+        var placeholderTrick = {
+            plays: [
+                {
+                    cards: Array(longestStraightCount).fill(0) // Only the length matters, the actual cards are irrelevant.
+                }]
+        };
+        return getHighestPlayWithWishStraight(suitWithStraight, placeholderTrick, wish);
+    }
+
+    return null;
 }
 
 function isBomb(selectedCards) {

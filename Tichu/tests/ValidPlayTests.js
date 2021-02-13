@@ -233,7 +233,7 @@ const tests = {
                 }
             ]
         }
-        var hand = [51, 27, 22, 34, 33, 32, 31, 30, 29, 28, 26, 39] // 4-5-6-7-8-9-10 swords
+        var hand = [51, 37, 22, 34, 33, 32, 31, 30, 29, 28, 26, 39] // 4-5-6-7-8-9-10 swords
         sortCards(hand);
         var wish = 7;
 
@@ -249,7 +249,7 @@ const tests = {
                 }
             ]
         }
-        var hand = [51, 27, 22, 34, 33, 32, 31, 30, 29, 28, 26, 39] // 4-5-6-7-8-9-10 swords
+        var hand = [51, 37, 22, 34, 33, 32, 31, 30, 29, 28, 26, 39] // 4-5-6-7-8-9-10 swords
         sortCards(hand);
         var wish = 3;
 
@@ -259,17 +259,27 @@ const tests = {
     },
     straightBombWishHasBombNoPreviousTrick: () => {
         var currentTrick = null;
-        var hand = [51, 27, 22, 34, 33, 32, 31, 30, 29, 28, 26, 39] // 4-5-6-7-8-9-10 swords
+        var hand = [51, 37, 22, 34, 33, 32, 31, 30, 29, 28, 26, 39] // 4-5-6-7-8-9-10 swords
         sortCards(hand);
         var wish = 7;
 
         var wishPlay = validPlays.straightFlush.getHighestPlayWithWish(hand, currentTrick, wish);
 
-        assertHandEqual([34, 33, 32, 31, 30], wishPlay);
+        assertHandEqual([34, 33, 32, 31, 30, 29, 28], wishPlay);
     },
     straightBombWishNoBomb: () => {
         var currentTrick = null;
-        var hand = [51, 27, 22, 34, 33, 32, 31, 29, 28, 26, 39] // 4-5-6-7-8-9-10 swords
+        var hand = [51, 37, 22, 34, 33, 32, 31, 29, 28, 26, 39] // 4-5- -7-8-9-10 swords
+        sortCards(hand);
+        var wish = 7;
+
+        var wishPlay = validPlays.straightFlush.getHighestPlayWithWish(hand, currentTrick, wish);
+
+        assertFalsy(wishPlay);
+    },
+    straightBombWishNonBombStraight: () => {
+        var currentTrick = null;
+        var hand = [51, 37, 22, 34, 33, 32, 31, 17, 29, 28, 26, 39] // 4-5-7-8-9-10 swords, 6 is jade
         sortCards(hand);
         var wish = 7;
 
@@ -345,7 +355,7 @@ function assertFalse(a, message) {
 }
 
 function assertFalsy(a, message) {
-    if (!message) { message = `assertTruthy failed: ${a}`; }
+    if (!message) { message = `assertFalsy failed: ${a}`; }
     if (a) {
         throw message;
     }
