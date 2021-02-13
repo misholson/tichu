@@ -212,6 +212,7 @@ export const TichuBoard = (props) => {
                                     {Array(13).fill(null).map((_, ix) =>
                                         <Button key={ix} color="primary" className="mx-1" onClick={() => onWish(14-ix)}>{wishRank(14-ix)}</Button>
                                     )}
+                                    <Button color="primary" className="mx-1" onClick={() => onWish(null)}>None</Button>
                                 </FormGroup>
                             </>
                         }

@@ -69858,7 +69858,13 @@ var TichuBoard = function TichuBoard(props) {
         return onWish(14 - ix);
       }
     }, wishRank(14 - ix));
-  }))), stage === constants.phases.playTrick.stages.passDragon && ctx.activePlayers && ctx.activePlayers[playerID] === constants.phases.playTrick.stages.passDragon && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null), "Give trick with Dragon to:", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
+    color: "primary",
+    className: "mx-1",
+    onClick: function onClick() {
+      return onWish(null);
+    }
+  }, "None"))), stage === constants.phases.playTrick.stages.passDragon && ctx.activePlayers && ctx.activePlayers[playerID] === constants.phases.playTrick.stages.passDragon && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null), "Give trick with Dragon to:", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
     className: "under-hand"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
     color: "primary",
@@ -70536,6 +70542,9 @@ var _require4 = __webpack_require__(/*! ./ValidPlays */ "./src/ValidPlays.js"),
 var _require5 = __webpack_require__(/*! ./Deck */ "./src/Deck.js"),
     cardDefinitions = _require5.cardDefinitions;
 
+var _require6 = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js"),
+    isNumeric = _require6.isNumeric;
+
 function onPhaseBegin(G, ctx) {
   console.debug("");
   console.debug("------Begin Trick------");
@@ -70705,7 +70714,8 @@ function playCards(G, ctx, cards) {
 }
 
 function makeWish(G, ctx, wish) {
-  if (wish < 2 || wish > 14) {
+  if (wish !== null && !(wish >= 2 && wish <= 14)) {
+    console.debug("Tried to make an invalid wish of ".concat(wish));
     return INVALID_MOVE;
   }
 

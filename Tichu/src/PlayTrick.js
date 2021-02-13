@@ -3,6 +3,7 @@ const { sortCards, removeFromHand, getPlayerIDs } = require('./Helpers');
 const { constants } = require('./Constants');
 const { detectPlayType, validPlays, canPass, getPreviousPlay, rank, canFulfillWish } = require('./ValidPlays');
 const { cardDefinitions } = require('./Deck');
+const { isNumeric } = require('jquery');
 
 function onPhaseBegin(G, ctx) {
     console.debug("");
@@ -160,7 +161,8 @@ function playCards(G, ctx, cards) {
 }
 
 function makeWish(G, ctx, wish) {
-    if (wish < 2 || wish > 14) {
+    if (wish !== null && !(wish >= 2 && wish <= 14)) {
+        console.debug(`Tried to make an invalid wish of ${wish}`);
         return INVALID_MOVE;
     }
 

@@ -317,7 +317,7 @@ function isValidSteppedPairs(selectedCards, currentTrick) {
 }
 
 function getHighestPlayWithWishSteppedPairs(hand, currentTrick, wish) {
-    var lengthNeeded = currentTrick.plays[0].cards.length;
+    var lengthNeeded = getPreviousPlay(currentTrick).cards.length;
     var numPairsNeeded = lengthNeeded / 2;
 
     // First thing to do is see if we even have the pair we need.
@@ -557,7 +557,7 @@ function isValidStraight(selectedCards, currentTrick) {
 }
 
 function getHighestPlayWithWishStraight(hand, currentTrick, wish) {
-    var lengthNeeded = currentTrick.plays[0].cards.length;
+    var lengthNeeded = getPreviousPlay(currentTrick).cards.length;
 
     var hasPhoenix = hand.some((cardID) => { cardID === constants.specials.phoenix });
 
@@ -750,7 +750,7 @@ function getHighestPlayWithWishStraightBomb(hand, currentTrick, wish) {
     var minLengthNeeded = 5;
     if (hasCurrent(currentTrick) && currentTrick.type === validPlays.straightFlush.name) {
         // If this bomb needs to respond to another straight bomb, it needs to match its length.
-        minLengthNeeded = currentTrick.plays[0].cards.length;
+        minLengthNeeded = getPreviousPlay(currentTrick).cards.length;
     }
 
     var longestStraightCount = 0;
