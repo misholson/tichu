@@ -27,7 +27,7 @@ const validPlays = {
     fullHouse: {
         name: "Full House",
         isValid: isValidFullHouse,
-        getHighestPlayWithWish: getHighestPlayWithWishSteppedPairs
+        getHighestPlayWithWish: getHighestPlayWithWishFullHouse
     },
     straightFlush: {
         name: "Straight Flush Bomb",
@@ -441,12 +441,84 @@ function getFullHouseThreesRank(selectedCards) {
 }
 
 function getHighestPlayWithWishFullHouse(hand, currentTrick, wish) {
-    // In a full house the wish can be the highest pair or highest three of a kind.
-    // So maybe search for the highest 3 of a kind and the highest pair, then see if there's
-    // any other cards?
+    var ranks = hand.rankCount(3);
+    var usedPhoenix = !hand.some((cID) => cID === constants.specials.phoenix);
 
-    // TODO
-    return null;
+    // Find the highest three of a kind.
+    var threesRank = 999;
+    for (var i = 14; i >= 2; i--) {
+        if (ranks[i] >= 3) {
+            threesRank = i;
+            break;
+        }
+    }
+
+    // If threesRank is still 999, then we didn't find any three of a kind.
+    // If we have the phoenix we can still make it work.
+    if (threesRank > 14 && !usedPhoenix) {
+        for (var j = 14; j >= 2; j--) {
+            if (ranks[j] >= 2) {
+                threesRank = j;
+                break;
+            }
+        }
+
+        if (threesRank <= 14 && threesRank >= 2) {
+            usedPhoenix = true;
+        }
+    }
+
+    if (threesRank > 14) {
+        // If we made it this far without a three of a kind, then we can't make a full house.
+        return null;
+    }
+
+    var twosRank = 999;
+
+    if (threesRank === wish) {
+        // If the three rank is the wish rank, then find ay other pair (or single if we can still use the phoenix)
+        for (var m = 14; m >= 2; m--) {
+            if (ranks !== wish && ranks[m] >= (usedPhoenix ? 2 : 1)) {
+                twosRank = m;
+            }
+        }
+
+        if (twosRank > 14) {
+            // We couldn't make a pair here.
+            return null;
+        }
+    } else {
+        // If the three rank was any other card then the twos have to be the wish pair.
+        if (ranks[wish] >= (usedPhoenix ? 2 : 1)) {
+            twosRank = wish;
+        } else {
+            // We can't even make a pair with the wish card so there's no wish here.
+            return null;
+        }
+    }
+
+    var threeCards = [];
+    for (var k = 0; k < hand.length && threeCards.length < 3; k++) {
+        if (rank(hand[k]) === threesRank) {
+            threeCards.push(hand[k]);
+        }
+    }
+
+    var twoCards = [];
+    for (var l = 0; l < hand.length && twoCards.length < 2; l++) {
+        if (rank(hand[l]) === twosRank) {
+            twoCards.push(hand[l]);
+        }
+    }
+
+    var cards = threeCards.concat(twoCards);
+
+    if (cards.length === 4) {
+        // Add the phoenix back in
+        cards.unshift(constants.specials.phoenix);
+    }
+
+    return cards;
 }
 
 function isValidStraight(selectedCards, currentTrick) {

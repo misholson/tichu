@@ -128,6 +128,154 @@ const tests = {
         var wishPlay = validPlays.straight.getHighestPlayWithWish(hand, currentTrick, wish);
 
         assertFalsy(wishPlay);
+    },
+    fullHouseWishInThree: () => {
+        var currentTrick = {
+            plays: [
+                {
+                    cards: [1, 14, 0, 13, 26] // 3-3-2-2-2
+                }
+            ]
+        }
+        var hand = [10, 22, 32, 5, 18, 31, 4, 17, 16, 2] // 7-7-7-6-6
+        sortCards(hand);
+        var wish = 7;
+
+        var wishPlay = validPlays.fullHouse.getHighestPlayWithWish(hand, currentTrick, wish);
+
+        assertHandEqual([5, 18, 31, 4, 17], wishPlay);
+    },
+    fullHouseWishInTwo: () => {
+        var currentTrick = {
+            plays: [
+                {
+                    cards: [1, 14, 0, 13, 26] // 3-3-2-2-2
+                }
+            ]
+        }
+        var hand = [10, 22, 32, 18, 31, 4, 17, 30, 16, 2] // 7-7-6-6-6
+        sortCards(hand);
+        var wish = 7;
+
+        var wishPlay = validPlays.fullHouse.getHighestPlayWithWish(hand, currentTrick, wish);
+
+        assertHandEqual([18, 31, 4, 17, 30], wishPlay);
+    },
+    fullHouseWishTwoTwoPhoenix: () => {
+        var currentTrick = {
+            plays: [
+                {
+                    cards: [1, 14, 0, 13, 26] // 3-3-2-2-2
+                }
+            ]
+        }
+        var hand = [53, 10, 22, 32, 18, 31, 4, 17, 16, 2] // p-7-7-6-6
+        sortCards(hand);
+        var wish = 7;
+
+        var wishPlay = validPlays.fullHouse.getHighestPlayWithWish(hand, currentTrick, wish);
+
+        assertHandEqual([53, 18, 31, 4, 17], wishPlay);
+    },
+    fullHouseWishOneThreePhoenix: () => {
+        var currentTrick = {
+            plays: [
+                {
+                    cards: [1, 14, 0, 13, 26] // 3-3-2-2-2
+                }
+            ]
+        }
+        var hand = [53, 10, 22, 32, 18, 30, 4, 17, 16, 2] // p-7-6-6-6
+        sortCards(hand);
+        var wish = 7;
+
+        var wishPlay = validPlays.fullHouse.getHighestPlayWithWish(hand, currentTrick, wish);
+
+        assertHandEqual([53, 18, 30, 4, 17], wishPlay);
+    },
+    fullHouseWishNonePhoenix: () => {
+        var currentTrick = {
+            plays: [
+                {
+                    cards: [1, 14, 0, 13, 26] // 3-3-2-2-2
+                }
+            ]
+        }
+        var hand = [53, 10, 22, 32, 18, 30, 17, 16, 2] // p-7-6-6
+        sortCards(hand);
+        var wish = 7;
+
+        var wishPlay = validPlays.fullHouse.getHighestPlayWithWish(hand, currentTrick, wish);
+
+        assertFalsy(wishPlay);
+    },
+    fullHouseWishNone: () => {
+        var currentTrick = {
+            plays: [
+                {
+                    cards: [1, 14, 0, 13, 26] // 3-3-2-2-2
+                }
+            ]
+        }
+        var hand = [10, 22, 32, 5, 18, 30, 17, 16, 2] // 7-7-6-6
+        sortCards(hand);
+        var wish = 7;
+
+        var wishPlay = validPlays.fullHouse.getHighestPlayWithWish(hand, currentTrick, wish);
+
+        assertFalsy(wishPlay);
+    },
+    straightBombWish: () => {
+        var currentTrick = {
+            plays: [
+                {
+                    cards: [6, 5, 4, 3, 2, 1, 0] // 2-3-4-5-6-7-8 pagodas
+                }
+            ]
+        }
+        var hand = [51, 27, 22, 34, 33, 32, 31, 30, 29, 28, 26, 39] // 4-5-6-7-8-9-10 swords
+        sortCards(hand);
+        var wish = 7;
+
+        var wishPlay = validPlays.straightFlush.getHighestPlayWithWish(hand, currentTrick, wish);
+
+        assertHandEqual([34, 33, 32, 31, 30, 29, 28], wishPlay);
+    },
+    straightBombWishHasBombWithoutWish: () => {
+        var currentTrick = {
+            plays: [
+                {
+                    cards: [6, 5, 4, 3, 2, 1, 0] // 2-3-4-5-6-7-8 pagodas
+                }
+            ]
+        }
+        var hand = [51, 27, 22, 34, 33, 32, 31, 30, 29, 28, 26, 39] // 4-5-6-7-8-9-10 swords
+        sortCards(hand);
+        var wish = 3;
+
+        var wishPlay = validPlays.straightFlush.getHighestPlayWithWish(hand, currentTrick, wish);
+
+        assertFalsy(wishPlay);
+    },
+    straightBombWishHasBombNoPreviousTrick: () => {
+        var currentTrick = null;
+        var hand = [51, 27, 22, 34, 33, 32, 31, 30, 29, 28, 26, 39] // 4-5-6-7-8-9-10 swords
+        sortCards(hand);
+        var wish = 7;
+
+        var wishPlay = validPlays.straightFlush.getHighestPlayWithWish(hand, currentTrick, wish);
+
+        assertHandEqual([34, 33, 32, 31, 30], wishPlay);
+    },
+    straightBombWishNoBomb: () => {
+        var currentTrick = null;
+        var hand = [51, 27, 22, 34, 33, 32, 31, 29, 28, 26, 39] // 4-5-6-7-8-9-10 swords
+        sortCards(hand);
+        var wish = 7;
+
+        var wishPlay = validPlays.straightFlush.getHighestPlayWithWish(hand, currentTrick, wish);
+
+        assertFalsy(wishPlay);
     }
 }
 
