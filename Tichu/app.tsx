@@ -4,11 +4,8 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 
 import { App } from './src/App';
+import { runTests } from './tests/ValidPlayTests';
 
-export const Hello = () => {
-    return (
-        <h1>Welcome to React!!</h1>
-    );
-}
+runTests();
 
 ReactDOM.render(<App />, document.getElementById('root'));

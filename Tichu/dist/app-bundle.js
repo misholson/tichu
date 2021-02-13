@@ -96,13 +96,11 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Hello = void 0;
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 var ReactDOM = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
 var App_1 = __webpack_require__(/*! ./src/App */ "./src/App.js");
-exports.Hello = function () {
-    return (React.createElement("h1", null, "Welcome to React!!"));
-};
+var ValidPlayTests_1 = __webpack_require__(/*! ./tests/ValidPlayTests */ "./tests/ValidPlayTests.js");
+ValidPlayTests_1.runTests();
 ReactDOM.render(React.createElement(App_1.App, null), document.getElementById('root'));
 
 
@@ -71301,10 +71299,7 @@ var validPlays = {
   fullHouse: {
     name: "Full House",
     isValid: isValidFullHouse,
-    getHighestPlayWithWish: function getHighestPlayWithWish() {
-      return null;
-    } // TODO
-
+    getHighestPlayWithWish: getHighestPlayWithWishSteppedPairs
   },
   straightFlush: {
     name: "Straight Flush Bomb",
@@ -71318,10 +71313,7 @@ var validPlays = {
   straight: {
     name: "Straight",
     isValid: isValidStraight,
-    getHighestPlayWithWish: function getHighestPlayWithWish() {
-      return null;
-    } // TODO
-
+    getHighestPlayWithWish: getHighestPlayWithWishStraight
   },
   fourOfAKind: {
     name: "4 Bomb",
@@ -71538,7 +71530,7 @@ function getHighestPlayWithWishMultiCard(hand, currentTrick, wish, length) {
 
   for (var i = 0; i < hand.length; i++) {
     if (isValidPhoenix(hand[i]) || rank(hand[i]) === wish) {
-      cards.push[cardID];
+      cards.push(hand[i]);
 
       if (cards.length >= length) {
         return cards;
@@ -71619,7 +71611,7 @@ function isValidSteppedPairs(selectedCards, currentTrick) {
 }
 
 function getHighestPlayWithWishSteppedPairs(hand, currentTrick, wish) {
-  var lengthNeeded = currentTrick.plays[0].length;
+  var lengthNeeded = currentTrick.plays[0].cards.length;
   var numPairsNeeded = lengthNeeded / 2; // First thing to do is see if we even have the pair we need.
 
   var wishPair = getHighestPlayWithWishPair(hand, currentTrick, wish);
@@ -71629,18 +71621,7 @@ function getHighestPlayWithWishSteppedPairs(hand, currentTrick, wish) {
   } // Get the count values for each possible rank.
 
 
-  var ranks = Array(15).fill(0);
-
-  for (var i = 0; i < hand.length; i++) {
-    var countRank = rank[hand(i)];
-
-    if (countRank >= 2 && countRank <= 14) {
-      if (ranks[countRank] < 2) {
-        ranks[countRank]++; // Don't go any higher than 2.
-      }
-    }
-  }
-
+  var ranks = hand.rankCount(2);
   var hasPhoenix = hand.some(function (cardID) {
     return cardID === constants.specials.phoenix;
   }); // Now we have an array like [1, 2, 0, 0, 2, 1, 2, 2, ...]
@@ -71652,7 +71633,7 @@ function getHighestPlayWithWishSteppedPairs(hand, currentTrick, wish) {
 
   var startRankBegin = Math.min(wish + (numPairsNeeded - 1), 14); // The highest rank can't be lower than 14.
 
-  var startRankEnd = Max(wish, 2 + (numPairs - 1)); // The lowest rank can't be lower than 2, so 2 + (numPairs - 1) is the lowest possible start.
+  var startRankEnd = Math.max(wish, 2 + (numPairsNeeded - 1)); // The lowest rank can't be lower than 2, so 2 + (numPairs - 1) is the lowest possible start.
   // Now loop over the window we've defined of possible ranks a stepped pairs hand could be.
 
   for (var startRank = startRankBegin; startRank >= startRankEnd; startRank--) {
@@ -71660,19 +71641,19 @@ function getHighestPlayWithWishSteppedPairs(hand, currentTrick, wish) {
     var total = 0;
 
     for (var windowPosition = 0; windowPosition < numPairsNeeded; windowPosition++) {
-      total += ranks[windowPosition];
+      total += ranks[startRank - windowPosition];
     }
 
     if (total === lengthNeeded || hasPhoenix && total === lengthNeeded - 1) {
       // We can make the play 
       // Get the actual hand.
       var cards = [];
-      var index = hand.find(function (cID) {
+      var index = hand.findIndex(function (cID) {
         return rank(cID) === startRank;
       });
       var currentRank = startRank;
 
-      while (cards.length < lengthNeeded || index === hand.length || currentRank === 0) {
+      while (cards.length < total || index === hand.length || currentRank === 0) {
         if (ranks[currentRank] === 0) {
           // there are no more cards with this rank
           currentRank--;
@@ -71763,6 +71744,14 @@ function getFullHouseThreesRank(selectedCards) {
   }
 }
 
+function getHighestPlayWithWishFullHouse(hand, currentTrick, wish) {
+  // In a full house the wish can be the highest pair or highest three of a kind.
+  // So maybe search for the highest 3 of a kind and the highest pair, then see if there's
+  // any other cards?
+  // TODO
+  return null;
+}
+
 function isValidStraight(selectedCards, currentTrick) {
   var ranks = getStraightRankArray(selectedCards);
 
@@ -71801,6 +71790,92 @@ function isValidStraight(selectedCards, currentTrick) {
 
   return ranks[0] > previousRanks[0];
 }
+
+function getHighestPlayWithWishStraight(hand, currentTrick, wish) {
+  var lengthNeeded = currentTrick.plays[0].cards.length;
+  var hasPhoenix = hand.some(function (cardID) {
+    cardID === constants.specials.phoenix;
+  }); // Get a sorted array of all the unique ranks without specials
+
+  var ranks = hand.rankCount(1);
+  var windowStart = Math.min(wish + (lengthNeeded - 1), 14);
+  var windowEnd = Math.max(wish, 2 + (lengthNeeded - 1));
+  ;
+
+  for (var startRank = windowStart; startRank >= windowEnd; startRank--) {
+    var total = 0;
+
+    for (var windowPosition = 0; windowPosition < lengthNeeded; windowPosition++) {
+      total += ranks[startRank - windowPosition];
+    }
+
+    if (total === lengthNeeded || total === lengthNeeded - 1 && hasPhoenix) {
+      // We got one, no we have to actually get the cards.
+      // Get the actual hand.
+      var cards = [];
+      var index = hand.findIndex(function (cID) {
+        return rank(cID) === startRank;
+      });
+      var currentRank = startRank;
+
+      while (cards.length < total || index === hand.length || currentRank === 0) {
+        if (ranks[currentRank] === 0) {
+          // there are no more cards with this rank
+          currentRank--;
+        } else if (rank(hand[index]) === currentRank) {
+          cards.push(hand[index]);
+          index++;
+          ranks[currentRank]--; // Reduce the count on the current rank.
+        } else {
+          // The current spot in the hand no longer matches the current rank, so move along in the hand.
+          index++;
+        }
+      }
+
+      if (cards.length === lengthNeeded - 1) {
+        // Add the phoenix back in
+        cards.unshift(constants.specials.phoenix);
+      }
+
+      return cards;
+    }
+  }
+
+  return null;
+}
+
+Array.prototype.getUnique = function () {
+  var u = {},
+      a = [];
+
+  for (var i = 0, l = this.length; i < l; ++i) {
+    if (u.hasOwnProperty(this[i])) {
+      continue;
+    }
+
+    a.push(this[i]);
+    u[this[i]] = 1;
+  }
+
+  return a;
+};
+
+Array.prototype.rankCount = function (max) {
+  // Get the count values for each possible rank.
+  var ranks = Array(15).fill(0);
+
+  for (var i = 0; i < this.length; i++) {
+    var countRank = rank(this[i]);
+
+    if (countRank >= 2 && countRank <= 14) {
+      if (!max || ranks[countRank] < max) {
+        ranks[countRank]++;
+      }
+    }
+  }
+
+  return ranks;
+};
 
 function isValidStraightBomb(selectedCards, currentTrick) {
   // straights are minimum 5.
@@ -72024,6 +72099,268 @@ const currentTrickExample = {
     ]
 }
 */
+
+/***/ }),
+
+/***/ "./tests/ValidPlayTests.js":
+/*!*********************************!*\
+  !*** ./tests/ValidPlayTests.js ***!
+  \*********************************/
+/*! exports provided: runTests */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "runTests", function() { return runTests; });
+// I can't get any of the unit test frameworks to work, so I'm going to have to create
+// my own janky unit test framework that prints test results to the browser console when I run.
+
+/*
+ * Cards:
+ *          2   3   4   5   6   7   8   9  10   J   Q   K   A
+ *          --------------------------------------------------
+ * pagodas  0   1   2   3   4   5   6   7   8   9  10  11  12
+ * jade    13  14  15  16  17  18  19  20  21  22  23  24  25
+ * swords  26  27  28  29  30  31  32  33  34  35  36  37  38
+ * stars   39  40  41  42  43  44  45  46  47  48  49  50  51
+ * 
+ * dragon:  52
+ * phoenix: 53
+ * dog:     54
+ * mahjong: 55
+ */
+var _require = __webpack_require__(/*! ../src/ValidPlays */ "./src/ValidPlays.js"),
+    validPlays = _require.validPlays,
+    detectPlayType = _require.detectPlayType,
+    canPass = _require.canPass,
+    isValidPlay = _require.isValidPlay;
+
+var _require2 = __webpack_require__(/*! ../src/Helpers */ "./src/Helpers.js"),
+    sortCards = _require2.sortCards;
+
+var tests = {
+  singlePlayValid: function singlePlayValid() {
+    assertTrue(validPlays.single.isValid([8]));
+  },
+  pairWishTest: function pairWishTest() {
+    var currentTrick = {
+      plays: [{
+        cards: [17, 4] // 6-6
+
+      }]
+    };
+    var hand = [51, 24, 31, 44, 30, 43, 29, 42, 27, 1, 39, 13]; // 7-7 among other things
+
+    var wish = 7;
+    var wishPlay = validPlays.pair.getHighestPlayWithWish(hand, currentTrick, wish);
+    assertHandEqual([31, 44], wishPlay);
+  },
+  steppedPairWishTest: function steppedPairWishTest() {
+    var currentTrick = {
+      plays: [{
+        cards: [17, 4, 16, 3, 15, 2] // 4-4-5-5-6-6
+
+      }]
+    };
+    var hand = [51, 24, 31, 44, 30, 43, 29, 42, 27, 1, 39, 13]; // 5-5-6-6-7-7 among other things
+
+    var wish = 7;
+    var wishPlay = validPlays.steppedPairs.getHighestPlayWithWish(hand, currentTrick, wish);
+    assertHandEqual([31, 44, 30, 43, 29, 42], wishPlay);
+  },
+  steppedPairWishWithPhoenixOnWishCard: function steppedPairWishWithPhoenixOnWishCard() {
+    var currentTrick = {
+      plays: [{
+        cards: [17, 4, 16, 3, 15, 2] // 4-4-5-5-6-6
+
+      }]
+    };
+    var hand = [53, 51, 24, 44, 30, 43, 29, 42, 27, 1, 39, 13]; // 5-5-6-6-7-p among other things
+
+    var wish = 7;
+    var wishPlay = validPlays.steppedPairs.getHighestPlayWithWish(hand, currentTrick, wish);
+    assertHandEqual([53, 44, 30, 43, 29, 42], wishPlay);
+  },
+  steppedPairWishTestPhoenixOnOtherCard: function steppedPairWishTestPhoenixOnOtherCard() {
+    var currentTrick = {
+      plays: [{
+        cards: [17, 4, 16, 3, 15, 2] // 4-4-5-5-6-6
+
+      }]
+    };
+    var hand = [53, 51, 24, 31, 44, 30, 43, 42, 27, 1, 39, 13]; // p-5-6-6-7-7 among other things
+
+    var wish = 7;
+    var wishPlay = validPlays.steppedPairs.getHighestPlayWithWish(hand, currentTrick, wish);
+    assertHandEqual([53, 31, 44, 30, 43, 42], wishPlay);
+  },
+  steppedPairWishNoWish: function steppedPairWishNoWish() {
+    var currentTrick = {
+      plays: [{
+        cards: [17, 4, 16, 3, 15, 2] // 4-4-5-5-6-6
+
+      }]
+    };
+    var hand = [51, 24, 44, 43, 29, 42, 27, 1, 39, 13]; // 5-5-6-6-7-p among other things
+
+    var wish = 7;
+    var wishPlay = validPlays.steppedPairs.getHighestPlayWithWish(hand, currentTrick, wish);
+    assertFalsy(wishPlay);
+  },
+  straightWish: function straightWish() {
+    var currentTrick = {
+      plays: [{
+        cards: [6, 44, 30, 16, 2] // 4-5-6-7-8
+
+      }]
+    };
+    var hand = [51, 25, 23, 8, 7, 19, 18, 4, 29, 41, 13, 26]; // 6-7-8-9-10 among other things (also has a 4 and 5)
+
+    var wish = 7;
+    var wishPlay = validPlays.straight.getHighestPlayWithWish(hand, currentTrick, wish);
+    assertHandEqual([8, 7, 19, 18, 4], wishPlay);
+  },
+  straightWishPhoenixAccountsForWish: function straightWishPhoenixAccountsForWish() {
+    var currentTrick = {
+      plays: [{
+        cards: [6, 44, 30, 16, 2] // 4-5-6-7-8
+
+      }]
+    };
+    var hand = [53, 51, 25, 23, 8, 7, 19, 4, 29, 41, 13, 26]; // 6-p-8-9-10, so is a valid straight but not a required wish
+
+    var wish = 7;
+    var wishPlay = validPlays.straight.getHighestPlayWithWish(hand, currentTrick, wish);
+    assertHandEqual([], wishPlay);
+  }
+};
+/*
+ * Cards:
+ *          2   3   4   5   6   7   8   9  10   J   Q   K   A
+ *          --------------------------------------------------
+ * pagodas  0   1   2   3   4   5   6   7   8   9  10  11  12
+ * jade    13  14  15  16  17  18  19  20  21  22  23  24  25
+ * swords  26  27  28  29  30  31  32  33  34  35  36  37  38
+ * stars   39  40  41  42  43  44  45  46  47  48  49  50  51
+ *
+ * dragon:  52
+ * phoenix: 53
+ * dog:     54
+ * mahjong: 55
+ */
+
+var runTests = function runTests() {
+  console.debug("Tests running");
+  var testNames = Object.keys(tests);
+  var passed = 0;
+  var failed = 0;
+
+  for (var i = 0; i < testNames.length; i++) {
+    try {
+      tests[testNames[i]]();
+      console.info("".concat(testNames[i], " PASSED"));
+      passed++;
+    } catch (e) {
+      console.error("".concat(testNames[i], " FAILED: ").concat(e));
+      failed++;
+    }
+  }
+
+  console.info("".concat(testNames.length, " tests completed. ").concat(passed, " passed, ").concat(failed, " failed"));
+};
+
+function assertEqual(a, b, message) {
+  if (!message) {
+    message = "assertEqual failed: ".concat(a, " != ").concat(b);
+  }
+
+  if (a !== b) {
+    throw message;
+  }
+}
+
+function assertTrue(a, message) {
+  if (!message) {
+    message = "assertTrue failed: ".concat(a);
+  }
+
+  if (a !== true) {
+    throw message;
+  }
+}
+
+function assertTruthy(a, message) {
+  if (!message) {
+    message = "assertTruthy failed: ".concat(a);
+  }
+
+  if (!a) {
+    throw message;
+  }
+}
+
+function assertFalse(a, message) {
+  if (!message) {
+    message = "assertFalse failed: ".concat(a);
+  }
+
+  if (a !== false) {
+    throw message;
+  }
+}
+
+function assertFalsy(a, message) {
+  if (!message) {
+    message = "assertTruthy failed: ".concat(a);
+  }
+
+  if (a) {
+    throw message;
+  }
+}
+
+function assertHandEqual(handa, handb, message) {
+  if (!message) {
+    message = "assertHandEqual failed: ".concat(JSON.stringify(handa), " vs ").concat(JSON.stringify(handb));
+  }
+
+  if (!handa) {
+    if (!message) {
+      message = "assertHandEqual failed: handa is ".concat(handa);
+    }
+
+    throw message;
+  }
+
+  if (!handb) {
+    if (!message) {
+      message = "assertHandEqual failed: handb is ".concat(handb);
+    }
+
+    throw message;
+  }
+
+  if (handa.length !== handb.length) {
+    if (!message) {
+      message = "assertHandEqual failed: handa length: ".concat(handa.length, " vs handb length: ").concat(handb.length);
+    }
+
+    throw message;
+  }
+
+  handa.sort();
+  handb.sort();
+
+  for (var i = 0; i < handa.length; i++) {
+    if (handa[i] !== handb[i]) {
+      if (!message) {
+        message = "assertHandEqual failed: handa[".concat(i, "]: ").concat(handa[i], " vs handb[").concat(i, "]: ").concat(handb[i]);
+      }
+
+      throw message;
+    }
+  }
+}
 
 /***/ }),
 

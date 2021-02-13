@@ -8,6 +8,8 @@
     <TypeScriptSourceMap>true</TypeScriptSourceMap>
     <TypeScriptModuleKind>CommonJS</TypeScriptModuleKind>
     <SaveNodeJsSettingsInProjectFile>False</SaveNodeJsSettingsInProjectFile>
+    <JavaScriptTestFramework>mocha</JavaScriptTestFramework>
+    <JavaScriptTestRoot>tests</JavaScriptTestRoot>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -148,6 +150,10 @@
     <Content Include="styles\tichu.css">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="tests\ValidPlayTests.js">
+      <SubType>Code</SubType>
+      <TestFramework>Mocha</TestFramework>
+    </Content>
     <Content Include="tsconfig.json">
       <SubType>Code</SubType>
     </Content>
@@ -162,6 +168,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="images\" />
+    <Folder Include="tests\" />
     <Folder Include="scenarios\" />
     <Folder Include="styles\" />
     <Folder Include="src\" />

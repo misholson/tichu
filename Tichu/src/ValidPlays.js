@@ -234,7 +234,7 @@ function getHighestPlayWithWishMultiCard(hand, currentTrick, wish, length) {
     // Count the number of cards matching that rank.
     for (var i = 0; i < hand.length; i++) {
         if (isValidPhoenix(hand[i]) || rank(hand[i]) === wish) {
-            cards.push[cardID];
+            cards.push(hand[i]);
             if (cards.length >= length) {
                 return cards;
             }
@@ -317,7 +317,7 @@ function isValidSteppedPairs(selectedCards, currentTrick) {
 }
 
 function getHighestPlayWithWishSteppedPairs(hand, currentTrick, wish) {
-    var lengthNeeded = currentTrick.plays[0].length;
+    var lengthNeeded = currentTrick.plays[0].cards.length;
     var numPairsNeeded = lengthNeeded / 2;
 
     // First thing to do is see if we even have the pair we need.
@@ -325,15 +325,7 @@ function getHighestPlayWithWishSteppedPairs(hand, currentTrick, wish) {
     if (!wishPair) { return null; }
 
     // Get the count values for each possible rank.
-    var ranks = Array(15).fill(0);
-    for (var i = 0; i < hand.length; i++) {
-        var countRank = rank[hand(i)];
-        if (countRank >= 2 && countRank <= 14) {
-            if (ranks[countRank] < 2) {
-                ranks[countRank]++; // Don't go any higher than 2.
-            }
-        }
-    }
+    var ranks = hand.rankCount(2);
 
     var hasPhoenix = hand.some((cardID) => cardID === constants.specials.phoenix);
 
@@ -352,7 +344,7 @@ function getHighestPlayWithWishSteppedPairs(hand, currentTrick, wish) {
         // Start window at the highest card needed for wish to work. Work its way down until the wish card is the highest rank.
         var total = 0;
         for (var windowPosition = 0; windowPosition < numPairsNeeded; windowPosition++) {
-            total += ranks[windowPosition];
+            total += ranks[startRank - windowPosition];
         }
 
         if (total === lengthNeeded || (hasPhoenix && total === lengthNeeded - 1)) {
@@ -360,9 +352,9 @@ function getHighestPlayWithWishSteppedPairs(hand, currentTrick, wish) {
 
             // Get the actual hand.
             var cards = [];
-            var index = hand.find((cID) => rank(cID) === startRank);
+            var index = hand.findIndex((cID) => rank(cID) === startRank);
             var currentRank = startRank;
-            while (cards.length < lengthNeeded || index === hand.length || currentRank === 0) {
+            while (cards.length < total || index === hand.length || currentRank === 0) {
                 if (ranks[currentRank] === 0) {
                     // there are no more cards with this rank
                     currentRank--;
@@ -448,7 +440,7 @@ function getFullHouseThreesRank(selectedCards) {
     }
 }
 
-function getHighestPlayWithWishSteppedPairs(hand, currentTrick, wish) {
+function getHighestPlayWithWishFullHouse(hand, currentTrick, wish) {
     // In a full house the wish can be the highest pair or highest three of a kind.
     // So maybe search for the highest 3 of a kind and the highest pair, then see if there's
     // any other cards?
@@ -493,30 +485,30 @@ function isValidStraight(selectedCards, currentTrick) {
 }
 
 function getHighestPlayWithWishStraight(hand, currentTrick, wish) {
-    var neededLength = currentTrick.plays[0].length;
+    var lengthNeeded = currentTrick.plays[0].cards.length;
 
     var hasPhoenix = hand.some((cardID) => { cardID === constants.specials.phoenix });
 
     // Get a sorted array of all the unique ranks without specials
-    var rankArray = hand.rankCount(1);
+    var ranks = hand.rankCount(1);
 
-    var windowStart = Math.min(wish + (neededLength - 1), 14);
-    var windowEnd = Math.max(wish, 2 + (numPairsNeeded - 1));;
+    var windowStart = Math.min(wish + (lengthNeeded - 1), 14);
+    var windowEnd = Math.max(wish, 2 + (lengthNeeded - 1));;
 
     for (var startRank = windowStart; startRank >= windowEnd; startRank--) {
         var total = 0;
-        for (var windowPosition = 0; windowPosition < neededLength; windowPosition++) {
-            total += ranks[windowPosition];
+        for (var windowPosition = 0; windowPosition < lengthNeeded; windowPosition++) {
+            total += ranks[startRank - windowPosition];
         }
 
-        if (total === neededLength || (total === (neededLength - 1) && hasPhoenix)) {
+        if (total === lengthNeeded || (total === (lengthNeeded - 1) && hasPhoenix)) {
             // We got one, no we have to actually get the cards.
 
             // Get the actual hand.
             var cards = [];
-            var index = hand.find((cID) => rank(cID) === startRank);
+            var index = hand.findIndex((cID) => rank(cID) === startRank);
             var currentRank = startRank;
-            while (cards.length < lengthNeeded || index === hand.length || currentRank === 0) {
+            while (cards.length < total || index === hand.length || currentRank === 0) {
                 if (ranks[currentRank] === 0) {
                     // there are no more cards with this rank
                     currentRank--;
@@ -558,7 +550,7 @@ Array.prototype.rankCount = function (max) {
     // Get the count values for each possible rank.
     var ranks = Array(15).fill(0);
     for (var i = 0; i < this.length; i++) {
-        var countRank = rank[this(i)];
+        var countRank = rank(this[i]);
         if (countRank >= 2 && countRank <= 14) {
             if (!max || ranks[countRank] < max) {
                 ranks[countRank]++;
