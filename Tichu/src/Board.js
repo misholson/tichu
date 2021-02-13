@@ -215,6 +215,16 @@ export const TichuBoard = (props) => {
                                 </FormGroup>
                             </>
                         }
+                        {stage === constants.phases.playTrick.stages.passDragon && ctx.activePlayers && ctx.activePlayers[playerID] === constants.phases.playTrick.stages.passDragon &&
+                            <>
+                                <Clear />
+                                Give trick with Dragon to: 
+                                <FormGroup className="under-hand">
+                                    <Button color="primary" className="mx-1" onClick={() => moves.passDragon(playerIDs.left)}>Player {playerIDs.left} (Left)</Button>
+                                    <Button color="primary" className="mx-1" onClick={() => moves.passDragon(playerIDs.right)}>Player {playerIDs.right} (Right)</Button>
+                                </FormGroup>
+                            </>
+                        }
                         <Clear />
                     </Col>
                     <Col md={2} className="board-side">

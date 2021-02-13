@@ -1,7 +1,6 @@
-const { INVALID_MOVE, TurnOrder } = require('boardgame.io/core');
+const { INVALID_MOVE, TurnOrder, Stage } = require('boardgame.io/core');
 const { sortCards, removeFromHand, getPlayerIDs } = require('./Helpers');
 const { constants } = require('./Constants');
-const { Stage } = require('boardgame.io/core');
 const { detectPlayType, validPlays, canPass, getPreviousPlay, rank, canFulfillWish } = require('./ValidPlays');
 const { cardDefinitions } = require('./Deck');
 
@@ -205,14 +204,39 @@ function trickEndIf(G, ctx) {
     var winner = findTrickWinner(G, ctx);
     // If the last player to play is also the current player.
     if (winner) {
-        console.debug(`trick will end with winner ${G.currentTrick.winner}`);
+        console.debug(`trick will end with winner ${winner}`);
         var playerOutCount = countOutPlayers(G, ctx);
         if (playerOutCount >= 3) {
             console.debug(`3 players are out. Hand will end.`);
+            if (getPreviousPlay(G.currentTrick).cards[0] === constants.specials.dragon) {
+                // If it's a dragon and the trick is over we can automatically give away the dragon to the opponent
+                // who is not out.
+                var playerIDs = getPlayerIDs(ctx, ctx.currentPlayer);
+                G.currentTrick.receivingPlayerID = G.public.players[playerIDs.left].out ? playerIDs.right : playerIDs.left;
+                return false;
+            }
             return {
                 next: constants.phases.preHand.name
             };
         } else {
+            // If it's a dragon we won't end the trick quite yet.
+            // The actual command to set the player to the passDragon phase is in turnEndIf
+            console.debug(`First card in the history is ${getPreviousPlay(G.currentTrick).cards[0]}`);
+            if (!G.currentTrick.receivingPlayerID && getPreviousPlay(G.currentTrick).cards[0] === constants.specials.dragon) {
+                console.debug(`Setting active player to ${winner}`);
+                var activePlayers = {};
+                activePlayers[winner] = {
+                    stage: constants.phases.playTrick.stages.passDragon,
+                    moveLimit: 1,
+                    revert: true
+                };
+                ctx.events.setActivePlayers({
+                    value: activePlayers
+                });
+
+                // Don't end the phase. 
+                return false;
+            }
             return {
                 next: constants.phases.playTrick.name
             };
@@ -220,6 +244,17 @@ function trickEndIf(G, ctx) {
     }
 
     return false;
+}
+
+function passDragon(G, ctx, receivingPlayerID) {
+    var playerIDs = getPlayerIDs(ctx, ctx.currentPlayer);
+    if (playerIDs.left !== receivingPlayerID && playerIDs.right !== receivingPlayerID) {
+        console.debug(`Cannot give dragon trick to player ${receivingPlayerID}. Only ${playerIDs.left} and ${playerIDs.right} are valid.`);
+        return INVALID_MOVE;
+    }
+
+    console.debug(`Passing dragon trick to player ${receivingPlayerID}`)
+    G.currentTrick.receivingPlayerID = receivingPlayerID;
 }
 
 function findTrickWinner(G, ctx) {
@@ -287,9 +322,14 @@ function onTrickEnd(G, ctx) {
     console.debug("------Begin Cleanup------\n");
     console.debug(`Cleaning up trick. Winner: ${winner}`);
     if (winner) {
-        // TODO: Deal with giving away the dragon by sending the player to a "give away dragon" stage.
         G.currentTrick.winner = winner;
-        clearTable(G, winner);
+
+        // Give the cards in the trick to the winner, or if a dragon trick to the opponent the winner chose.
+        var receivingPlayerID = winner;
+        if (G.currentTrick.receivingPlayerID) {
+            receivingPlayerID = G.currentTrick.receivingPlayerID; // We can override the person to give cards to when the dragon won the trick.
+        }
+        clearTable(G, receivingPlayerID);
 
         // Save off the current trick to the log of previous tricks.
         G.previousTricks = G.previousTricks || [];
@@ -323,6 +363,14 @@ function turnEndIf(G, ctx) {
 
     // If there's a winner for the trick, end the turn.
     if (G.currentTrick.winner) {
+        //if (G.currentTrick.plays && G.currentTrick.plays[0].cards[0] === constants.specials.dragon) {
+        //    console.debug(`Setting active player to ${G.currentTrick.winner}`);
+        //    var activePlayers = {};
+        //    activePlayers[G.currentTrick.winner] = constants.phases.playTrick.stages.passDragon.name;
+        //    ctx.events.setActivePlayers({
+        //        value: activePlayers
+        //    });
+        //}
         return true;
     }
     // If the current player is out, play proceeds in regular turn order.
@@ -465,7 +513,13 @@ const playTrick = {
                 moves: {
                     makeWish: makeWish
                 }
-            }
+            },
+            passDragon: {
+                moves: {
+                    passDragon: passDragon
+                }
+            },
+            wait: {}
         }
     },
     moves: {

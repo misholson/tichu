@@ -15,7 +15,8 @@ module.exports.constants = {
             stages: {
                 makeWish: "makeWish",
                 passDragon: "passDragon",
-                bomb: "bomb"
+                bomb: "bomb",
+                wait: "wait"
             }
         }
     },

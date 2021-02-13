@@ -69858,7 +69858,21 @@ var TichuBoard = function TichuBoard(props) {
         return onWish(14 - ix);
       }
     }, wishRank(14 - ix));
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
+  }))), stage === constants.phases.playTrick.stages.passDragon && ctx.activePlayers && ctx.activePlayers[playerID] === constants.phases.playTrick.stages.passDragon && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null), "Give trick with Dragon to:", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
+    className: "under-hand"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
+    color: "primary",
+    className: "mx-1",
+    onClick: function onClick() {
+      return moves.passDragon(playerIDs.left);
+    }
+  }, "Player ", playerIDs.left, " (Left)"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
+    color: "primary",
+    className: "mx-1",
+    onClick: function onClick() {
+      return moves.passDragon(playerIDs.right);
+    }
+  }, "Player ", playerIDs.right, " (Right)"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
     md: 2,
     className: "board-side"
   }, "\xA0")))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Sidebar, null));
@@ -69959,7 +69973,8 @@ module.exports.constants = {
       stages: {
         makeWish: "makeWish",
         passDragon: "passDragon",
-        bomb: "bomb"
+        bomb: "bomb",
+        wait: "wait"
       }
     }
   },
@@ -70499,7 +70514,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 var _require = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boardgame.io/dist/esm/core.js"),
     INVALID_MOVE = _require.INVALID_MOVE,
-    TurnOrder = _require.TurnOrder;
+    TurnOrder = _require.TurnOrder,
+    Stage = _require.Stage;
 
 var _require2 = __webpack_require__(/*! ./Helpers */ "./src/Helpers.js"),
     sortCards = _require2.sortCards,
@@ -70509,19 +70525,16 @@ var _require2 = __webpack_require__(/*! ./Helpers */ "./src/Helpers.js"),
 var _require3 = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
     constants = _require3.constants;
 
-var _require4 = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boardgame.io/dist/esm/core.js"),
-    Stage = _require4.Stage;
+var _require4 = __webpack_require__(/*! ./ValidPlays */ "./src/ValidPlays.js"),
+    detectPlayType = _require4.detectPlayType,
+    validPlays = _require4.validPlays,
+    canPass = _require4.canPass,
+    getPreviousPlay = _require4.getPreviousPlay,
+    rank = _require4.rank,
+    canFulfillWish = _require4.canFulfillWish;
 
-var _require5 = __webpack_require__(/*! ./ValidPlays */ "./src/ValidPlays.js"),
-    detectPlayType = _require5.detectPlayType,
-    validPlays = _require5.validPlays,
-    canPass = _require5.canPass,
-    getPreviousPlay = _require5.getPreviousPlay,
-    rank = _require5.rank,
-    canFulfillWish = _require5.canFulfillWish;
-
-var _require6 = __webpack_require__(/*! ./Deck */ "./src/Deck.js"),
-    cardDefinitions = _require6.cardDefinitions;
+var _require5 = __webpack_require__(/*! ./Deck */ "./src/Deck.js"),
+    cardDefinitions = _require5.cardDefinitions;
 
 function onPhaseBegin(G, ctx) {
   console.debug("");
@@ -70740,15 +70753,43 @@ function trickEndIf(G, ctx) {
   var winner = findTrickWinner(G, ctx); // If the last player to play is also the current player.
 
   if (winner) {
-    console.debug("trick will end with winner ".concat(G.currentTrick.winner));
+    console.debug("trick will end with winner ".concat(winner));
     var playerOutCount = countOutPlayers(G, ctx);
 
     if (playerOutCount >= 3) {
       console.debug("3 players are out. Hand will end.");
+
+      if (getPreviousPlay(G.currentTrick).cards[0] === constants.specials.dragon) {
+        // If it's a dragon and the trick is over we can automatically give away the dragon to the opponent
+        // who is not out.
+        var playerIDs = getPlayerIDs(ctx, ctx.currentPlayer);
+        G.currentTrick.receivingPlayerID = G["public"].players[playerIDs.left].out ? playerIDs.right : playerIDs.left;
+        return false;
+      }
+
       return {
         next: constants.phases.preHand.name
       };
     } else {
+      // If it's a dragon we won't end the trick quite yet.
+      // The actual command to set the player to the passDragon phase is in turnEndIf
+      console.debug("First card in the history is ".concat(getPreviousPlay(G.currentTrick).cards[0]));
+
+      if (!G.currentTrick.receivingPlayerID && getPreviousPlay(G.currentTrick).cards[0] === constants.specials.dragon) {
+        console.debug("Setting active player to ".concat(winner));
+        var activePlayers = {};
+        activePlayers[winner] = {
+          stage: constants.phases.playTrick.stages.passDragon,
+          moveLimit: 1,
+          revert: true
+        };
+        ctx.events.setActivePlayers({
+          value: activePlayers
+        }); // Don't end the phase. 
+
+        return false;
+      }
+
       return {
         next: constants.phases.playTrick.name
       };
@@ -70756,6 +70797,18 @@ function trickEndIf(G, ctx) {
   }
 
   return false;
+}
+
+function passDragon(G, ctx, receivingPlayerID) {
+  var playerIDs = getPlayerIDs(ctx, ctx.currentPlayer);
+
+  if (playerIDs.left !== receivingPlayerID && playerIDs.right !== receivingPlayerID) {
+    console.debug("Cannot give dragon trick to player ".concat(receivingPlayerID, ". Only ").concat(playerIDs.left, " and ").concat(playerIDs.right, " are valid."));
+    return INVALID_MOVE;
+  }
+
+  console.debug("Passing dragon trick to player ".concat(receivingPlayerID));
+  G.currentTrick.receivingPlayerID = receivingPlayerID;
 }
 
 function findTrickWinner(G, ctx) {
@@ -70824,9 +70877,15 @@ function onTrickEnd(G, ctx) {
   console.debug("Cleaning up trick. Winner: ".concat(winner));
 
   if (winner) {
-    // TODO: Deal with giving away the dragon by sending the player to a "give away dragon" stage.
-    G.currentTrick.winner = winner;
-    clearTable(G, winner); // Save off the current trick to the log of previous tricks.
+    G.currentTrick.winner = winner; // Give the cards in the trick to the winner, or if a dragon trick to the opponent the winner chose.
+
+    var receivingPlayerID = winner;
+
+    if (G.currentTrick.receivingPlayerID) {
+      receivingPlayerID = G.currentTrick.receivingPlayerID; // We can override the person to give cards to when the dragon won the trick.
+    }
+
+    clearTable(G, receivingPlayerID); // Save off the current trick to the log of previous tricks.
 
     G.previousTricks = G.previousTricks || [];
     G.previousTricks.unshift(G.currentTrick);
@@ -70857,6 +70916,14 @@ function onTrickEnd(G, ctx) {
 function turnEndIf(G, ctx) {
   // If there's a winner for the trick, end the turn.
   if (G.currentTrick.winner) {
+    //if (G.currentTrick.plays && G.currentTrick.plays[0].cards[0] === constants.specials.dragon) {
+    //    console.debug(`Setting active player to ${G.currentTrick.winner}`);
+    //    var activePlayers = {};
+    //    activePlayers[G.currentTrick.winner] = constants.phases.playTrick.stages.passDragon.name;
+    //    ctx.events.setActivePlayers({
+    //        value: activePlayers
+    //    });
+    //}
     return true;
   } // If the current player is out, play proceeds in regular turn order.
 
@@ -70999,7 +71066,13 @@ var playTrick = {
         moves: {
           makeWish: makeWish
         }
-      }
+      },
+      passDragon: {
+        moves: {
+          passDragon: passDragon
+        }
+      },
+      wait: {}
     }
   },
   moves: {
