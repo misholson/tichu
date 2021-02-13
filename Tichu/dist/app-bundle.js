@@ -72231,7 +72231,7 @@ var tests = {
 
     var wish = 7;
     var wishPlay = validPlays.straight.getHighestPlayWithWish(hand, currentTrick, wish);
-    assertHandEqual([], wishPlay);
+    assertFalsy(wishPlay);
   }
 };
 /*
@@ -72258,10 +72258,10 @@ var runTests = function runTests() {
   for (var i = 0; i < testNames.length; i++) {
     try {
       tests[testNames[i]]();
-      console.info("".concat(testNames[i], " PASSED"));
+      console.info("PASSED ".concat(testNames[i]));
       passed++;
     } catch (e) {
-      console.error("".concat(testNames[i], " FAILED: ").concat(e));
+      console.error("FAILED ".concat(testNames[i], ": ").concat(e));
       failed++;
     }
   }

@@ -176,7 +176,7 @@ export const TichuBoard = (props) => {
                 </Row>
                 <Row className="board-row clearfix">
                     <Col md={2} className="board-side">
-                            &nbsp;{G.wish && <>Wish: {G.wish}</>}
+                            &nbsp;{G.wish && <>Wish: {wishRank(G.wish)}</>}
                     </Col>
                     <Col md={8} className="board-middle">
                         <Player playerID={playerID} phase={phase} currentPlayer={ctx.currentPlayer} />
