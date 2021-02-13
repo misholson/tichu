@@ -69594,7 +69594,9 @@ var _require3 = __webpack_require__(/*! ./ValidPlays */ "./src/ValidPlays.js"),
     validPlays = _require3.validPlays,
     detectPlayType = _require3.detectPlayType,
     canPass = _require3.canPass,
-    isValidPlay = _require3.isValidPlay;
+    isValidPlay = _require3.isValidPlay,
+    canFulfillWish = _require3.canFulfillWish,
+    rank = _require3.rank;
 
 var TichuBoard = function TichuBoard(props) {
   var G = props.G,
@@ -69738,6 +69740,21 @@ var TichuBoard = function TichuBoard(props) {
       default:
         return rank;
     }
+  };
+
+  var playButtonDisabled = function playButtonDisabled() {
+    var isValidGenerally = isValidPlay(selectedCards, G.currentTrick);
+
+    if (isValidGenerally) {
+      if (canFulfillWish(G, ctx) && !selectedCards.some(function (cardID) {
+        return rank(cardID) === G.wish;
+      })) {
+        // If they can fulfill the wish, but this card doesn't fulfill it, the play button should be disabled.
+        return true;
+      }
+    }
+
+    return !isValidGenerally;
   }; // TODO: Figure out if the player must play due to a wish.
 
 
@@ -69824,7 +69841,7 @@ var TichuBoard = function TichuBoard(props) {
     color: "primary",
     className: "mx-1",
     onClick: onPlayClicked,
-    disabled: !isValidPlay(selectedCards, G.currentTrick)
+    disabled: playButtonDisabled()
   }, "Play"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
     color: "primary",
     className: "mx-1",
@@ -70500,7 +70517,8 @@ var _require5 = __webpack_require__(/*! ./ValidPlays */ "./src/ValidPlays.js"),
     validPlays = _require5.validPlays,
     canPass = _require5.canPass,
     getPreviousPlay = _require5.getPreviousPlay,
-    rank = _require5.rank;
+    rank = _require5.rank,
+    canFulfillWish = _require5.canFulfillWish;
 
 var _require6 = __webpack_require__(/*! ./Deck */ "./src/Deck.js"),
     cardDefinitions = _require6.cardDefinitions;
@@ -70609,10 +70627,8 @@ function playCards(G, ctx, cards) {
 
 
   if (G.wish) {
-    var bestWishPlay = playType.getHighestPlayWithWish(G.players[ctx.currentPlayer].hand, G.currentTrick, G.wish);
-
-    if (bestWishPlay && bestWishPlay.length > 0) {
-      // The current player CAN play a wish.
+    if (canFulfillWish(G, ctx, playType)) {
+      // The current player CAN play a wish. If a wish card is not in their selection then the move fails.
       if (!cards.some(function (cardID) {
         return rank(cardID) === G.wish;
       })) {
@@ -71557,7 +71573,7 @@ function isValidSteppedPairs(selectedCards, currentTrick) {
   var i = selectedCards.length - 1;
   var previousRank = rank(selectedCards[i]) - 1; // Get one rank lower than the lowest card for checking.
 
-  while (i >= 0) {
+  while (i >= 1) {
     if (rank(selectedCards[i]) !== rank(selectedCards[i - 1])) {
       if (selectedCards[0] !== constants.specials.phoenix) {
         // If there's no phoenix then these two should be equal.
@@ -72201,8 +72217,10 @@ function canPass(G, ctx) {
       console.debug("Player has a card that matches fulfills wish ".concat(wish)); // Now check if the player has any valid play that contains the wished card.
 
       var wishPlay = validPlays[currentTrick.type].getHighestPlayWithWish(hand, currentTrick, wish);
+      var wishPlay4Bomb = validPlays.fourOfAKind.getHighestPlayWithWish(hand, currentTrick, wish);
+      var wishPlayStraightBomb = validPlays.straightFlush.getHighestPlayWithWish(hand, currentTrick, wish);
 
-      if (isValidPlay(wishPlay, currentTrick)) {
+      if (isValidPlay(wishPlay, currentTrick) || isValidPlay(wishPlay4Bomb, currentTrick) || isValidPlay(wishPlayStraightBomb, currentTrick)) {
         return false; // If you can make a valid move with the wish you must.
       }
     }
@@ -72211,11 +72229,33 @@ function canPass(G, ctx) {
   return true;
 }
 
+function canFulfillWish(G, ctx, playType) {
+  var hand = G.players[ctx.currentPlayer].hand;
+
+  if (!playType) {
+    if (!G.currentTrick) {
+      // If no current trick is specified then even a single is valid.
+      return !!getHighestPlayWithWishSingle(hand, G.currentTrick, G.wish);
+    }
+
+    playType = validPlays[G.currentTrick.type];
+  }
+
+  var bestWishPlay = playType.getHighestPlayWithWish(hand, G.currentTrick, G.wish);
+
+  if (bestWishPlay && bestWishPlay.length > 0 && isValidPlay(bestWishPlay, G.currentTrick)) {
+    return true;
+  }
+
+  return false;
+}
+
 module.exports = {
   validPlays: validPlays,
   isValidPlay: isValidPlay,
   detectPlayType: detectPlayType,
   canPass: canPass,
+  canFulfillWish: canFulfillWish,
   getPreviousPlay: getPreviousPlay,
   rank: rank
 };
@@ -72289,6 +72329,24 @@ var tests = {
     var wish = 7;
     var wishPlay = validPlays.pair.getHighestPlayWithWish(hand, currentTrick, wish);
     assertHandEqual([31, 44], wishPlay);
+  },
+  steppedPairValid: function steppedPairValid() {
+    var currentTrick = null;
+    var selectedCards = [8, 34, 46, 7]; // 9-9-10-10
+
+    assertTrue(validPlays.steppedPairs.isValid(selectedCards, currentTrick));
+  },
+  steppedPairValidPhoenix: function steppedPairValidPhoenix() {
+    var currentTrick = null;
+    var selectedCards = [53, 34, 46, 7]; // 9-9-10-p
+
+    assertTrue(validPlays.steppedPairs.isValid(selectedCards, currentTrick));
+  },
+  steppedPairInvalid: function steppedPairInvalid() {
+    var currentTrick = null;
+    var selectedCards = [53, 34, 46, 6]; // 8-9-10-p
+
+    assertFalse(validPlays.steppedPairs.isValid(selectedCards, currentTrick));
   },
   steppedPairWishTest: function steppedPairWishTest() {
     var currentTrick = {
@@ -72487,7 +72545,7 @@ var tests = {
     sortCards(hand);
     var wish = 7;
     var wishPlay = validPlays.straightFlush.getHighestPlayWithWish(hand, currentTrick, wish);
-    assertHandEqual([34, 33, 32, 31, 30], wishPlay);
+    assertHandEqual([34, 33, 32, 31, 30, 29, 28], wishPlay);
   },
   straightBombWishNoBomb: function straightBombWishNoBomb() {
     var currentTrick = null;

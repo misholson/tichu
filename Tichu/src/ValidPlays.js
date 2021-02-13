@@ -261,7 +261,7 @@ function isValidSteppedPairs(selectedCards, currentTrick) {
     var phoenixUsed = false;
     var i = selectedCards.length - 1;
     var previousRank = rank(selectedCards[i]) - 1; // Get one rank lower than the lowest card for checking.
-    while (i >= 0) {
+    while (i >= 1) {
         if (rank(selectedCards[i]) !== rank(selectedCards[i - 1])) {
             if (selectedCards[0] !== constants.specials.phoenix) {
                 // If there's no phoenix then these two should be equal.
@@ -859,7 +859,10 @@ function canPass(G, ctx) {
 
             // Now check if the player has any valid play that contains the wished card.
             var wishPlay = validPlays[currentTrick.type].getHighestPlayWithWish(hand, currentTrick, wish);
-            if (isValidPlay(wishPlay, currentTrick)) {
+            var wishPlay4Bomb = validPlays.fourOfAKind.getHighestPlayWithWish(hand, currentTrick, wish);
+            var wishPlayStraightBomb = validPlays.straightFlush.getHighestPlayWithWish(hand, currentTrick, wish);
+
+            if (isValidPlay(wishPlay, currentTrick) || isValidPlay(wishPlay4Bomb, currentTrick) || isValidPlay(wishPlayStraightBomb, currentTrick)) {
                 return false; // If you can make a valid move with the wish you must.
             }
         }
@@ -868,12 +871,31 @@ function canPass(G, ctx) {
     return true;
 }
 
+function canFulfillWish(G, ctx, playType) {
+    var hand = G.players[ctx.currentPlayer].hand;
+    if (!playType) {
+        if (!G.currentTrick) {
+            // If no current trick is specified then even a single is valid.
+            return !!getHighestPlayWithWishSingle(hand, G.currentTrick, G.wish);
+        }
+
+        playType = validPlays[G.currentTrick.type];
+    }
+
+    var bestWishPlay = playType.getHighestPlayWithWish(hand, G.currentTrick, G.wish);
+    if (bestWishPlay && bestWishPlay.length > 0 && isValidPlay(bestWishPlay, G.currentTrick)) {
+        return true;
+    }
+
+    return false;
+}
 
 module.exports = {
     validPlays: validPlays,
     isValidPlay: isValidPlay,
     detectPlayType: detectPlayType,
     canPass: canPass,
+    canFulfillWish: canFulfillWish,
     getPreviousPlay: getPreviousPlay,
     rank: rank
 }

@@ -39,6 +39,24 @@ const tests = {
         assertHandEqual([31, 44], wishPlay);
 
     },
+    steppedPairValid: () => {
+        var currentTrick = null;
+        var selectedCards = [8, 34, 46, 7]; // 9-9-10-10
+
+        assertTrue(validPlays.steppedPairs.isValid(selectedCards, currentTrick));
+    },
+    steppedPairValidPhoenix: () => {
+        var currentTrick = null;
+        var selectedCards = [53, 34, 46, 7]; // 9-9-10-p
+
+        assertTrue(validPlays.steppedPairs.isValid(selectedCards, currentTrick));
+    },
+    steppedPairInvalid: () => {
+        var currentTrick = null;
+        var selectedCards = [53, 34, 46, 6]; // 8-9-10-p
+
+        assertFalse(validPlays.steppedPairs.isValid(selectedCards, currentTrick));
+    },
     steppedPairWishTest: () => {
         var currentTrick = {
             plays: [

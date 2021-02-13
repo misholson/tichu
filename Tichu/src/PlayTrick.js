@@ -2,7 +2,7 @@ const { INVALID_MOVE, TurnOrder } = require('boardgame.io/core');
 const { sortCards, removeFromHand, getPlayerIDs } = require('./Helpers');
 const { constants } = require('./Constants');
 const { Stage } = require('boardgame.io/core');
-const { detectPlayType, validPlays, canPass, getPreviousPlay, rank } = require('./ValidPlays');
+const { detectPlayType, validPlays, canPass, getPreviousPlay, rank, canFulfillWish } = require('./ValidPlays');
 const { cardDefinitions } = require('./Deck');
 
 function onPhaseBegin(G, ctx) {
@@ -107,9 +107,8 @@ function playCards(G, ctx, cards) {
 
     // Check if the player can fulfill a wish.
     if (G.wish) {
-        var bestWishPlay = playType.getHighestPlayWithWish(G.players[ctx.currentPlayer].hand, G.currentTrick, G.wish);
-        if (bestWishPlay && bestWishPlay.length > 0) {
-            // The current player CAN play a wish.
+        if (canFulfillWish(G, ctx, playType)) {
+            // The current player CAN play a wish. If a wish card is not in their selection then the move fails.
             if (!cards.some((cardID) => rank(cardID) === G.wish)) {
                 console.debug(`Tried to play when it was possible to fulfill wish ${G.wish}`);
                 console.debug(`Cards attempted to play: ${JSON.stringify(cards)} (ranks: ${JSON.stringify(cards.map((c) => rank(c)))})`);

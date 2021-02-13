@@ -7,7 +7,7 @@ import { FormGroup, Button, Container, Row, Col } from 'reactstrap';
 import 'bootstrap';
 const { sortCards, removeFromHand, getPlayerIDs, addToHand } = require('./Helpers');
 const { constants } = require('./Constants');
-const { validPlays, detectPlayType, canPass, isValidPlay } = require('./ValidPlays');
+const { validPlays, detectPlayType, canPass, isValidPlay, canFulfillWish, rank } = require('./ValidPlays');
 
 export const TichuBoard = (props) => {
 
@@ -139,6 +139,18 @@ export const TichuBoard = (props) => {
         }
     }
 
+    const playButtonDisabled = () => {
+        var isValidGenerally = isValidPlay(selectedCards, G.currentTrick);
+        if (isValidGenerally) {
+            if (canFulfillWish(G, ctx) && !selectedCards.some((cardID) => rank(cardID) === G.wish)) {
+                // If they can fulfill the wish, but this card doesn't fulfill it, the play button should be disabled.
+                return true;
+            }
+        }
+
+        return !isValidGenerally;
+    }
+
     // TODO: Figure out if the player must play due to a wish.
 
     return (
@@ -189,7 +201,7 @@ export const TichuBoard = (props) => {
                         }
                         {isPlayerActive && stage === null &&
                             <FormGroup className="under-hand">
-                                <Button color="primary" className="mx-1" onClick={onPlayClicked} disabled={!isValidPlay(selectedCards, G.currentTrick)}>Play</Button>
+                                <Button color="primary" className="mx-1" onClick={onPlayClicked} disabled={playButtonDisabled()}>Play</Button>
                                 <Button color="primary" className="mx-1" onClick={onPassClicked} disabled={!canPass(G, ctx) && hand.length > 0}>Pass</Button>
                             </FormGroup>
                         }
