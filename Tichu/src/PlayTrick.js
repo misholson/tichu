@@ -38,7 +38,13 @@ function findStartPlayer(G, ctx) {
 function findNextPlayer(G, ctx) {
     var previousPlay = getPreviousPlay(G.currentTrick);
 
-    var nextPlayerPos = (ctx.playOrderPos + 1) % ctx.numPlayers;
+    var currentPlayerPos = ctx.playOrderPos;
+    if (G.currentTrick && G.currentTrick.plays && G.currentTrick.plays.length > 0) {
+        var previousPlayerID = G.currentTrick.plays[0].player;
+        currentPlayerPos = ctx.playOrder.findIndex((pID) => pID === previousPlayerID);
+    }
+
+    var nextPlayerPos = (currentPlayerPos + 1) % ctx.numPlayers;
 
     // If the previous play was the dog, go one player further.
     if (previousPlay) {
@@ -77,6 +83,8 @@ function onTurnBegin(G, ctx) {
             G.currentTrick = null;
         }
     }
+
+    ctx.events.setActivePlayers({ all: constants.phases.playTrick.stages.bomb });
 }
 
 function playCards(G, ctx, cards) {

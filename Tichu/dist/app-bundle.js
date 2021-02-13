@@ -69336,7 +69336,8 @@ module.exports = yeast;
 /***/ (function(module, exports, __webpack_require__) {
 
 var _require = __webpack_require__(/*! ../src/Helpers */ "./src/Helpers.js"),
-    dealCards = _require.dealCards;
+    dealCards = _require.dealCards,
+    sortCards = _require.sortCards;
 
 function skipPreHandPhase(game) {
   console.log(game);
@@ -69431,6 +69432,54 @@ function handAlmostFinished(game) {
   return game;
 }
 
+function giveAllPlayersBombs(game) {
+  console.log(game);
+  game.phases.preHand.start = false;
+  game.phases.playTrick.start = true;
+
+  game.phases.playTrick.onBegin = function (G, ctx) {
+    console.log("TESTING ONLY: shuffle and deal from primary play phase");
+
+    if (!G.previousTricks) {
+      G.secret.deck = [];
+      G.players[0].hand = [2, 3, 4, 5, 6, 18, 19, 32, 33, 34, 35, 11, 14, 27]; // 4-8 pagodas
+
+      G.players[1].hand = [0, 13, 26, 39, 1, 15, 16, 17, 28, 29, 30, 31, 52, 53]; // 4 bomb
+
+      G.players[2].hand = [41, 42, 43, 44, 45, 14, 7, 21, 36, 24, 12, 9, 8, 54];
+      G.players[3].hand = [46, 47, 48, 49, 50, 51, 10, 20, 22, 23, 25, 37, 38, 55];
+      G["public"].players[0].cards = 14;
+      G["public"].players[1].cards = 14;
+      G["public"].players[2].cards = 14;
+      G["public"].players[3].cards = 14;
+      sortCards(G.players[0].hand);
+      sortCards(G.players[1].hand);
+      sortCards(G.players[2].hand);
+      sortCards(G.players[3].hand);
+    } else {
+      G.currentTrick = null;
+    }
+  };
+
+  console.log(game);
+  return game;
+}
+/*
+ * Cards:
+ *          2   3   4   5   6   7   8   9  10   J   Q   K   A
+ *          --------------------------------------------------
+ * pagodas  0   1   2   3   4   5   6   7   8   9  10  11  12
+ * jade    13  14  15  16  17  18  19  20  21  22  23  24  25
+ * swords  26  27  28  29  30  31  32  33  34  35  36  37  38
+ * stars   39  40  41  42  43  44  45  46  47  48  49  50  51
+ *
+ * dragon:  52
+ * phoenix: 53
+ * dog:     54
+ * mahjong: 55
+ */
+
+
 function generateDeck(size) {
   var deck = [];
 
@@ -69444,7 +69493,8 @@ function generateDeck(size) {
 module.exports = {
   skipPreHandPhase: skipPreHandPhase,
   firstPlayerStartsWithFullHouse: firstPlayerStartsWithFullHouse,
-  handAlmostFinished: handAlmostFinished
+  handAlmostFinished: handAlmostFinished,
+  giveAllPlayersBombs: giveAllPlayersBombs
 };
 
 /***/ }),
@@ -69596,7 +69646,8 @@ var _require3 = __webpack_require__(/*! ./ValidPlays */ "./src/ValidPlays.js"),
     canPass = _require3.canPass,
     isValidPlay = _require3.isValidPlay,
     canFulfillWish = _require3.canFulfillWish,
-    rank = _require3.rank;
+    rank = _require3.rank,
+    hasBomb = _require3.hasBomb;
 
 var TichuBoard = function TichuBoard(props) {
   var G = props.G,
@@ -69673,7 +69724,7 @@ var TichuBoard = function TichuBoard(props) {
   var handleCardClicked = function handleCardClicked(cardID) {
     if (phase === constants.phases.preHand.name && stage === constants.phases.preHand.stages.passCards) {
       selectCardToPass(cardID);
-    } else if (phase === constants.phases.playTrick.name && playerID === ctx.currentPlayer) {
+    } else if (phase === constants.phases.playTrick.name) {
       selectCardForPlay(cardID);
     }
   };
@@ -69719,6 +69770,9 @@ var TichuBoard = function TichuBoard(props) {
     }
   };
 
+  var onBombClicked = function onBombClicked() {// TODO
+  };
+
   var onWish = function onWish(rank) {
     moves.makeWish(rank);
   };
@@ -69743,6 +69797,11 @@ var TichuBoard = function TichuBoard(props) {
   };
 
   var playButtonDisabled = function playButtonDisabled() {
+    // If the player is not active, the play button should be disabled.
+    if (!isPlayerActive) {
+      return true;
+    }
+
     var isValidGenerally = isValidPlay(selectedCards, G.currentTrick);
 
     if (isValidGenerally) {
@@ -69755,8 +69814,7 @@ var TichuBoard = function TichuBoard(props) {
     }
 
     return !isValidGenerally;
-  }; // TODO: Figure out if the player must play due to a wish.
-
+  };
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "board"
@@ -69835,7 +69893,7 @@ var TichuBoard = function TichuBoard(props) {
     color: "primary",
     className: "mx-1",
     onClick: onTakeClicked
-  }, "Take")), isPlayerActive && stage === null && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
+  }, "Take")), isPlayerActive && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
     className: "under-hand"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
     color: "primary",
@@ -69847,7 +69905,14 @@ var TichuBoard = function TichuBoard(props) {
     className: "mx-1",
     onClick: onPassClicked,
     disabled: !canPass(G, ctx) && hand.length > 0
-  }, "Pass")), isPlayerActive && stage === constants.phases.playTrick.stages.makeWish && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
+  }, "Pass")), ctx.activePlayers[playerID] === constants.phases.playTrick.stages.bomb && hasBomb(hand) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
+    className: "under-hand"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
+    color: "primary",
+    className: "mx-1",
+    onClick: onBombClicked,
+    disabled: !hasBomb(selectedCards)
+  }, " Bomb")), isPlayerActive && stage === constants.phases.playTrick.stages.makeWish && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
     className: "under-hand"
   }, Array(13).fill(null).map(function (_, ix) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
@@ -70197,7 +70262,7 @@ var tichu = {
   maxPlayers: 4
 };
 module.exports = {
-  Tichu: scenarios.skipPreHandPhase(tichu)
+  Tichu: scenarios.giveAllPlayersBombs(tichu)
 };
 
 /***/ }),
@@ -70584,7 +70649,16 @@ function findStartPlayer(G, ctx) {
 
 function findNextPlayer(G, ctx) {
   var previousPlay = getPreviousPlay(G.currentTrick);
-  var nextPlayerPos = (ctx.playOrderPos + 1) % ctx.numPlayers; // If the previous play was the dog, go one player further.
+  var currentPlayerPos = ctx.playOrderPos;
+
+  if (G.currentTrick && G.currentTrick.plays && G.currentTrick.plays.length > 0) {
+    var previousPlayerID = G.currentTrick.plays[0].player;
+    currentPlayerPos = ctx.playOrder.findIndex(function (pID) {
+      return pID === previousPlayerID;
+    });
+  }
+
+  var nextPlayerPos = (currentPlayerPos + 1) % ctx.numPlayers; // If the previous play was the dog, go one player further.
 
   if (previousPlay) {
     if (previousPlay.cards.length === 1 && previousPlay.cards[0] === constants.specials.dog) {
@@ -70619,6 +70693,10 @@ function onTurnBegin(G, ctx) {
       G.currentTrick = null;
     }
   }
+
+  ctx.events.setActivePlayers({
+    all: constants.phases.playTrick.stages.bomb
+  });
 }
 
 function playCards(G, ctx, cards) {
@@ -71707,7 +71785,7 @@ function isValidSteppedPairs(selectedCards, currentTrick) {
 }
 
 function getHighestPlayWithWishSteppedPairs(hand, currentTrick, wish) {
-  var lengthNeeded = currentTrick.plays[0].cards.length;
+  var lengthNeeded = getPreviousPlay(currentTrick).cards.length;
   var numPairsNeeded = lengthNeeded / 2; // First thing to do is see if we even have the pair we need.
 
   var wishPair = getHighestPlayWithWishPair(hand, currentTrick, wish);
@@ -71965,7 +72043,7 @@ function isValidStraight(selectedCards, currentTrick) {
 }
 
 function getHighestPlayWithWishStraight(hand, currentTrick, wish) {
-  var lengthNeeded = currentTrick.plays[0].cards.length;
+  var lengthNeeded = getPreviousPlay(currentTrick).cards.length;
   var hasPhoenix = hand.some(function (cardID) {
     cardID === constants.specials.phoenix;
   }); // Get a sorted array of all the unique ranks without specials
@@ -71991,7 +72069,7 @@ function getHighestPlayWithWishStraight(hand, currentTrick, wish) {
       });
       var currentRank = startRank;
 
-      while (cards.length < total || index === hand.length || currentRank === 0) {
+      while (cards.length < total && index < hand.length && currentRank >= 2) {
         if (ranks[currentRank] === 0) {
           // there are no more cards with this rank
           currentRank--;
@@ -72181,7 +72259,7 @@ function getHighestPlayWithWishStraightBomb(hand, currentTrick, wish) {
 
   if (hasCurrent(currentTrick) && currentTrick.type === validPlays.straightFlush.name) {
     // If this bomb needs to respond to another straight bomb, it needs to match its length.
-    minLengthNeeded = currentTrick.plays[0].cards.length;
+    minLengthNeeded = getPreviousPlay(currentTrick).cards.length;
   }
 
   var longestStraightCount = 0;
@@ -72235,6 +72313,26 @@ function getHighestPlayWithWishStraightBomb(hand, currentTrick, wish) {
   }
 
   return null;
+}
+
+function hasBomb(hand) {
+  var ranks = hand.rankCount(); // See if we have a four of a kind anywhere.
+
+  for (var i = 14; i >= 2; i--) {
+    if (ranks[i] === 4) {
+      return true;
+    }
+  } // See if we have a straight flush. All 5-card straights must contain
+  // a 6 or 10, so wishing for those will get you a valid straight if one exists.
+
+
+  if (getHighestPlayWithWishStraightBomb(hand, null, 6)) {
+    return true;
+  }
+
+  if (getHighestPlayWithWishStraightBomb(hand, null, 10)) {
+    return true;
+  }
 }
 
 function isBomb(selectedCards) {
@@ -72340,7 +72438,8 @@ module.exports = {
   canPass: canPass,
   canFulfillWish: canFulfillWish,
   getPreviousPlay: getPreviousPlay,
-  rank: rank
+  rank: rank,
+  hasBomb: hasBomb
 };
 /*
 const currentTrickExample = {
@@ -72391,7 +72490,8 @@ var _require = __webpack_require__(/*! ../src/ValidPlays */ "./src/ValidPlays.js
     validPlays = _require.validPlays,
     detectPlayType = _require.detectPlayType,
     canPass = _require.canPass,
-    isValidPlay = _require.isValidPlay;
+    isValidPlay = _require.isValidPlay,
+    hasBomb = _require.hasBomb;
 
 var _require2 = __webpack_require__(/*! ../src/Helpers */ "./src/Helpers.js"),
     sortCards = _require2.sortCards;
@@ -72647,6 +72747,28 @@ var tests = {
     var wish = 7;
     var wishPlay = validPlays.straightFlush.getHighestPlayWithWish(hand, currentTrick, wish);
     assertFalsy(wishPlay);
+  },
+  hasBomb1: function hasBomb1() {
+    var hand = [2, 3, 4, 5, 6, 18, 19, 32, 33, 34, 35, 11, 14, 27]; // 4-8 pagodas
+
+    sortCards(hand);
+    assertTrue(hasBomb(hand));
+  },
+  hasBomb2: function hasBomb2() {
+    var hand = [46, 47, 48, 49, 50, 51, 10, 20, 22, 23, 25, 37, 38, 55];
+    sortCards(hand);
+    assertTrue(hasBomb(hand));
+  },
+  hasBomb3: function hasBomb3() {
+    var hand = [41, 42, 43, 44, 45, 14, 7, 21, 36, 24, 12, 9, 8, 54];
+    sortCards(hand);
+    assertTrue(hasBomb(hand));
+  },
+  hasBomb4: function hasBomb4() {
+    var hand = [0, 13, 26, 39, 1, 15, 16, 17, 28, 29, 30, 31, 52, 53]; // 4 bomb
+
+    sortCards(hand);
+    assertTrue(hasBomb(hand));
   }
 };
 /*

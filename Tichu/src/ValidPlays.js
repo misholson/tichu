@@ -580,7 +580,7 @@ function getHighestPlayWithWishStraight(hand, currentTrick, wish) {
             var cards = [];
             var index = hand.findIndex((cID) => rank(cID) === startRank);
             var currentRank = startRank;
-            while (cards.length < total || index === hand.length || currentRank === 0) {
+            while (cards.length < total && index < hand.length && currentRank >= 2) {
                 if (ranks[currentRank] === 0) {
                     // there are no more cards with this rank
                     currentRank--;
@@ -800,6 +800,28 @@ function getHighestPlayWithWishStraightBomb(hand, currentTrick, wish) {
     return null;
 }
 
+function hasBomb(hand) {
+    var ranks = hand.rankCount();
+
+    // See if we have a four of a kind anywhere.
+    for (var i = 14; i >= 2; i--) {
+        if (ranks[i] === 4) {
+            return true;
+        }
+    }
+
+    // See if we have a straight flush. All 5-card straights must contain
+    // a 6 or 10, so wishing for those will get you a valid straight if one exists.
+
+    if (getHighestPlayWithWishStraightBomb(hand, null, 6)) {
+        return true;
+    }
+
+    if (getHighestPlayWithWishStraightBomb(hand, null, 10)) {
+        return true;
+    }
+}
+
 function isBomb(selectedCards) {
     return (isValid4Bomb(selectedCards) || isValidStraightBomb(selectedCards));
 }
@@ -897,7 +919,8 @@ module.exports = {
     canPass: canPass,
     canFulfillWish: canFulfillWish,
     getPreviousPlay: getPreviousPlay,
-    rank: rank
+    rank: rank,
+    hasBomb: hasBomb
 }
 
 /*

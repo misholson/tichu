@@ -7,7 +7,7 @@ import { FormGroup, Button, Container, Row, Col } from 'reactstrap';
 import 'bootstrap';
 const { sortCards, removeFromHand, getPlayerIDs, addToHand } = require('./Helpers');
 const { constants } = require('./Constants');
-const { validPlays, detectPlayType, canPass, isValidPlay, canFulfillWish, rank } = require('./ValidPlays');
+const { validPlays, detectPlayType, canPass, isValidPlay, canFulfillWish, rank, hasBomb } = require('./ValidPlays');
 
 export const TichuBoard = (props) => {
 
@@ -73,7 +73,7 @@ export const TichuBoard = (props) => {
     const handleCardClicked = (cardID) => {
         if (phase === constants.phases.preHand.name && stage === constants.phases.preHand.stages.passCards) {
             selectCardToPass(cardID);
-        } else if (phase === constants.phases.playTrick.name && playerID === ctx.currentPlayer) {
+        } else if (phase === constants.phases.playTrick.name) {
             selectCardForPlay(cardID);
         }
     }
@@ -120,6 +120,10 @@ export const TichuBoard = (props) => {
         }
     }
 
+    const onBombClicked = () => {
+        // TODO
+    }
+
     const onWish = (rank) => {
         moves.makeWish(rank);
     }
@@ -140,6 +144,11 @@ export const TichuBoard = (props) => {
     }
 
     const playButtonDisabled = () => {
+        // If the player is not active, the play button should be disabled.
+        if (!isPlayerActive) {
+            return true;
+        }
+
         var isValidGenerally = isValidPlay(selectedCards, G.currentTrick);
         if (isValidGenerally) {
             if (canFulfillWish(G, ctx) && !selectedCards.some((cardID) => rank(cardID) === G.wish)) {
@@ -150,8 +159,6 @@ export const TichuBoard = (props) => {
 
         return !isValidGenerally;
     }
-
-    // TODO: Figure out if the player must play due to a wish.
 
     return (
         <>
@@ -199,10 +206,15 @@ export const TichuBoard = (props) => {
                                 <Button color="primary" className="mx-1" onClick={onTakeClicked}>Take</Button>
                             </FormGroup>
                         }
-                        {isPlayerActive && stage === null &&
+                        {(isPlayerActive) &&
                             <FormGroup className="under-hand">
                                 <Button color="primary" className="mx-1" onClick={onPlayClicked} disabled={playButtonDisabled()}>Play</Button>
                                 <Button color="primary" className="mx-1" onClick={onPassClicked} disabled={!canPass(G, ctx) && hand.length > 0}>Pass</Button>
+                            </FormGroup>
+                        }
+                        {ctx.activePlayers[playerID] === constants.phases.playTrick.stages.bomb && hasBomb(hand) &&
+                            <FormGroup className="under-hand">
+                                <Button color="primary" className="mx-1" onClick={onBombClicked} disabled={!hasBomb(selectedCards)} > Bomb</Button>
                             </FormGroup>
                         }
                         {isPlayerActive && stage === constants.phases.playTrick.stages.makeWish &&

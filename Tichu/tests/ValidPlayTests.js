@@ -16,7 +16,7 @@
  * mahjong: 55
  */
 
-const { validPlays, detectPlayType, canPass, isValidPlay } = require('../src/ValidPlays');
+const { validPlays, detectPlayType, canPass, isValidPlay, hasBomb } = require('../src/ValidPlays');
 const { sortCards } = require('../src/Helpers');
 
 const tests = {
@@ -304,6 +304,30 @@ const tests = {
         var wishPlay = validPlays.straightFlush.getHighestPlayWithWish(hand, currentTrick, wish);
 
         assertFalsy(wishPlay);
+    },
+    hasBomb1: () => {
+        var hand = [2, 3, 4, 5, 6, 18, 19, 32, 33, 34, 35, 11, 14, 27]; // 4-8 pagodas
+        sortCards(hand);
+
+        assertTrue(hasBomb(hand));
+    },
+    hasBomb2: () => {
+        var hand = [46, 47, 48, 49, 50, 51, 10, 20, 22, 23, 25, 37, 38, 55];
+        sortCards(hand);
+
+        assertTrue(hasBomb(hand));
+    },
+    hasBomb3: () => {
+        var hand = [41, 42, 43, 44, 45, 14, 7, 21, 36, 24, 12, 9, 8, 54];
+        sortCards(hand);
+
+        assertTrue(hasBomb(hand));
+    },
+    hasBomb4: () => {
+        var hand = [0, 13, 26, 39, 1, 15, 16, 17, 28, 29, 30, 31, 52, 53]; // 4 bomb
+        sortCards(hand);
+
+        assertTrue(hasBomb(hand));
     }
 }
 
