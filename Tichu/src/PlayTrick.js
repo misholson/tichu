@@ -229,12 +229,29 @@ function clearTable(G, receivingPlayerID) {
 function trickEndIf(G, ctx) {
     var winner = findTrickWinner(G, ctx);
     // If the last player to play is also the current player.
+    var playerOutCount = countOutPlayers(G, ctx);
+    var previousPlay = getPreviousPlay(G.currentTrick);
+
+    // If the two players out are from the same team we can stop and clean up the hand now.
+    if (playerOutCount === 2) {
+        if (isOneTwo(G, ctx, ctx.playOrder[0]) || isOneTwo(G, ctx, ctx.playOrder[1])) {
+            return {
+                next: constants.phases.preHand.name
+            }
+        }
+    }
+
+    if (!winner && playerOutCount >= 3) {
+        // If the third player to go out was the last to play, they are the winner
+        // of that trick and we should proceed with cleaning up the trick (and ending the hand)
+        winner = previousPlay.player;
+    }
+
     if (winner) {
         console.debug(`trick will end with winner ${winner}`);
-        var playerOutCount = countOutPlayers(G, ctx);
         if (playerOutCount >= 3) {
             console.debug(`3 players are out. Hand will end.`);
-            if (getPreviousPlay(G.currentTrick).cards[0] === constants.specials.dragon) {
+            if (previousPlay.cards[0] === constants.specials.dragon) {
                 // If it's a dragon and the trick is over we can automatically give away the dragon to the opponent
                 // who is not out.
                 var playerIDs = getPlayerIDs(ctx, ctx.currentPlayer);
@@ -247,8 +264,8 @@ function trickEndIf(G, ctx) {
         } else {
             // If it's a dragon we won't end the trick quite yet.
             // The actual command to set the player to the passDragon phase is in turnEndIf
-            console.debug(`First card in the history is ${getPreviousPlay(G.currentTrick).cards[0]}`);
-            if (!G.currentTrick.receivingPlayerID && getPreviousPlay(G.currentTrick).cards[0] === constants.specials.dragon) {
+            console.debug(`First card in the history is ${previousPlay.cards[0]}`);
+            if (!G.currentTrick.receivingPlayerID && previousPlay.cards[0] === constants.specials.dragon) {
                 console.debug(`Setting active player to ${winner}`);
                 var activePlayers = {};
                 activePlayers[winner] = {
@@ -347,6 +364,12 @@ function onTrickEnd(G, ctx) {
     console.debug("------End Trick------\n");
     console.debug("------Begin Cleanup------\n");
     console.debug(`Cleaning up trick. Winner: ${winner}`);
+    var oneTwo = false;
+    if ((isOneTwo(G, ctx, ctx.playOrder[0]) || isOneTwo(G, ctx, ctx.playOrder[1])) && !winner) {
+        console.debug(`Someone went 1-2! Setting winner of trick to ${ctx.currentPlayer}`);
+        winner = ctx.currentPlayer; // If it's over due to a 1-2, just set the trick winner to whoever because it doesn't matter.
+        oneTwo = true;
+    }
     if (winner) {
         G.currentTrick.winner = winner;
 
@@ -362,7 +385,7 @@ function onTrickEnd(G, ctx) {
         G.previousTricks.unshift(G.currentTrick);
 
         var playerOutCount = countOutPlayers(G, ctx);
-        if (playerOutCount === 3) {
+        if (playerOutCount === 3 || oneTwo) {
             console.debug("\n---------- End Playing Tricks ----------\n");
 
             // Set the out order of the last player.
@@ -440,12 +463,12 @@ function updateScore(G, ctx) {
         }
 
         // Count score for this round.
-        if (isOneTwo(ctx.playOrder[0])) {
+        if (isOneTwo(G, ctx, ctx.playOrder[0])) {
             console.debug(`Team ${ctx.playOrder[0]}-${ctx.playOrder[2]} went one-two (first if)`);
-            G.roundScore[ctx.playOrder[0]] = 200;
-        } else if (isOneTwo(ctx.playOrder[1])) {
+            roundScore[ctx.playOrder[0]] = 200;
+        } else if (isOneTwo(G, ctx, ctx.playOrder[1])) {
             console.debug(`Team ${ctx.playOrder[1]}-${ctx.playOrder[3]} went one-two (second if)`);
-            G.roundScore[ctx.playOrder[1]] = 200;
+            roundScore[ctx.playOrder[1]] = 200;
         } else {
             for (var j = 0; j < ctx.numPlayers; j++) {
                 var playerID = ctx.playOrder[j];
@@ -508,7 +531,13 @@ function updateScore(G, ctx) {
     }
 }
 
-function isOneTwo(G, playerID) {
+function isOneTwo(G, ctx, playerID) {
+    var partnerID = getPlayerIDs(ctx, playerID).partner;
+    if (G.public.players[playerID].outOrder === 1 && G.public.players[partnerID].outOrder === 2) {
+        return true;
+    } else if (G.public.players[playerID].outOrder === 2 && G.public.players[partnerID].outOrder === 1) {
+        return true;
+    }
     return false;
 }
 

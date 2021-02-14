@@ -9,7 +9,7 @@ const TichuClient = Client({
     game: Tichu,
     board: TichuBoard,
     numPlayers: 4,
-    multiplayer: SocketIO({ server: 'localhost:1337' })
+    multiplayer: SocketIO({ server: `${window.location.hostname}:1337` })
 });
 
 const ExpandableClient = ({ playerID }) => {

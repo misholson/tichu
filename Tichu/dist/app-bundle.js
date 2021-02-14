@@ -69416,13 +69416,6 @@ function handAlmostFinished(game) {
         winner: "0",
         pass: false
       }];
-      G.currentTrick = {
-        plays: [],
-        player: "0",
-        cards: [22, 45, 19],
-        winner: "0",
-        pass: false
-      };
     } else {
       G.currentTrick = null;
     }
@@ -69567,7 +69560,7 @@ var TichuClient = Object(boardgame_io_react__WEBPACK_IMPORTED_MODULE_1__["Client
   board: _Board__WEBPACK_IMPORTED_MODULE_4__["TichuBoard"],
   numPlayers: 4,
   multiplayer: Object(boardgame_io_multiplayer__WEBPACK_IMPORTED_MODULE_2__["SocketIO"])({
-    server: 'localhost:1337'
+    server: "".concat(window.location.hostname, ":1337")
   })
 });
 
@@ -69945,7 +69938,7 @@ var TichuBoard = function TichuBoard(props) {
     color: "primary",
     className: "mx-1",
     onClick: onTakeClicked
-  }, "Take")), isPlayerActive && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
+  }, "Take")), isPlayerActive && stage !== constants.phases.playTrick.stages.makeWish && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
     className: "under-hand"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
     color: "primary",
@@ -70029,7 +70022,8 @@ var Sidebar = function Sidebar(_ref) {
     className: "header"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], null, ourScore(G.score)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], null, theirScore(G.score))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), G.scoreHistory && G.scoreHistory.map(function (score, ix) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], {
-      key: ix
+      key: ix,
+      className: "history"
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], null, ourScore(score)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], null, theirScore(score)));
   }));
 };
@@ -70341,7 +70335,7 @@ var tichu = {
   maxPlayers: 4
 };
 module.exports = {
-  Tichu: scenarios.giveAllPlayersBombs(tichu)
+  Tichu: scenarios.handAlmostFinished(tichu)
 };
 
 /***/ }),
@@ -70945,14 +70939,30 @@ function clearTable(G, receivingPlayerID) {
 function trickEndIf(G, ctx) {
   var winner = findTrickWinner(G, ctx); // If the last player to play is also the current player.
 
+  var playerOutCount = countOutPlayers(G, ctx);
+  var previousPlay = getPreviousPlay(G.currentTrick); // If the two players out are from the same team we can stop and clean up the hand now.
+
+  if (playerOutCount === 2) {
+    if (isOneTwo(G, ctx, ctx.playOrder[0]) || isOneTwo(G, ctx, ctx.playOrder[1])) {
+      return {
+        next: constants.phases.preHand.name
+      };
+    }
+  }
+
+  if (!winner && playerOutCount >= 3) {
+    // If the third player to go out was the last to play, they are the winner
+    // of that trick and we should proceed with cleaning up the trick (and ending the hand)
+    winner = previousPlay.player;
+  }
+
   if (winner) {
     console.debug("trick will end with winner ".concat(winner));
-    var playerOutCount = countOutPlayers(G, ctx);
 
     if (playerOutCount >= 3) {
       console.debug("3 players are out. Hand will end.");
 
-      if (getPreviousPlay(G.currentTrick).cards[0] === constants.specials.dragon) {
+      if (previousPlay.cards[0] === constants.specials.dragon) {
         // If it's a dragon and the trick is over we can automatically give away the dragon to the opponent
         // who is not out.
         var playerIDs = getPlayerIDs(ctx, ctx.currentPlayer);
@@ -70966,9 +70976,9 @@ function trickEndIf(G, ctx) {
     } else {
       // If it's a dragon we won't end the trick quite yet.
       // The actual command to set the player to the passDragon phase is in turnEndIf
-      console.debug("First card in the history is ".concat(getPreviousPlay(G.currentTrick).cards[0]));
+      console.debug("First card in the history is ".concat(previousPlay.cards[0]));
 
-      if (!G.currentTrick.receivingPlayerID && getPreviousPlay(G.currentTrick).cards[0] === constants.specials.dragon) {
+      if (!G.currentTrick.receivingPlayerID && previousPlay.cards[0] === constants.specials.dragon) {
         console.debug("Setting active player to ".concat(winner));
         var activePlayers = {};
         activePlayers[winner] = {
@@ -71068,6 +71078,14 @@ function onTrickEnd(G, ctx) {
   console.debug("------End Trick------\n");
   console.debug("------Begin Cleanup------\n");
   console.debug("Cleaning up trick. Winner: ".concat(winner));
+  var oneTwo = false;
+
+  if ((isOneTwo(G, ctx, ctx.playOrder[0]) || isOneTwo(G, ctx, ctx.playOrder[1])) && !winner) {
+    console.debug("Someone went 1-2! Setting winner of trick to ".concat(ctx.currentPlayer));
+    winner = ctx.currentPlayer; // If it's over due to a 1-2, just set the trick winner to whoever because it doesn't matter.
+
+    oneTwo = true;
+  }
 
   if (winner) {
     G.currentTrick.winner = winner; // Give the cards in the trick to the winner, or if a dragon trick to the opponent the winner chose.
@@ -71084,7 +71102,7 @@ function onTrickEnd(G, ctx) {
     G.previousTricks.unshift(G.currentTrick);
     var playerOutCount = countOutPlayers(G, ctx);
 
-    if (playerOutCount === 3) {
+    if (playerOutCount === 3 || oneTwo) {
       console.debug("\n---------- End Playing Tricks ----------\n"); // Set the out order of the last player.
 
       Object.values(G["public"].players).find(function (player) {
@@ -71163,12 +71181,12 @@ function updateScore(G, ctx) {
     } // Count score for this round.
 
 
-    if (isOneTwo(ctx.playOrder[0])) {
+    if (isOneTwo(G, ctx, ctx.playOrder[0])) {
       console.debug("Team ".concat(ctx.playOrder[0], "-").concat(ctx.playOrder[2], " went one-two (first if)"));
-      G.roundScore[ctx.playOrder[0]] = 200;
-    } else if (isOneTwo(ctx.playOrder[1])) {
+      roundScore[ctx.playOrder[0]] = 200;
+    } else if (isOneTwo(G, ctx, ctx.playOrder[1])) {
       console.debug("Team ".concat(ctx.playOrder[1], "-").concat(ctx.playOrder[3], " went one-two (second if)"));
-      G.roundScore[ctx.playOrder[1]] = 200;
+      roundScore[ctx.playOrder[1]] = 200;
     } else {
       for (var j = 0; j < ctx.numPlayers; j++) {
         var playerID = ctx.playOrder[j];
@@ -71229,7 +71247,15 @@ function updateScore(G, ctx) {
   }
 }
 
-function isOneTwo(G, playerID) {
+function isOneTwo(G, ctx, playerID) {
+  var partnerID = getPlayerIDs(ctx, playerID).partner;
+
+  if (G["public"].players[playerID].outOrder === 1 && G["public"].players[partnerID].outOrder === 2) {
+    return true;
+  } else if (G["public"].players[playerID].outOrder === 2 && G["public"].players[partnerID].outOrder === 1) {
+    return true;
+  }
+
   return false;
 }
 

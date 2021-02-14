@@ -72,13 +72,6 @@ function handAlmostFinished(game) {
                     pass: false
                 }
             ];
-            G.currentTrick = {
-                plays: [],
-                player: "0",
-                cards: [22, 45, 19],
-                winner: "0",
-                pass: false
-            }
         } else {
             G.currentTrick = null;
         }

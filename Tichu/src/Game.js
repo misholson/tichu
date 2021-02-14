@@ -93,5 +93,5 @@ const tichu = {
 
 
 module.exports = {
-    Tichu: scenarios.giveAllPlayersBombs(tichu)
+    Tichu: scenarios.handAlmostFinished(tichu)
 }

@@ -215,7 +215,7 @@ export const TichuBoard = (props) => {
                                 <Button color="primary" className="mx-1" onClick={onTakeClicked}>Take</Button>
                             </FormGroup>
                         }
-                        {(isPlayerActive) &&
+                        {isPlayerActive && stage !== constants.phases.playTrick.stages.makeWish &&
                             <FormGroup className="under-hand">
                                 <Button color="primary" className="mx-1" onClick={onPlayClicked} disabled={playButtonDisabled()}>Play</Button>
                                 <Button color="primary" className="mx-1" onClick={onPassClicked} disabled={!canPass(G, ctx) && hand.length > 0}>Pass</Button>
