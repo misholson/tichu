@@ -69770,7 +69770,8 @@ var TichuBoard = function TichuBoard(props) {
     }
   };
 
-  var onBombClicked = function onBombClicked() {// TODO
+  var onBombClicked = function onBombClicked() {
+    moves.playBomb(selectedCards);
   };
 
   var onWish = function onWish(rank) {
@@ -69802,7 +69803,7 @@ var TichuBoard = function TichuBoard(props) {
       return true;
     }
 
-    var isValidGenerally = isValidPlay(selectedCards, G.currentTrick);
+    var isValidGenerally = isValidPlay(_toConsumableArray(selectedCards), G.currentTrick);
 
     if (isValidGenerally) {
       if (canFulfillWish(G, ctx) && !selectedCards.some(function (cardID) {
@@ -69814,6 +69815,14 @@ var TichuBoard = function TichuBoard(props) {
     }
 
     return !isValidGenerally;
+  };
+
+  var bombButtonDisabled = function bombButtonDisabled() {
+    if (hasBomb(_toConsumableArray(selectedCards)) && isValidPlay(_toConsumableArray(selectedCards), G.currentTrick)) {
+      return false;
+    }
+
+    return true;
   };
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
@@ -69911,7 +69920,7 @@ var TichuBoard = function TichuBoard(props) {
     color: "primary",
     className: "mx-1",
     onClick: onBombClicked,
-    disabled: !hasBomb(selectedCards)
+    disabled: bombButtonDisabled()
   }, " Bomb")), isPlayerActive && stage === constants.phases.playTrick.stages.makeWish && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
     className: "under-hand"
   }, Array(13).fill(null).map(function (_, ix) {
@@ -70583,6 +70592,18 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
 var _require = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boardgame.io/dist/esm/core.js"),
     INVALID_MOVE = _require.INVALID_MOVE,
     TurnOrder = _require.TurnOrder,
@@ -70700,25 +70721,32 @@ function onTurnBegin(G, ctx) {
 }
 
 function playCards(G, ctx, cards) {
-  console.debug("player ".concat(ctx.currentPlayer, " playing cards ").concat(JSON.stringify(cards)));
+  if (ctx.currentPlayer !== ctx.playerID) {
+    console.debug("Only current player ".concat(ctx.currentPlayer, " can play cards"));
+    return INVALID_MOVE;
+  }
+
+  return playCardsCore(G, ctx, cards, ctx.currentPlayer);
+}
+
+function playCardsCore(G, ctx, cards, playerID) {
+  console.debug("player ".concat(playerID, " playing cards ").concat(JSON.stringify(cards)));
 
   if (!cards || cards.length === 0 || cards.length > 14) {
     console.debug("Invalid cards array");
     return INVALID_MOVE;
   }
 
-  var type;
-
-  if (G.currentTrick) {
-    type = G.currentTrick.type;
-  }
-
-  if (!type) {
-    type = detectPlayType(cards);
-  }
-
+  var type = detectPlayType(cards);
   console.debug("Detected play type: ".concat(type));
   var playType = validPlays[type];
+
+  if (G.currentTrick) {
+    if (type !== G.currentTrick.type && !playType.isBomb) {
+      console.debug("Play type ".concat(type, " does not match current trick type ").concat(G.currentTrick.type));
+      return INVALID_MOVE;
+    }
+  }
 
   if (!playType.isValid(cards, G.currentTrick)) {
     console.debug("Invalid play");
@@ -70750,20 +70778,23 @@ function playCards(G, ctx, cards) {
       type: type,
       plays: []
     };
+  } else if (playType.isBomb) {
+    // If it's a bomb we should update the trick type.
+    G.currentTrick.type = type;
   }
 
   console.debug("Adding play to current trick");
   G.currentTrick.plays.unshift({
-    cards: cards,
+    cards: _toConsumableArray(cards),
     player: ctx.currentPlayer,
     pass: false
   });
   console.debug("Removing cards from player hand");
   cards.forEach(function (c) {
-    return removeFromHand(G.players[ctx.currentPlayer].hand, c);
+    return removeFromHand(G.players[playerID].hand, c);
   });
-  G["public"].players[ctx.currentPlayer].cards = G.players[ctx.currentPlayer].hand.length;
-  var publicPlayerInfo = G["public"].players[ctx.currentPlayer];
+  G["public"].players[playerID].cards = G.players[playerID].hand.length;
+  var publicPlayerInfo = G["public"].players[playerID];
 
   if (publicPlayerInfo.cards === 0) {
     publicPlayerInfo.out = true;
@@ -70820,6 +70851,10 @@ function pass(G, ctx) {
     pass: true
   });
   ctx.events.endTurn();
+}
+
+function playBomb(G, ctx, cards) {
+  return playCardsCore(G, ctx, cards, ctx.playerID);
 }
 
 function clearTable(G, receivingPlayerID) {
@@ -71160,12 +71195,14 @@ var playTrick = {
           passDragon: passDragon
         }
       },
-      wait: {}
+      bomb: {
+        moves: {
+          playBomb: playBomb,
+          playCards: playCards,
+          pass: pass
+        }
+      }
     }
-  },
-  moves: {
-    playCards: playCards,
-    pass: pass
   },
   endIf: trickEndIf,
   onEnd: onTrickEnd
@@ -71519,19 +71556,19 @@ function detectPlayType(selectedCards) {
   }
 
   return Object.keys(validPlays).find(function (playType) {
-    return validPlays[playType].isValid(selectedCards);
+    return validPlays[playType].isValid(_toConsumableArray(selectedCards));
   }) || "invalid";
 }
 
 function isValidPlay(selectedCards, currentTrick, wish) {
-  var selectedPlayType = detectPlayType(selectedCards);
+  var selectedPlayType = detectPlayType(_toConsumableArray(selectedCards));
 
-  if (currentTrick && currentTrick.type !== selectedPlayType) {
+  if (currentTrick && currentTrick.type !== selectedPlayType && !validPlays[selectedPlayType].isBomb) {
     return false;
   } // This is not a valid play of the selected type or it doesn't beat the current highest play.
 
 
-  if (!validPlays[selectedPlayType].isValid(selectedCards, currentTrick)) {
+  if (!validPlays[selectedPlayType].isValid(_toConsumableArray(selectedCards), currentTrick)) {
     return false;
   }
 
@@ -72336,7 +72373,7 @@ function hasBomb(hand) {
 }
 
 function isBomb(selectedCards) {
-  return isValid4Bomb(selectedCards) || isValidStraightBomb(selectedCards);
+  return isValid4Bomb(_toConsumableArray(selectedCards)) || isValidStraightBomb(_toConsumableArray(selectedCards));
 }
 
 function rank(card) {

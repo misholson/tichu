@@ -61,17 +61,17 @@ const validPlays = {
 function detectPlayType(selectedCards) {
     if (!selectedCards || selectedCards.length === 0) { return "invalid"; }
 
-    return Object.keys(validPlays).find((playType) => validPlays[playType].isValid(selectedCards)) || "invalid";
+    return Object.keys(validPlays).find((playType) => validPlays[playType].isValid([...selectedCards])) || "invalid";
 }
 
 function isValidPlay(selectedCards, currentTrick, wish) {
-    var selectedPlayType = detectPlayType(selectedCards);
-    if (currentTrick && currentTrick.type !== selectedPlayType) {
+    var selectedPlayType = detectPlayType([...selectedCards]);
+    if (currentTrick && currentTrick.type !== selectedPlayType && !validPlays[selectedPlayType].isBomb) {
         return false;
     }
 
     // This is not a valid play of the selected type or it doesn't beat the current highest play.
-    if (!validPlays[selectedPlayType].isValid(selectedCards, currentTrick)) {
+    if (!validPlays[selectedPlayType].isValid([...selectedCards], currentTrick)) {
         return false;
     }
 
@@ -823,7 +823,7 @@ function hasBomb(hand) {
 }
 
 function isBomb(selectedCards) {
-    return (isValid4Bomb(selectedCards) || isValidStraightBomb(selectedCards));
+    return (isValid4Bomb([...selectedCards]) || isValidStraightBomb([...selectedCards]));
 }
 
 function rank(card) {

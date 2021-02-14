@@ -88,25 +88,34 @@ function onTurnBegin(G, ctx) {
 }
 
 function playCards(G, ctx, cards) {
-    console.debug(`player ${ctx.currentPlayer} playing cards ${JSON.stringify(cards)}`);
+    if (ctx.currentPlayer !== ctx.playerID) {
+        console.debug(`Only current player ${ctx.currentPlayer} can play cards`);
+        return INVALID_MOVE;
+    }
+
+    return playCardsCore(G, ctx, cards, ctx.currentPlayer);
+}
+
+function playCardsCore(G, ctx, cards, playerID) {
+    console.debug(`player ${playerID} playing cards ${JSON.stringify(cards)}`);
 
     if (!cards || cards.length === 0 || cards.length > 14) {
         console.debug("Invalid cards array");
         return INVALID_MOVE;
     }
 
-    var type;
-    if (G.currentTrick) {
-        type = G.currentTrick.type;
-    }
-
-    if (!type) {
-        type = detectPlayType(cards);
-    }
+    var type = detectPlayType(cards);
 
     console.debug(`Detected play type: ${type}`);
 
     var playType = validPlays[type];
+
+    if (G.currentTrick) {
+        if (type !== G.currentTrick.type && !playType.isBomb) {
+            console.debug(`Play type ${type} does not match current trick type ${G.currentTrick.type}`);
+            return INVALID_MOVE;
+        }
+    }
 
     if (!playType.isValid(cards, G.currentTrick)) {
         console.debug(`Invalid play`);
@@ -132,20 +141,23 @@ function playCards(G, ctx, cards) {
             type: type,
             plays: []
         };
+    } else if (playType.isBomb) {
+        // If it's a bomb we should update the trick type.
+        G.currentTrick.type = type;
     }
 
     console.debug(`Adding play to current trick`);
     G.currentTrick.plays.unshift({
-        cards: cards,
+        cards: [...cards],
         player: ctx.currentPlayer,
         pass: false
     });
 
     console.debug(`Removing cards from player hand`);
-    cards.forEach((c) => removeFromHand(G.players[ctx.currentPlayer].hand, c));
-    G.public.players[ctx.currentPlayer].cards = G.players[ctx.currentPlayer].hand.length;
+    cards.forEach((c) => removeFromHand(G.players[playerID].hand, c));
+    G.public.players[playerID].cards = G.players[playerID].hand.length;
 
-    var publicPlayerInfo = G.public.players[ctx.currentPlayer];
+    var publicPlayerInfo = G.public.players[playerID];
     if (publicPlayerInfo.cards === 0) {
         publicPlayerInfo.out = true;
         publicPlayerInfo.outOrder = countOutPlayers(G, ctx);
@@ -195,6 +207,10 @@ function pass(G, ctx) {
         pass: true
     })
     ctx.events.endTurn();
+}
+
+function playBomb(G, ctx, cards) {
+    return playCardsCore(G, ctx, cards, ctx.playerID);
 }
 
 function clearTable(G, receivingPlayerID) {
@@ -529,12 +545,14 @@ const playTrick = {
                     passDragon: passDragon
                 }
             },
-            wait: {}
+            bomb: {
+                moves: {
+                    playBomb: playBomb,
+                    playCards: playCards,
+                    pass: pass
+                }
+            }
         }
-    },
-    moves: {
-        playCards: playCards,
-        pass: pass
     },
     endIf: trickEndIf,
     onEnd: onTrickEnd

@@ -121,7 +121,7 @@ export const TichuBoard = (props) => {
     }
 
     const onBombClicked = () => {
-        // TODO
+        moves.playBomb(selectedCards);
     }
 
     const onWish = (rank) => {
@@ -149,7 +149,7 @@ export const TichuBoard = (props) => {
             return true;
         }
 
-        var isValidGenerally = isValidPlay(selectedCards, G.currentTrick);
+        var isValidGenerally = isValidPlay([...selectedCards], G.currentTrick);
         if (isValidGenerally) {
             if (canFulfillWish(G, ctx) && !selectedCards.some((cardID) => rank(cardID) === G.wish)) {
                 // If they can fulfill the wish, but this card doesn't fulfill it, the play button should be disabled.
@@ -158,6 +158,14 @@ export const TichuBoard = (props) => {
         }
 
         return !isValidGenerally;
+    }
+
+    const bombButtonDisabled = () => {
+        if (hasBomb([...selectedCards]) && isValidPlay([...selectedCards], G.currentTrick)) {
+            return false;
+        }
+
+        return true;
     }
 
     return (
@@ -214,7 +222,7 @@ export const TichuBoard = (props) => {
                         }
                         {ctx.activePlayers[playerID] === constants.phases.playTrick.stages.bomb && hasBomb(hand) &&
                             <FormGroup className="under-hand">
-                                <Button color="primary" className="mx-1" onClick={onBombClicked} disabled={!hasBomb(selectedCards)} > Bomb</Button>
+                                <Button color="primary" className="mx-1" onClick={onBombClicked} disabled={bombButtonDisabled()} > Bomb</Button>
                             </FormGroup>
                         }
                         {isPlayerActive && stage === constants.phases.playTrick.stages.makeWish &&
