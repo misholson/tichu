@@ -33,4 +33,25 @@ ul.hand-vertical {
 
 
 .sidebar .header {
+    font-size: medium;
+}
+
+.play-area .left {
+    top: 84px;
+    left: 16px;
+}
+
+.play-area .top {
+    top: 16px;
+    left: 140px;
+}
+
+.play-area .right {
+    top: 56px;
+    left: 315px;
+}
+
+.play-area .bottom {
+    top: 182px;
+    left: 210px;
 }

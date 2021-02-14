@@ -69910,7 +69910,9 @@ var TichuBoard = function TichuBoard(props) {
     onPassConfirmed: handlePassConfirmed,
     onAcceptConfirmed: handleAcceptConfirmed
   }), phase === constants.phases.playTrick.name && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_PlayArea__WEBPACK_IMPORTED_MODULE_4__["PlayArea"], {
-    currentTrick: G.currentTrick
+    currentTrick: G.currentTrick,
+    previousTricks: G.previousTricks,
+    playerIDs: playerIDs
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
     xs: "2",
     className: "board-side"
@@ -69950,7 +69952,7 @@ var TichuBoard = function TichuBoard(props) {
     color: "primary",
     className: "mx-1",
     onClick: onTakeClicked
-  }, "Take")), (stage === constants.phases.preHand.stages.passCards || stage === constants.phases.preHand.stages.acceptPass) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
+  }, "Take")), (stage === constants.phases.preHand.stages.passCards || stage === constants.phases.preHand.stages.acceptPass || stage === constants.phases.preHand.stages.acceptPass) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
     className: "under-hand"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
     color: "primary",
@@ -70143,7 +70145,7 @@ module.exports.constants = {
         makeWish: "makeWish",
         passDragon: "passDragon",
         bomb: "bomb",
-        wait: "wait"
+        acknowledgeTrick: "acknowledgeTrick"
       }
     }
   },
@@ -70361,8 +70363,8 @@ var tichu = {
   maxPlayers: 4
 };
 module.exports = {
-  //Tichu: scenarios.handAlmostFinished(tichu)
-  Tichu: tichu
+  Tichu: scenarios.skipPreHandPhase(tichu) //Tichu: tichu
+
 };
 
 /***/ }),
@@ -70655,17 +70657,53 @@ var _require = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
     constants = _require.constants;
 
 var PlayArea = function PlayArea(_ref) {
-  var currentTrick = _ref.currentTrick;
+  var currentTrick = _ref.currentTrick,
+      previousTricks = _ref.previousTricks,
+      playerIDs = _ref.playerIDs,
+      playClearAnimation = _ref.playClearAnimation;
+  var displayingPreviousTrickOutcome = false;
+
+  if ((!currentTrick || !currentTrick.plays || currentTrick.plays.length === 0) && previousTricks && previousTricks.length > 0) {
+    // If the current trick hasn't started yet, keep displaying the previous trick with a note.
+    currentTrick = previousTricks[0];
+    displayingPreviousTrickOutcome = true;
+  }
+
+  var plays = [];
+
+  if (currentTrick) {
+    for (var i = currentTrick.plays.length - 1; i >= 0 && plays.length <= 4; i--) {
+      var play = currentTrick.plays[i];
+
+      if (!play.pass) {
+        var positionClass;
+
+        if (play.player === playerIDs.left) {
+          positionClass = "left";
+        } else if (play.player === playerIDs.partner) {
+          positionClass = "top";
+        } else if (play.player === playerIDs.right) {
+          positionClass = "right";
+        } else {
+          positionClass = "bottom";
+        }
+
+        plays.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+          className: "play clearfix ".concat(positionClass, " clear-cards-right"),
+          style: {
+            zIndex: 999 - i
+          },
+          key: i
+        }, "Player ", play.player, " ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
+          hand: play.cards
+        })));
+      }
+    }
+  }
+
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "play-area"
-  }, "\xA0", currentTrick && currentTrick.plays && currentTrick.plays.map(function (play, ix) {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-      className: play.pass ? "pass clearfix" : "play clearfix",
-      key: ix
-    }, "Player ", play.player, " ", play.pass ? "Passed" : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
-      hand: play.cards
-    }));
-  }));
+  }, "\xA0", plays);
 };
 
 /***/ }),

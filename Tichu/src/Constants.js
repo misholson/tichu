@@ -16,7 +16,7 @@ module.exports.constants = {
                 makeWish: "makeWish",
                 passDragon: "passDragon",
                 bomb: "bomb",
-                wait: "wait"
+                acknowledgeTrick: "acknowledgeTrick"
             }
         }
     },

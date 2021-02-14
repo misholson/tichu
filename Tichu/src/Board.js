@@ -198,7 +198,7 @@ export const TichuBoard = (props) => {
                     </Col>
                     <Col xs="8" className="board-middle">
                         {phase === constants.phases.preHand.name && <PassArea selectedCards={stage === constants.phases.preHand.stages.passCards ? passedCards : receivedCards} stage={stage} readyToPlay={G.public.players[playerID].readyToPlay} onReturnPass={handleReturnPass} onPassConfirmed={handlePassConfirmed} onAcceptConfirmed={handleAcceptConfirmed} />}
-                        {phase === constants.phases.playTrick.name && <PlayArea currentTrick={G.currentTrick} />}
+                        {phase === constants.phases.playTrick.name && <PlayArea currentTrick={G.currentTrick} previousTricks={G.previousTricks} playerIDs={playerIDs}/>}
                     </Col>
                     <Col xs="2" className="board-side">
                         <Player playerID={playerIDs.right} phase={phase} currentPlayer={ctx.currentPlayer} tichu={G.public.players[playerIDs.right].tichu} grand={G.public.players[playerIDs.right].grand} />
