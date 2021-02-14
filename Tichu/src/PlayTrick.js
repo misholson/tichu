@@ -93,10 +93,11 @@ function playCards(G, ctx, cards) {
         return INVALID_MOVE;
     }
 
-    return playCardsCore(G, ctx, cards, ctx.currentPlayer);
+    return playCardsCore(G, ctx, cards);
 }
 
-function playCardsCore(G, ctx, cards, playerID) {
+function playCardsCore(G, ctx, cards) {
+    var playerID = ctx.playerID;
     console.debug(`player ${playerID} playing cards ${JSON.stringify(cards)}`);
 
     if (!cards || cards.length === 0 || cards.length > 14) {
@@ -149,7 +150,7 @@ function playCardsCore(G, ctx, cards, playerID) {
     console.debug(`Adding play to current trick`);
     G.currentTrick.plays.unshift({
         cards: [...cards],
-        player: ctx.currentPlayer,
+        player: playerID,
         pass: false
     });
 
@@ -192,25 +193,32 @@ function makeWish(G, ctx, wish) {
 }
 
 function pass(G, ctx) {
-    // Put this in here in case the logic to auto-pass when are out isn't working right.
-    if (G.players[ctx.currentPlayer].hand.length === 0) { return true; }
-
-    if (!canPass(G, ctx)) {
-        console.debug(`Invalid move: Player ${ctx.currentPlayer} tried to pass on the first play of a trick or player must play due to a wish`);
+    var playerID = ctx.playerID;
+    if (ctx.currentPlayer !== ctx.playerID) {
+        console.debug(`Only current player ${ctx.currentPlayer} can pass`);
         return INVALID_MOVE;
     }
 
-    console.debug(`Player ${ctx.currentPlayer} passes`);
+    // Put this in here in case the logic to auto-pass when are out isn't working right.
+    if (G.players[playerID].hand.length === 0) { return true; }
+
+    if (!canPass(G, ctx)) {
+        console.debug(`Invalid move: Player ${playerID} tried to pass on the first play of a trick or player must play due to a wish`);
+        return INVALID_MOVE;
+    }
+
+    console.debug(`Player ${playerID} passes`);
     G.currentTrick.plays.unshift({
         cards: [],
-        player: ctx.currentPlayer,
+        player: playerID,
         pass: true
     })
     ctx.events.endTurn();
 }
 
 function playBomb(G, ctx, cards) {
-    return playCardsCore(G, ctx, cards, ctx.playerID);
+    console.debug(`Player ${ctx.playerID} is playing a bomb!`);
+    return playCardsCore(G, ctx, cards);
 }
 
 function clearTable(G, receivingPlayerID) {

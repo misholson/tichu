@@ -69809,6 +69809,7 @@ var TichuBoard = function TichuBoard(props) {
 
   var onBombClicked = function onBombClicked() {
     moves.playBomb(selectedCards);
+    setSelectedCards([]);
   };
 
   var onWish = function onWish(rank) {
@@ -70363,7 +70364,7 @@ var tichu = {
   maxPlayers: 4
 };
 module.exports = {
-  Tichu: scenarios.skipPreHandPhase(tichu) //Tichu: tichu
+  Tichu: scenarios.giveAllPlayersBombs(tichu) //Tichu: tichu
 
 };
 
@@ -70689,7 +70690,7 @@ var PlayArea = function PlayArea(_ref) {
         }
 
         plays.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-          className: "play clearfix ".concat(positionClass, " clear-cards-right"),
+          className: "play clearfix ".concat(positionClass),
           style: {
             zIndex: 999 - i
           },
@@ -70855,10 +70856,11 @@ function playCards(G, ctx, cards) {
     return INVALID_MOVE;
   }
 
-  return playCardsCore(G, ctx, cards, ctx.currentPlayer);
+  return playCardsCore(G, ctx, cards);
 }
 
-function playCardsCore(G, ctx, cards, playerID) {
+function playCardsCore(G, ctx, cards) {
+  var playerID = ctx.playerID;
   console.debug("player ".concat(playerID, " playing cards ").concat(JSON.stringify(cards)));
 
   if (!cards || cards.length === 0 || cards.length > 14) {
@@ -70915,7 +70917,7 @@ function playCardsCore(G, ctx, cards, playerID) {
   console.debug("Adding play to current trick");
   G.currentTrick.plays.unshift({
     cards: _toConsumableArray(cards),
-    player: ctx.currentPlayer,
+    player: playerID,
     pass: false
   });
   console.debug("Removing cards from player hand");
@@ -70963,27 +70965,35 @@ function makeWish(G, ctx, wish) {
 }
 
 function pass(G, ctx) {
-  // Put this in here in case the logic to auto-pass when are out isn't working right.
-  if (G.players[ctx.currentPlayer].hand.length === 0) {
+  var playerID = ctx.playerID;
+
+  if (ctx.currentPlayer !== ctx.playerID) {
+    console.debug("Only current player ".concat(ctx.currentPlayer, " can pass"));
+    return INVALID_MOVE;
+  } // Put this in here in case the logic to auto-pass when are out isn't working right.
+
+
+  if (G.players[playerID].hand.length === 0) {
     return true;
   }
 
   if (!canPass(G, ctx)) {
-    console.debug("Invalid move: Player ".concat(ctx.currentPlayer, " tried to pass on the first play of a trick or player must play due to a wish"));
+    console.debug("Invalid move: Player ".concat(playerID, " tried to pass on the first play of a trick or player must play due to a wish"));
     return INVALID_MOVE;
   }
 
-  console.debug("Player ".concat(ctx.currentPlayer, " passes"));
+  console.debug("Player ".concat(playerID, " passes"));
   G.currentTrick.plays.unshift({
     cards: [],
-    player: ctx.currentPlayer,
+    player: playerID,
     pass: true
   });
   ctx.events.endTurn();
 }
 
 function playBomb(G, ctx, cards) {
-  return playCardsCore(G, ctx, cards, ctx.playerID);
+  console.debug("Player ".concat(ctx.playerID, " is playing a bomb!"));
+  return playCardsCore(G, ctx, cards);
 }
 
 function clearTable(G, receivingPlayerID) {

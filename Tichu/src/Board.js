@@ -126,6 +126,7 @@ export const TichuBoard = (props) => {
 
     const onBombClicked = () => {
         moves.playBomb(selectedCards);
+        setSelectedCards([]);
     }
 
     const onWish = (rank) => {
