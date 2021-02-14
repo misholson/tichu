@@ -17,7 +17,7 @@ export const Hand = ({ hand, selectedCards, onCardClicked }) => {
 
 export const PartnerHand = ({ backs }) => {
     return (
-        <ul className="hand-vertical hand">
+        <ul className="hand">
             {backs && Array(backs).fill(null).map((_, i) => <li key={i}><Card cardID={"back"} /></li>)}
         </ul>
     )
@@ -26,9 +26,9 @@ export const PartnerHand = ({ backs }) => {
 export const OpponentHand = ({ backs }) => {
     return (
         <ul className="hand-vertical hand">
-            {backs && Array(Math.floor((14 - backs)/2)).fill(null).map((_, i) => <li key={i}><div className="card-spacer">&nbsp;</div></li>)}
-            {backs && Array(backs).fill(null).map((_, i) => <li key={i}><div className="card-back-rotated"></div></li>)}
-            {backs && Array(Math.ceil((14 - backs)/2)).fill(null).map((_, i) => <li key={i}><div className="card-spacer">&nbsp;</div></li>)}
+            {backs && Array(Math.floor((14 - backs)/2)).fill(null).map((_, i) => <li key={i}><div className="card-spacer card-shape">&nbsp;</div></li>)}
+            {backs && Array(backs).fill(null).map((_, i) => <li key={i}><div className="card-back-rotated card-shape"></div></li>)}
+            {backs && Array(Math.ceil((14 - backs)/2)).fill(null).map((_, i) => <li key={i}><div className="card-spacer card-shape">&nbsp;</div></li>)}
         </ul>
         )
 }

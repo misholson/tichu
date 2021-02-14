@@ -147,7 +147,14 @@
     <Content Include="src\ValidPlays.js">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="styles\tichu.css">
+    <Content Include="styles\general.css">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="styles\tichu.css" />
+    <Content Include="styles\tichuM.css">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="styles\tichuSM.css">
       <SubType>Code</SubType>
     </Content>
     <Content Include="tests\ValidPlayTests.js">

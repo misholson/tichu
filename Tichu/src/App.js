@@ -31,15 +31,16 @@ const ExpandableClient = ({ playerID }) => {
 }
 
 export const App = () => (
-    <Lobby
+    /*<TichuClient playerID="0" />*/
+    /*<Lobby
         gameServer={`http://localhost:1337`}
         lobbyServer={`http://localhost:8000`}
         gameComponents={[
             { game: Tichu, board: TichuBoard }
         ]}
-    />
+    />*/
 
-    /*<table style={{ width: "100%" }}>
+    <table style={{ width: "100%" }}>
         <tbody>
             <tr>
                 <td><ExpandableClient playerID="0" /></td>
@@ -54,5 +55,5 @@ export const App = () => (
                 <td><ExpandableClient playerID="3" /></td>
             </tr>
         </tbody>
-    </table>*/
+    </table>
 );

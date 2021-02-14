@@ -10,7 +10,7 @@ const server = Server({ games: [Tichu] });
 
 const lobbyConfig = {
     apiPort: 8000,
-    apiCallback: () => console.log("Running Lobby API on port 8000")
+    apiCallback: (...args) => console.log(`Running Lobby API on port 8000: ${JSON.stringify(args)}`)
 };
 
 var staticPath = path.join(__dirname, '/');

@@ -1,0 +1,32 @@
+.hand .card-shape {
+    width: 56px;
+    height: 84px;
+    margin-left: -40px;
+}
+
+
+.hand-vertical .card-shape {
+    width: 84px;
+    height: 56px;
+    margin-top: -45px;
+}
+
+.hand-vertical .card-spacer {
+    width: 84px;
+    height: 56px;
+    margin-top: -40px;
+    border: 0px;
+}
+
+ul.hand-vertical {
+    margin-top: 25px;
+}
+
+.card-shape {
+    width: 56px;
+    height: 84px;
+}
+
+.card-selected {
+    margin-top: 12px;
+}

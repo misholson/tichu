@@ -1,0 +1,87 @@
+.hand .card-front {
+    border: 1px solid black;
+    border-radius: 5px;
+    box-shadow: 1px 1px 5px #555;
+    float: left;
+}
+
+.hand-vertical .card-back-rotated {
+    border: 1px solid black;
+    border-radius: 5px;
+    box-shadow: 1px 1px 5px #555;
+    /*float: left;*/
+    background-image: url("/images/back_rotated.jpg");
+    background-position: center;
+    background-size: cover;
+}
+
+.hand-vertical .card-spacer {
+    border: 0px;
+    margin-top: -50px;
+}
+
+.under-hand-buttons {
+    width: 100%;
+}
+
+.under-hand-buttons .form-group {
+    margin: auto;
+}
+
+.pass-area {
+}
+
+.card-front {
+    border: 1px solid black;
+    border-radius: 5px;
+    box-shadow: 1px 1px 5px #555;
+}
+
+.play-area .play {
+    height: 150px;
+    float: none;
+    width: 100%;
+}
+
+.play-area .pass {
+    float: none;
+    width: 100%;
+}
+
+.play-area {
+    width: 100%;
+    overflow-y: auto;
+    height: 100%;
+}
+
+.hand .selectedCard {
+    padding-bottom: 20px;
+}
+
+ul.hand {
+    list-style: none;
+}
+
+.board {
+    border: 1px solid black;
+    height: 100%; /* Can I make this more dynamic later?*/
+    width: 80%;
+    float: left;
+    background-color: #2a603b;
+}
+
+.sidebar {
+    border: 1px solid black;
+    float: left;
+    height: 100%;
+    width: 20%;
+}
+
+.board-row div {
+    float: left;
+}
+
+.board-middle table {
+    margin: auto;
+    margin-top: 50px;
+}

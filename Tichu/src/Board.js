@@ -173,39 +173,39 @@ export const TichuBoard = (props) => {
         <div className="board">
             <Container>
                 <Row className="board-row clearfix">
-                    <Col md={2} className="board-side">
+                    <Col xs="2" className="board-side">
                         &nbsp;
                     </Col>
-                    <Col md={8} className="board-middle">
+                    <Col xs="8" className="board-middle">
                         <Player playerID={playerIDs.partner} phase={phase} currentPlayer={ctx.currentPlayer} />
                         <PartnerHand backs={G.public.players[playerIDs.partner].cards} />
                         <Clear />
                     </Col>
-                    <Col md={2} className="board-side">
+                    <Col xs="2" className="board-side">
                         &nbsp;
                     </Col>
                 </Row>
                 <Row className="board-row clearfix">
-                    <Col md={2} className="board-side">
+                    <Col xs="2" className="board-side">
                         <Player playerID={playerIDs.left} phase={phase} currentPlayer={ctx.currentPlayer} />
                         <OpponentHand backs={G.public.players[playerIDs.left].cards} />
                         <Clear />
                     </Col>
-                    <Col md={8} className="board-middle">
+                    <Col xs="8" className="board-middle">
                         {phase === constants.phases.preHand.name && <PassArea selectedCards={stage === constants.phases.preHand.stages.passCards ? passedCards : receivedCards} stage={stage} readyToPlay={G.public.players[playerID].readyToPlay} onReturnPass={handleReturnPass} onPassConfirmed={handlePassConfirmed} onAcceptConfirmed={handleAcceptConfirmed} />}
                         {phase === constants.phases.playTrick.name && <PlayArea currentTrick={G.currentTrick} />}
                     </Col>
-                    <Col md={2} className="board-side">
+                    <Col xs="2" className="board-side">
                         <Player playerID={playerIDs.right} phase={phase} currentPlayer={ctx.currentPlayer} />
                         <OpponentHand backs={G.public.players[playerIDs.right].cards} />
                         <Clear />
                     </Col>
                 </Row>
                 <Row className="board-row clearfix">
-                    <Col md={2} className="board-side">
+                    <Col xs="2" className="board-side">
                             &nbsp;{G.wish && <>Wish: {wishRank(G.wish)}</>}
                     </Col>
-                    <Col md={8} className="board-middle">
+                    <Col xs="8" className="board-middle">
                         <Player playerID={playerID} phase={phase} currentPlayer={ctx.currentPlayer} />
                         <Hand hand={hand} selectedCards={selectedCards} onCardClicked={handleCardClicked} />
                         {stage === constants.phases.preHand.stages.takeOrGrand &&
@@ -248,7 +248,7 @@ export const TichuBoard = (props) => {
                         }
                         <Clear />
                     </Col>
-                    <Col md={2} className="board-side">
+                    <Col xs="2" className="board-side">
                         &nbsp;
                     </Col>
                 </Row>

@@ -14,8 +14,11 @@ export const Card = ({ cardID, selected, onCardClicked }) => {
         backgroundSize: "cover"
     };
 
+    var classes = "card-front card-shape";
+
     if (!selected) {
-        style.marginTop = "20px";
+        classes += " card-selected";
+        //style.marginTop = "20px";
     }
 
     const handleClick = () => {
@@ -25,7 +28,7 @@ export const Card = ({ cardID, selected, onCardClicked }) => {
     }
 
     return (
-        <div className="card-front" style={style} onClick={handleClick}>
+        <div className={classes} style={style} onClick={handleClick}>
         </div>
         );
 }
