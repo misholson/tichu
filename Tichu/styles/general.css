@@ -1,3 +1,6 @@
+body {
+}
+
 .hand .card-front {
     border: 1px solid black;
     border-radius: 5px;
@@ -74,7 +77,24 @@ ul.hand {
     border: 1px solid black;
     float: left;
     height: 100%;
-    width: 20%;
+    text-align: center;
+    background-color: #35784a;
+    color: floralwhite;
+}
+
+.sidebar .header {
+    font-weight: bold;
+}
+
+.sidebar hr {
+    height: 2px;
+    border: none;
+    background-color:antiquewhite;
+    margin: 8px;
+}
+
+.sidebar .history {
+    color: antiquewhite;
 }
 
 .board-row div {

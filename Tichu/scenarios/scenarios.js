@@ -107,6 +107,31 @@ function giveAllPlayersBombs(game) {
             sortCards(G.players[1].hand);
             sortCards(G.players[2].hand);
             sortCards(G.players[3].hand);
+
+            // Set score for testing score history.
+            G.score = { // 550-150
+                "0": 225,
+                "1": 150,
+                "2": 225,
+                "3": 100
+            };
+            G.scoreHistory = [{ // 30-70
+                "0": 115,
+                "1": 40,
+                "2": 15,
+                "3": 30
+            }, { // 280-20
+                "0": 225,
+                "1": 0,
+                "2": 55,
+                "3": 20
+            }, { // 240-60
+                "0": 210,
+                "1": -10,
+                "2": 30,
+                "3": 70
+            }
+            ];
         } else {
             G.currentTrick = null;
         }

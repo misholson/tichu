@@ -29,3 +29,7 @@ ul.hand-vertical {
 .card-selected {
     margin-top: 20px;
 }
+
+.sidebar .header {
+    font-size: x-large;
+}

@@ -169,8 +169,9 @@ export const TichuBoard = (props) => {
     }
 
     return (
-        <>
-        <div className="board">
+        <Container fluid>
+            <Row>
+        <Col xs="10" className="board">
             <Container>
                 <Row className="board-row clearfix">
                     <Col xs="2" className="board-side">
@@ -253,29 +254,57 @@ export const TichuBoard = (props) => {
                     </Col>
                 </Row>
             </Container>
-        </div>
-            <Sidebar />
-        </>
+            </Col>
+            <Col xs="2">
+                <Sidebar G={G} ctx={ctx} playerID={playerID} />
+                </Col>
+                </Row>
+        </Container>
     );
 }
 
-const Sidebar = ({ G, ctx }) => {
+const Sidebar = ({ G, ctx, playerID }) => {
+    const playerIDs = getPlayerIDs(ctx, playerID);
+
+    const ourScore = (scoreRecord) => {
+        return scoreRecord[playerID] + scoreRecord[playerIDs.partner];
+    }
+
+    const theirScore = (scoreRecord) => {
+        return scoreRecord[playerIDs.left] + scoreRecord[playerIDs.right];
+    }
 
     return (
-        <div className="sidebar">
-            <div>
-                <h4>Score:</h4>
-
-            </div>
-            <div>
-                <h4>History:</h4>
-
-            </div>
-            <div>
-                <h4>Chat:</h4>
-
-            </div>
-        </div>
+        <Container className="sidebar">
+            <Row className="header">
+                <Col>
+                    Us
+                </Col>
+                <Col>
+                    Opponents
+                </Col>
+            </Row>
+            <Row className="header">
+                <Col>
+                    {ourScore(G.score)}
+                </Col>
+                <Col>
+                    {theirScore(G.score)}
+                </Col>
+            </Row>
+            <hr />
+            {G.scoreHistory &&
+                G.scoreHistory.map((score, ix) =>
+                    <Row key={ix} className="history">
+                        <Col>
+                            {ourScore(score)}
+                        </Col>
+                        <Col>
+                            {theirScore(score)}
+                        </Col>
+                    </Row>
+            )}
+        </Container>
     );
 }
 
