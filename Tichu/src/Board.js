@@ -33,11 +33,11 @@ export const TichuBoard = (props) => {
 
 
     const onGrandClicked = () => {
-        moves.callGrand(playerID);
+        moves.callGrand();
     }
 
     const onTakeClicked = () => {
-        moves.takeCards(playerID);
+        moves.takeCards();
     }
 
     var readyToPlay = G.public.players[playerID].readyToPlay;
@@ -89,13 +89,17 @@ export const TichuBoard = (props) => {
 
     const handlePassConfirmed = () => {
         if (stage === constants.phases.preHand.stages.passCards && passedCards.length === 3) {
-            moves.passCards(playerID, passedCards);
+            moves.passCards(passedCards);
             setPassedCards([]);
         }
     }
 
     const handleAcceptConfirmed = () => {
         moves.acceptPass(playerID);
+    }
+
+    const handleTichuCalled = () => {
+        moves.callTichu();
     }
 
     const receivedCards = []
@@ -178,7 +182,7 @@ export const TichuBoard = (props) => {
                         &nbsp;
                     </Col>
                     <Col xs="8" className="board-middle">
-                        <Player playerID={playerIDs.partner} phase={phase} currentPlayer={ctx.currentPlayer} />
+                        <Player playerID={playerIDs.partner} phase={phase} currentPlayer={ctx.currentPlayer} tichu={G.public.players[playerIDs.partner].tichu} grand={G.public.players[playerIDs.partner].grand}/>
                         <PartnerHand backs={G.public.players[playerIDs.partner].cards} />
                         <Clear />
                     </Col>
@@ -188,7 +192,7 @@ export const TichuBoard = (props) => {
                 </Row>
                 <Row className="board-row clearfix">
                     <Col xs="2" className="board-side">
-                        <Player playerID={playerIDs.left} phase={phase} currentPlayer={ctx.currentPlayer} />
+                        <Player playerID={playerIDs.left} phase={phase} currentPlayer={ctx.currentPlayer} tichu={G.public.players[playerIDs.left].tichu} grand={G.public.players[playerIDs.left].grand}/>
                         <OpponentHand backs={G.public.players[playerIDs.left].cards} />
                         <Clear />
                     </Col>
@@ -197,7 +201,7 @@ export const TichuBoard = (props) => {
                         {phase === constants.phases.playTrick.name && <PlayArea currentTrick={G.currentTrick} />}
                     </Col>
                     <Col xs="2" className="board-side">
-                        <Player playerID={playerIDs.right} phase={phase} currentPlayer={ctx.currentPlayer} />
+                        <Player playerID={playerIDs.right} phase={phase} currentPlayer={ctx.currentPlayer} tichu={G.public.players[playerIDs.right].tichu} grand={G.public.players[playerIDs.right].grand} />
                         <OpponentHand backs={G.public.players[playerIDs.right].cards} />
                         <Clear />
                     </Col>
@@ -207,12 +211,17 @@ export const TichuBoard = (props) => {
                             &nbsp;{G.wish && <>Wish: {wishRank(G.wish)}</>}
                     </Col>
                     <Col xs="8" className="board-middle">
-                        <Player playerID={playerID} phase={phase} currentPlayer={ctx.currentPlayer} />
+                        <Player playerID={playerID} phase={phase} currentPlayer={ctx.currentPlayer} tichu={G.public.players[playerID].tichu} grand={G.public.players[playerID].grand} />
                         <Hand hand={hand} selectedCards={selectedCards} onCardClicked={handleCardClicked} />
                         {stage === constants.phases.preHand.stages.takeOrGrand &&
                             <FormGroup className="under-hand-buttons">
                                 <Button color="primary" className="mx-1" onClick={onGrandClicked}>Grand Tichu</Button>
                                 <Button color="primary" className="mx-1" onClick={onTakeClicked}>Take</Button>
+                            </FormGroup>
+                        }
+                        {(stage === constants.phases.preHand.stages.passCards || stage === constants.phases.preHand.stages.acceptPass || stage === constants.phases.preHand.stages.acceptPass) &&
+                            <FormGroup className="under-hand">
+                                <Button color="primary" className="mx-1" onClick={handleTichuCalled} disabled={G.public.players[playerID].tichu || hand.length !== 14}>Tichu</Button>
                             </FormGroup>
                         }
                         {isPlayerActive && stage !== constants.phases.playTrick.stages.makeWish &&
@@ -224,6 +233,11 @@ export const TichuBoard = (props) => {
                         {ctx.activePlayers[playerID] === constants.phases.playTrick.stages.bomb && hasBomb(hand) &&
                             <FormGroup className="under-hand">
                                 <Button color="primary" className="mx-1" onClick={onBombClicked} disabled={bombButtonDisabled()} > Bomb</Button>
+                            </FormGroup>
+                        }
+                        {ctx.activePlayers[playerID] === constants.phases.playTrick.stages.bomb &&
+                            <FormGroup className="under-hand">
+                                <Button color="primary" className="mx-1" onClick={handleTichuCalled} disabled={G.public.players[playerID].tichu || hand.length !== 14}>Tichu</Button>
                             </FormGroup>
                         }
                         {isPlayerActive && stage === constants.phases.playTrick.stages.makeWish &&

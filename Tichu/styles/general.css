@@ -71,6 +71,7 @@ ul.hand {
     width: 80%;
     float: left;
     background-color: #2a603b;
+    color: floralwhite;
 }
 
 .sidebar {
@@ -94,7 +95,7 @@ ul.hand {
 }
 
 .sidebar .history {
-    color: antiquewhite;
+    color: floralwhite;
 }
 
 .board-row div {

@@ -300,6 +300,14 @@ function passDragon(G, ctx, receivingPlayerID) {
     G.currentTrick.receivingPlayerID = receivingPlayerID;
 }
 
+function callTichu(G, ctx) {
+    if (G.players[ctx.playerID].hand.length !== 14) {
+        // Can only call tichu while you haven't played any cards.
+        return INVALID_MOVE;
+    }
+    G.public.players[ctx.playerID].tichu = true;
+}
+
 function findTrickWinner(G, ctx) {
     // Basic logic here is that if the player who most recently played cards is the current player, then everyone else passed
     // and the current player is the winner.
@@ -578,6 +586,7 @@ const playTrick = {
                 moves: {
                     playBomb: playBomb,
                     playCards: playCards,
+                    callTichu: callTichu,
                     pass: pass
                 }
             }

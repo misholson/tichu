@@ -2,13 +2,26 @@ const { INVALID_MOVE } = require('boardgame.io/core');
 const { sortCards, removeFromHand, getPlayerIDs, dealCards } = require('./Helpers');
 const { constants } = require('./Constants');
 
-function callGrand(G, ctx, playerID) {
-    G.public.players[playerID].tichu = true;
-    G.public.players[playerID].grand = true;
-    return takeCards(G, ctx, playerID);
+function callGrand(G, ctx) {
+    if (G.players[ctx.playerID].hand.length !== 8) {
+        // Can only call grand when hand length is still 8.
+        return INVALID_MOVE;
+    }
+    G.public.players[ctx.playerID].tichu = true;
+    G.public.players[ctx.playerID].grand = true;
+    return takeCards(G, ctx, ctx.playerID);
 }
 
-function takeCards(G, ctx, playerID) {
+function callTichu(G, ctx) {
+    if (G.players[ctx.playerID].hand.length !== 14) {
+        // Can only call tichu while you haven't played any cards.
+        return INVALID_MOVE;
+    }
+    G.public.players[ctx.playerID].tichu = true;
+}
+
+function takeCards(G, ctx) {
+    var playerID = ctx.playerID;
     // Take 6 more cards.
     for (var i = 0; i < 6; i++) {
         G.players[playerID].hand.push(G.secret.deck.pop());
@@ -18,7 +31,8 @@ function takeCards(G, ctx, playerID) {
     ctx.events.endStage();
 }
 
-function passCards(G, ctx, playerID, selectedCards) {
+function passCards(G, ctx, selectedCards) {
+    var playerID = ctx.playerID;
     // Check the player is on the passCards stage
     if (ctx.activePlayers[playerID] !== constants.phases.preHand.stages.passCards) {
         return INVALID_MOVE;
@@ -146,15 +160,20 @@ const preHand = {
             },
             passCards: {
                 moves: {
-                    passCards: passCards
+                    passCards: passCards,
+                    callTichu: callTichu
                 },
                 next: constants.phases.preHand.stages.waitForPass
             },
             waitForPass: {
+                moves: {
+                    callTichu: callTichu
+                },
                 next: constants.phases.preHand.stages.acceptPass
             },
             acceptPass: {
                 moves: {
+                    callTichu: callTichu,
                     acceptPass: acceptPass
                 }
             }

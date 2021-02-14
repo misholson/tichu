@@ -69714,11 +69714,11 @@ var TichuBoard = function TichuBoard(props) {
       setSelectedCards = _useState6[1];
 
   var onGrandClicked = function onGrandClicked() {
-    moves.callGrand(playerID);
+    moves.callGrand();
   };
 
   var onTakeClicked = function onTakeClicked() {
-    moves.takeCards(playerID);
+    moves.takeCards();
   };
 
   var readyToPlay = G["public"].players[playerID].readyToPlay;
@@ -69772,13 +69772,17 @@ var TichuBoard = function TichuBoard(props) {
 
   var handlePassConfirmed = function handlePassConfirmed() {
     if (stage === constants.phases.preHand.stages.passCards && passedCards.length === 3) {
-      moves.passCards(playerID, passedCards);
+      moves.passCards(passedCards);
       setPassedCards([]);
     }
   };
 
   var handleAcceptConfirmed = function handleAcceptConfirmed() {
     moves.acceptPass(playerID);
+  };
+
+  var handleTichuCalled = function handleTichuCalled() {
+    moves.callTichu();
   };
 
   var receivedCards = [];
@@ -69874,7 +69878,9 @@ var TichuBoard = function TichuBoard(props) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Player__WEBPACK_IMPORTED_MODULE_2__["Player"], {
     playerID: playerIDs.partner,
     phase: phase,
-    currentPlayer: ctx.currentPlayer
+    currentPlayer: ctx.currentPlayer,
+    tichu: G["public"].players[playerIDs.partner].tichu,
+    grand: G["public"].players[playerIDs.partner].grand
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["PartnerHand"], {
     backs: G["public"].players[playerIDs.partner].cards
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
@@ -69888,7 +69894,9 @@ var TichuBoard = function TichuBoard(props) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Player__WEBPACK_IMPORTED_MODULE_2__["Player"], {
     playerID: playerIDs.left,
     phase: phase,
-    currentPlayer: ctx.currentPlayer
+    currentPlayer: ctx.currentPlayer,
+    tichu: G["public"].players[playerIDs.left].tichu,
+    grand: G["public"].players[playerIDs.left].grand
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
     backs: G["public"].players[playerIDs.left].cards
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
@@ -69909,7 +69917,9 @@ var TichuBoard = function TichuBoard(props) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Player__WEBPACK_IMPORTED_MODULE_2__["Player"], {
     playerID: playerIDs.right,
     phase: phase,
-    currentPlayer: ctx.currentPlayer
+    currentPlayer: ctx.currentPlayer,
+    tichu: G["public"].players[playerIDs.right].tichu,
+    grand: G["public"].players[playerIDs.right].grand
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
     backs: G["public"].players[playerIDs.right].cards
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], {
@@ -69923,7 +69933,9 @@ var TichuBoard = function TichuBoard(props) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Player__WEBPACK_IMPORTED_MODULE_2__["Player"], {
     playerID: playerID,
     phase: phase,
-    currentPlayer: ctx.currentPlayer
+    currentPlayer: ctx.currentPlayer,
+    tichu: G["public"].players[playerID].tichu,
+    grand: G["public"].players[playerID].grand
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
     hand: hand,
     selectedCards: selectedCards,
@@ -69938,7 +69950,14 @@ var TichuBoard = function TichuBoard(props) {
     color: "primary",
     className: "mx-1",
     onClick: onTakeClicked
-  }, "Take")), isPlayerActive && stage !== constants.phases.playTrick.stages.makeWish && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
+  }, "Take")), (stage === constants.phases.preHand.stages.passCards || stage === constants.phases.preHand.stages.acceptPass) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
+    className: "under-hand"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
+    color: "primary",
+    className: "mx-1",
+    onClick: handleTichuCalled,
+    disabled: G["public"].players[playerID].tichu || hand.length !== 14
+  }, "Tichu")), isPlayerActive && stage !== constants.phases.playTrick.stages.makeWish && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
     className: "under-hand"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
     color: "primary",
@@ -69957,7 +69976,14 @@ var TichuBoard = function TichuBoard(props) {
     className: "mx-1",
     onClick: onBombClicked,
     disabled: bombButtonDisabled()
-  }, " Bomb")), isPlayerActive && stage === constants.phases.playTrick.stages.makeWish && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
+  }, " Bomb")), ctx.activePlayers[playerID] === constants.phases.playTrick.stages.bomb && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
+    className: "under-hand"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
+    color: "primary",
+    className: "mx-1",
+    onClick: handleTichuCalled,
+    disabled: G["public"].players[playerID].tichu || hand.length !== 14
+  }, "Tichu")), isPlayerActive && stage === constants.phases.playTrick.stages.makeWish && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
     className: "under-hand"
   }, Array(13).fill(null).map(function (_, ix) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
@@ -70335,7 +70361,8 @@ var tichu = {
   maxPlayers: 4
 };
 module.exports = {
-  Tichu: scenarios.handAlmostFinished(tichu)
+  //Tichu: scenarios.handAlmostFinished(tichu)
+  Tichu: tichu
 };
 
 /***/ }),
@@ -71014,6 +71041,15 @@ function passDragon(G, ctx, receivingPlayerID) {
   G.currentTrick.receivingPlayerID = receivingPlayerID;
 }
 
+function callTichu(G, ctx) {
+  if (G.players[ctx.playerID].hand.length !== 14) {
+    // Can only call tichu while you haven't played any cards.
+    return INVALID_MOVE;
+  }
+
+  G["public"].players[ctx.playerID].tichu = true;
+}
+
 function findTrickWinner(G, ctx) {
   // Basic logic here is that if the player who most recently played cards is the current player, then everyone else passed
   // and the current player is the winner.
@@ -71295,6 +71331,7 @@ var playTrick = {
         moves: {
           playBomb: playBomb,
           playCards: playCards,
+          callTichu: callTichu,
           pass: pass
         }
       }
@@ -71329,13 +71366,15 @@ var _require = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
 var Player = function Player(_ref) {
   var playerID = _ref.playerID,
       phase = _ref.phase,
-      currentPlayer = _ref.currentPlayer;
+      currentPlayer = _ref.currentPlayer,
+      tichu = _ref.tichu,
+      grand = _ref.grand;
   var displayIsActive = phase === constants.phases.playTrick.name && playerID === currentPlayer;
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     style: {
       "float": "none"
     }
-  }, "Player ", playerID, " ", displayIsActive && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "ACTIVE"));
+  }, "Player ", playerID, " ", grand && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "GRAND"), " ", tichu && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "TICHU"), " ", displayIsActive && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "ACTIVE"));
 };
 
 /***/ }),
@@ -71359,14 +71398,29 @@ var _require2 = __webpack_require__(/*! ./Helpers */ "./src/Helpers.js"),
 var _require3 = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
     constants = _require3.constants;
 
-function callGrand(G, ctx, playerID) {
-  G["public"].players[playerID].tichu = true;
-  G["public"].players[playerID].grand = true;
-  return takeCards(G, ctx, playerID);
+function callGrand(G, ctx) {
+  if (G.players[ctx.playerID].hand.length !== 8) {
+    // Can only call grand when hand length is still 8.
+    return INVALID_MOVE;
+  }
+
+  G["public"].players[ctx.playerID].tichu = true;
+  G["public"].players[ctx.playerID].grand = true;
+  return takeCards(G, ctx, ctx.playerID);
 }
 
-function takeCards(G, ctx, playerID) {
-  // Take 6 more cards.
+function callTichu(G, ctx) {
+  if (G.players[ctx.playerID].hand.length !== 14) {
+    // Can only call tichu while you haven't played any cards.
+    return INVALID_MOVE;
+  }
+
+  G["public"].players[ctx.playerID].tichu = true;
+}
+
+function takeCards(G, ctx) {
+  var playerID = ctx.playerID; // Take 6 more cards.
+
   for (var i = 0; i < 6; i++) {
     G.players[playerID].hand.push(G.secret.deck.pop());
   }
@@ -71376,8 +71430,9 @@ function takeCards(G, ctx, playerID) {
   ctx.events.endStage();
 }
 
-function passCards(G, ctx, playerID, selectedCards) {
-  // Check the player is on the passCards stage
+function passCards(G, ctx, selectedCards) {
+  var playerID = ctx.playerID; // Check the player is on the passCards stage
+
   if (ctx.activePlayers[playerID] !== constants.phases.preHand.stages.passCards) {
     return INVALID_MOVE;
   } // Make sure they have selected three cards to pass.
@@ -71516,15 +71571,20 @@ var preHand = {
       },
       passCards: {
         moves: {
-          passCards: passCards
+          passCards: passCards,
+          callTichu: callTichu
         },
         next: constants.phases.preHand.stages.waitForPass
       },
       waitForPass: {
+        moves: {
+          callTichu: callTichu
+        },
         next: constants.phases.preHand.stages.acceptPass
       },
       acceptPass: {
         moves: {
+          callTichu: callTichu,
           acceptPass: acceptPass
         }
       }
