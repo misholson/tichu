@@ -2,6 +2,7 @@ const { PlayerView } = require('boardgame.io/core');
 const scenarios = require('../scenarios/scenarios');
 
 const tichu = {
+    name: "Tichu",
     setup: (ctx) => {
         var score = {};
         // Count score

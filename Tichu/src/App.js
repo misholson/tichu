@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Client } from 'boardgame.io/react';
+import { Client, Lobby } from 'boardgame.io/react';
 import { SocketIO } from 'boardgame.io/multiplayer';
 import { Tichu } from './Game';
 import { TichuBoard } from './Board';
@@ -31,7 +31,15 @@ const ExpandableClient = ({ playerID }) => {
 }
 
 export const App = () => (
-    <table style={{ width: "100%" }}>
+    <Lobby
+        gameServer={`http://localhost:1337`}
+        lobbyServer={`http://localhost:8000`}
+        gameComponents={[
+            { game: Tichu, board: TichuBoard }
+        ]}
+    />
+
+    /*<table style={{ width: "100%" }}>
         <tbody>
             <tr>
                 <td><ExpandableClient playerID="0" /></td>
@@ -46,5 +54,5 @@ export const App = () => (
                 <td><ExpandableClient playerID="3" /></td>
             </tr>
         </tbody>
-    </table>
+    </table>*/
 );

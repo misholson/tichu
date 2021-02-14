@@ -69567,19 +69567,31 @@ var ExpandableClient = function ExpandableClient(_ref) {
 };
 
 var App = function App() {
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
-    style: {
-      width: "100%"
-    }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ExpandableClient, {
-    playerID: "0"
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ExpandableClient, {
-    playerID: "1"
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ExpandableClient, {
-    playerID: "2"
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ExpandableClient, {
-    playerID: "3"
-  })))));
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(boardgame_io_react__WEBPACK_IMPORTED_MODULE_1__["Lobby"], {
+    gameServer: "http://localhost:1337",
+    lobbyServer: "http://localhost:8000",
+    gameComponents: [{
+      game: _Game__WEBPACK_IMPORTED_MODULE_3__["Tichu"],
+      board: _Board__WEBPACK_IMPORTED_MODULE_4__["TichuBoard"]
+    }]
+  })
+  /*<table style={{ width: "100%" }}>
+      <tbody>
+          <tr>
+              <td><ExpandableClient playerID="0" /></td>
+          </tr>
+          <tr>
+              <td><ExpandableClient playerID="1" /></td>
+          </tr>
+          <tr>
+              <td><ExpandableClient playerID="2" /></td>
+          </tr>
+          <tr>
+              <td><ExpandableClient playerID="3" /></td>
+          </tr>
+      </tbody>
+  </table>*/
+  ;
 };
 
 /***/ }),
@@ -70191,6 +70203,7 @@ var _require = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boar
 var scenarios = __webpack_require__(/*! ../scenarios/scenarios */ "./scenarios/scenarios.js");
 
 var tichu = {
+  name: "Tichu",
   setup: function setup(ctx) {
     var score = {}; // Count score
 
