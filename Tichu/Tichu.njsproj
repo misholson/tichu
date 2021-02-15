@@ -120,7 +120,9 @@
     <Content Include="tsconfig.json" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config" />
-    <Content Include="package.json" />
+    <Content Include="package.json">
+      <Publish>True</Publish>
+    </Content>
     <Content Include="README.md" />
     <Content Include="webpack-config.js" />
   </ItemGroup>
