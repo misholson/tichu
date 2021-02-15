@@ -69764,7 +69764,7 @@ var App = function App() {
 
     /*<TichuClient playerID="0" />*/
     react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(boardgame_io_react__WEBPACK_IMPORTED_MODULE_1__["Lobby"], {
-      gameServer: "http://".concat(window.location.hostname, ": ").concat(window.location.port),
+      gameServer: "http://".concat(window.location.hostname, ":").concat(window.location.port),
       lobbyServer: "http://".concat(window.location.hostname, ":").concat(window.location.port),
       gameComponents: [{
         game: _Game__WEBPACK_IMPORTED_MODULE_3__["Tichu"],

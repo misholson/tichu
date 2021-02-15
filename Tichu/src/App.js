@@ -33,7 +33,7 @@ const ExpandableClient = ({ playerID }) => {
 export const App = () => (
     /*<TichuClient playerID="0" />*/
     <Lobby
-        gameServer={`http://${window.location.hostname}: ${window.location.port}`}
+        gameServer={`http://${window.location.hostname}:${window.location.port}`}
         lobbyServer={`http://${window.location.hostname}:${window.location.port}`}
         gameComponents={[
             { game: Tichu, board: TichuBoard }
