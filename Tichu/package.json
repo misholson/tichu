@@ -2,7 +2,13 @@
   "name": "tichu",
   "version": "0.0.0",
   "description": "Tichu",
-  "main": "server.js",
+  "scripts": {
+    "start": "node server",
+    "build": "webpack-cli app.js --config webpack-config.js"
+  },
+  "engines": {
+    "node": "~6.10.x"
+  },
   "author": {
     "name": ""
   },
@@ -30,8 +36,9 @@
     "ts-loader": "^7.0.5",
     "typescript": "^3.9.7"
   },
-  "scripts": {
-    "build": "webpack-cli app.tsx --config webpack-config.js",
-    "serve": "node -r esm src/server.js"
+  "-vs-binding": {
+    "BeforeBuild": [
+      "build"
+    ]
   }
 }

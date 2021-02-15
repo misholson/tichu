@@ -1,6 +1,6 @@
 module.exports = {
     devtool: 'source-map',
-    entry: ".app.tsx",
+    entry: ".app.js",
     mode: "development",
     output: {
         filename: "./app-bundle.js"

@@ -4,18 +4,13 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <Name>Tichu</Name>
     <RootNamespace>Tichu</RootNamespace>
-    <EnableTypeScript>true</EnableTypeScript>
-    <TypeScriptSourceMap>true</TypeScriptSourceMap>
-    <TypeScriptModuleKind>CommonJS</TypeScriptModuleKind>
-    <SaveNodeJsSettingsInProjectFile>False</SaveNodeJsSettingsInProjectFile>
-    <JavaScriptTestFramework>mocha</JavaScriptTestFramework>
-    <JavaScriptTestRoot>tests</JavaScriptTestRoot>
+    <SaveNodeJsSettingsInProjectFile>True</SaveNodeJsSettingsInProjectFile>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>217bc1d6-c672-4f94-8d33-e9e4b248d0d8</ProjectGuid>
+    <ProjectGuid>6edaf0ca-e1ec-4229-bfab-d6fea576d91f</ProjectGuid>
     <ProjectHome>.</ProjectHome>
     <StartupFile>server.js</StartupFile>
     <SearchPath>
@@ -34,20 +29,12 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="babel.config.json">
+    <Content Include="app.js">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="images\back.png" />
-    <Content Include="images\back_rotated.jpg" />
-    <Content Include="images\s_mahjong.png" />
-    <Content Include="images\s_phoenix.png" />
-    <Content Include="images\s_dog.png" />
-    <Content Include="images\s_dragon.png" />
-    <Content Include="images\b10.png" />
-    <Content Include="images\b11.png" />
-    <Content Include="images\b12.png" />
-    <Content Include="images\b13.png" />
-    <Content Include="images\b14.png" />
+    <Content Include="babel.config.json" />
+    <Content Include="dist\app-bundle.js" />
+    <Content Include="dist\app-bundle.js.map" />
     <Content Include="images\b02.png" />
     <Content Include="images\b03.png" />
     <Content Include="images\b04.png" />
@@ -56,6 +43,13 @@
     <Content Include="images\b07.png" />
     <Content Include="images\b08.png" />
     <Content Include="images\b09.png" />
+    <Content Include="images\b10.png" />
+    <Content Include="images\b11.png" />
+    <Content Include="images\b12.png" />
+    <Content Include="images\b13.png" />
+    <Content Include="images\b14.png" />
+    <Content Include="images\back.png" />
+    <Content Include="images\back_rotated.jpg" />
     <Content Include="images\g02.png" />
     <Content Include="images\g03.png" />
     <Content Include="images\g04.png" />
@@ -95,91 +89,54 @@
     <Content Include="images\r12.png" />
     <Content Include="images\r13.png" />
     <Content Include="images\r14.png" />
-    <Content Include="index.html">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="scenarios\scenarios.js">
-      <SubType>Code</SubType>
-    </Content>
+    <Content Include="images\s_dog.png" />
+    <Content Include="images\s_dragon.png" />
+    <Content Include="images\s_mahjong.png" />
+    <Content Include="images\s_phoenix.png" />
+    <Content Include="index.html" />
+    <None Include="Properties\PublishProfiles\tichu - Web Deploy.pubxml" />
+    <Content Include="scenarios\scenarios.js" />
     <Content Include="server.js" />
+    <Content Include="src\App.js" />
+    <Content Include="src\Board.js" />
+    <Content Include="src\Card.js" />
+    <Content Include="src\Constants.js" />
+    <Content Include="src\Deck.js" />
+    <Content Include="src\Game.js" />
+    <Content Include="src\Hand.js" />
+    <Content Include="src\Helpers.js" />
+    <Content Include="src\PassArea.js" />
+    <Content Include="src\PlayArea.js" />
+    <Content Include="src\Player.js" />
+    <Content Include="src\PlayTrick.js" />
+    <Content Include="src\PreHand.js" />
+    <Content Include="src\PrimaryPlay.js" />
+    <Content Include="src\ValidPlays.js" />
+    <Content Include="styles\general.css" />
+    <Content Include="styles\tichu.css" />
+    <Content Include="styles\tichuM.css" />
+    <Content Include="styles\tichuSM.css" />
+    <Content Include="tests\ValidPlayTests.js" />
+    <Content Include="tsconfig.json" />
+    <Content Include="Web.config" />
+    <Content Include="Web.Debug.config" />
     <Content Include="package.json" />
     <Content Include="README.md" />
-    <Content Include="src\App.js">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="src\Board.js">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="src\Card.js">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="src\Constants.js">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="src\Deck.js">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="src\Game.js">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="src\Hand.js">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="src\Helpers.js">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="src\PassArea.js">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="src\PlayArea.js">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="src\Player.js">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="src\PlayTrick.js">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="src\PreHand.js">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="src\PrimaryPlay.js" />
-    <Content Include="src\ValidPlays.js">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="styles\general.css">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="styles\tichu.css" />
-    <Content Include="styles\tichuM.css">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="styles\tichuSM.css">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="tests\ValidPlayTests.js">
-      <SubType>Code</SubType>
-      <TestFramework>Mocha</TestFramework>
-    </Content>
-    <Content Include="tsconfig.json">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="webpack-config.js">
-      <SubType>Code</SubType>
-    </Content>
+    <Content Include="webpack-config.js" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="app.tsx">
-      <SubType>Code</SubType>
-    </TypeScriptCompile>
-  </ItemGroup>
-  <ItemGroup>
+    <Folder Include="dist\" />
     <Folder Include="images\" />
-    <Folder Include="tests\" />
-    <Folder Include="scenarios\" />
+    <Folder Include="Properties\" />
+    <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="styles\" />
     <Folder Include="src\" />
+    <Folder Include="tests\" />
+    <Folder Include="scenarios\" />
   </ItemGroup>
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="npm run build" />
+  </Target>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
   <ProjectExtensions>
     <VisualStudio>
