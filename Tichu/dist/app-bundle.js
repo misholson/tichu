@@ -69759,36 +69759,40 @@ var ExpandableClient = function ExpandableClient(_ref) {
 };
 
 var App = function App() {
-  return (
-    /*#__PURE__*/
+  var gameServer = "http://".concat(window.location.hostname);
 
-    /*<TichuClient playerID="0" />*/
-    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(boardgame_io_react__WEBPACK_IMPORTED_MODULE_1__["Lobby"], {
-      gameServer: "http://".concat(window.location.hostname, ":").concat(window.location.port),
-      lobbyServer: "http://".concat(window.location.hostname, ":").concat(window.location.port),
-      gameComponents: [{
-        game: _Game__WEBPACK_IMPORTED_MODULE_3__["Tichu"],
-        board: _Board__WEBPACK_IMPORTED_MODULE_4__["TichuBoard"]
-      }]
-    })
-    /*<table style={{ width: "100%" }}>
-        <tbody>
-            <tr>
-                <td><ExpandableClient playerID="0" /></td>
-            </tr>
-            <tr>
-                <td><ExpandableClient playerID="1" /></td>
-            </tr>
-            <tr>
-                <td><ExpandableClient playerID="2" /></td>
-            </tr>
-            <tr>
-                <td><ExpandableClient playerID="3" /></td>
-            </tr>
-        </tbody>
-    </table>*/
+  if (window.location.port && window.location.port !== ' ') {
+    gameServer += ":".concat(window.location.port);
+  }
 
-  );
+  gameServer += '/';
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(boardgame_io_react__WEBPACK_IMPORTED_MODULE_1__["Lobby"], {
+    gameServer: gameServer,
+    lobbyServer: gameServer,
+    gameComponents: [{
+      game: _Game__WEBPACK_IMPORTED_MODULE_3__["Tichu"],
+      board: _Board__WEBPACK_IMPORTED_MODULE_4__["TichuBoard"]
+    }]
+  })
+  /*<TichuClient playerID="0" />*/
+
+  /*<table style={{ width: "100%" }}>
+      <tbody>
+          <tr>
+              <td><ExpandableClient playerID="0" /></td>
+          </tr>
+          <tr>
+              <td><ExpandableClient playerID="1" /></td>
+          </tr>
+          <tr>
+              <td><ExpandableClient playerID="2" /></td>
+          </tr>
+          <tr>
+              <td><ExpandableClient playerID="3" /></td>
+          </tr>
+      </tbody>
+  </table>*/
+  ;
 };
 
 /***/ }),
@@ -70540,8 +70544,8 @@ var tichu = {
   maxPlayers: 4
 };
 module.exports = {
-  Tichu: scenarios.giveAllPlayersBombs(tichu) //Tichu: tichu
-
+  //Tichu: scenarios.giveAllPlayersBombs(tichu)
+  Tichu: tichu
 };
 
 /***/ }),
@@ -70849,7 +70853,7 @@ var PlayArea = function PlayArea(_ref) {
   var plays = [];
 
   if (currentTrick) {
-    for (var i = currentTrick.plays.length - 1; i >= 0 && plays.length <= 4; i--) {
+    for (var i = 0; i < currentTrick.plays.length && plays.length <= 4; i++) {
       var play = currentTrick.plays[i];
 
       if (!play.pass) {
@@ -71338,6 +71342,7 @@ function onTrickEnd(G, ctx) {
   console.debug("------End Trick------\n");
   console.debug("------Begin Cleanup------\n");
   console.debug("Cleaning up trick. Winner: ".concat(winner));
+  var playerOutCount = countOutPlayers(G, ctx);
   var oneTwo = false;
 
   if ((isOneTwo(G, ctx, ctx.playOrder[0]) || isOneTwo(G, ctx, ctx.playOrder[1])) && !winner) {
@@ -71345,6 +71350,9 @@ function onTrickEnd(G, ctx) {
     winner = ctx.currentPlayer; // If it's over due to a 1-2, just set the trick winner to whoever because it doesn't matter.
 
     oneTwo = true;
+  } else if (playerOutCount === 3) {
+    // If the last play resulted in the third player going out, that player automatically wins the trick.
+    winner = getPreviousPlay(G.currentTrick).player;
   }
 
   if (winner) {
@@ -71360,7 +71368,6 @@ function onTrickEnd(G, ctx) {
 
     G.previousTricks = G.previousTricks || [];
     G.previousTricks.unshift(G.currentTrick);
-    var playerOutCount = countOutPlayers(G, ctx);
 
     if (playerOutCount === 3 || oneTwo) {
       console.debug("\n---------- End Playing Tricks ----------\n"); // Set the out order of the last player.
@@ -71941,6 +71948,10 @@ function detectPlayType(selectedCards) {
 }
 
 function isValidPlay(selectedCards, currentTrick, wish) {
+  if (!selectedCards || selectedCards.length === 0) {
+    return false; // Nothing is never a valid play.
+  }
+
   var selectedPlayType = detectPlayType(_toConsumableArray(selectedCards));
 
   if (currentTrick && currentTrick.type !== selectedPlayType && !validPlays[selectedPlayType].isBomb) {

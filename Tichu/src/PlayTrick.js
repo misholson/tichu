@@ -380,11 +380,15 @@ function onTrickEnd(G, ctx) {
     console.debug("------End Trick------\n");
     console.debug("------Begin Cleanup------\n");
     console.debug(`Cleaning up trick. Winner: ${winner}`);
+    var playerOutCount = countOutPlayers(G, ctx);
     var oneTwo = false;
     if ((isOneTwo(G, ctx, ctx.playOrder[0]) || isOneTwo(G, ctx, ctx.playOrder[1])) && !winner) {
         console.debug(`Someone went 1-2! Setting winner of trick to ${ctx.currentPlayer}`);
         winner = ctx.currentPlayer; // If it's over due to a 1-2, just set the trick winner to whoever because it doesn't matter.
         oneTwo = true;
+    } else if (playerOutCount === 3) {
+        // If the last play resulted in the third player going out, that player automatically wins the trick.
+        winner = getPreviousPlay(G.currentTrick).player;
     }
     if (winner) {
         G.currentTrick.winner = winner;
@@ -400,7 +404,6 @@ function onTrickEnd(G, ctx) {
         G.previousTricks = G.previousTricks || [];
         G.previousTricks.unshift(G.currentTrick);
 
-        var playerOutCount = countOutPlayers(G, ctx);
         if (playerOutCount === 3 || oneTwo) {
             console.debug("\n---------- End Playing Tricks ----------\n");
 

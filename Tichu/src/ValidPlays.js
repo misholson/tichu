@@ -65,6 +65,9 @@ function detectPlayType(selectedCards) {
 }
 
 function isValidPlay(selectedCards, currentTrick, wish) {
+    if (!selectedCards || selectedCards.length === 0) {
+        return false; // Nothing is never a valid play.
+    }
     var selectedPlayType = detectPlayType([...selectedCards]);
     if (currentTrick && currentTrick.type !== selectedPlayType && !validPlays[selectedPlayType].isBomb) {
         return false;

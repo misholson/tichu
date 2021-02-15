@@ -30,15 +30,22 @@ const ExpandableClient = ({ playerID }) => {
     );
 }
 
-export const App = () => (
-    /*<TichuClient playerID="0" />*/
-    <Lobby
-        gameServer={`http://${window.location.hostname}:${window.location.port}`}
-        lobbyServer={`http://${window.location.hostname}:${window.location.port}`}
-        gameComponents={[
-            { game: Tichu, board: TichuBoard }
-        ]}
-    />
+export const App = () => {
+    var gameServer = `http://${window.location.hostname}`;
+    if (window.location.port && window.location.port !== ' ') {
+        gameServer += `:${window.location.port}`;
+    }
+    gameServer += '/';
+    return (
+    
+        <Lobby
+            gameServer={gameServer}
+            lobbyServer={gameServer}
+            gameComponents={[
+                { game: Tichu, board: TichuBoard }
+            ]}
+        />
+/*<TichuClient playerID="0" />*/
 
     /*<table style={{ width: "100%" }}>
         <tbody>
@@ -56,4 +63,4 @@ export const App = () => (
             </tr>
         </tbody>
     </table>*/
-);
+)};

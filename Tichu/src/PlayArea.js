@@ -14,7 +14,7 @@ export const PlayArea = ({ currentTrick, previousTricks, playerIDs, playClearAni
 
     var plays = [];
     if (currentTrick) {
-        for (var i = currentTrick.plays.length - 1; i >= 0 && plays.length <= 4; i--) {
+        for (var i = 0; i < currentTrick.plays.length && plays.length <= 4; i++) {
             var play = currentTrick.plays[i];
             if (!play.pass) {
                 var positionClass;
