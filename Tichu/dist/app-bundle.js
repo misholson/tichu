@@ -69866,7 +69866,8 @@ var TichuBoard = function TichuBoard(props) {
   var G = props.G,
       ctx = props.ctx,
       moves = props.moves,
-      playerID = props.playerID;
+      playerID = props.playerID,
+      matchData = props.matchData;
   var player = G.players[playerID];
   var stage = null;
 
@@ -70061,7 +70062,8 @@ var TichuBoard = function TichuBoard(props) {
     phase: phase,
     currentPlayer: ctx.currentPlayer,
     tichu: G["public"].players[playerIDs.partner].tichu,
-    grand: G["public"].players[playerIDs.partner].grand
+    grand: G["public"].players[playerIDs.partner].grand,
+    matchData: matchData
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["PartnerHand"], {
     backs: G["public"].players[playerIDs.partner].cards
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
@@ -70077,7 +70079,8 @@ var TichuBoard = function TichuBoard(props) {
     phase: phase,
     currentPlayer: ctx.currentPlayer,
     tichu: G["public"].players[playerIDs.left].tichu,
-    grand: G["public"].players[playerIDs.left].grand
+    grand: G["public"].players[playerIDs.left].grand,
+    matchData: matchData
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
     backs: G["public"].players[playerIDs.left].cards
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
@@ -70102,7 +70105,8 @@ var TichuBoard = function TichuBoard(props) {
     phase: phase,
     currentPlayer: ctx.currentPlayer,
     tichu: G["public"].players[playerIDs.right].tichu,
-    grand: G["public"].players[playerIDs.right].grand
+    grand: G["public"].players[playerIDs.right].grand,
+    matchData: matchData
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
     backs: G["public"].players[playerIDs.right].cards
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], {
@@ -70118,7 +70122,8 @@ var TichuBoard = function TichuBoard(props) {
     phase: phase,
     currentPlayer: ctx.currentPlayer,
     tichu: G["public"].players[playerID].tichu,
-    grand: G["public"].players[playerID].grand
+    grand: G["public"].players[playerID].grand,
+    matchData: matchData
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
     hand: hand,
     selectedCards: selectedCards,
@@ -71599,13 +71604,27 @@ var Player = function Player(_ref) {
       phase = _ref.phase,
       currentPlayer = _ref.currentPlayer,
       tichu = _ref.tichu,
-      grand = _ref.grand;
+      grand = _ref.grand,
+      matchData = _ref.matchData;
   var displayIsActive = phase === constants.phases.playTrick.name && playerID === currentPlayer;
+  var playerName = "Player ".concat(playerID);
+
+  if (matchData) {
+    var playerNum = parseInt(playerID);
+    var playerInfo = Object.values(matchData).find(function (playerInfo) {
+      return playerInfo.id === playerNum;
+    });
+
+    if (playerInfo) {
+      playerName = playerInfo.name;
+    }
+  }
+
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     style: {
       "float": "none"
     }
-  }, "Player ", playerID, " ", grand && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "GRAND"), " ", tichu && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "TICHU"), " ", displayIsActive && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "ACTIVE"));
+  }, playerName, " ", grand && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "GRAND"), " ", tichu && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "TICHU"), " ", displayIsActive && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "ACTIVE"));
 };
 
 /***/ }),
