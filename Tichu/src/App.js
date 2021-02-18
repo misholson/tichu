@@ -3,6 +3,7 @@ import { Client, Lobby } from 'boardgame.io/react';
 import { SocketIO } from 'boardgame.io/multiplayer';
 import { Tichu } from './Game';
 import { TichuBoard } from './Board';
+import { TichuLobby } from './TichuLobby';
 import { Card, CardHeader, CardBody, Button } from 'reactstrap';
 
 const TichuClient = Client({
@@ -37,14 +38,15 @@ export const App = () => {
     }
     gameServer += '/';
     return (
+        <TichuLobby game="Tichu" gameServer={gameServer} />
     
-        <Lobby
+        /*<Lobby
             gameServer={gameServer}
             lobbyServer={gameServer}
             gameComponents={[
                 { game: Tichu, board: TichuBoard }
             ]}
-        />
+        />*/
 /*<TichuClient playerID="0" />*/
 
     /*<table style={{ width: "100%" }}>
