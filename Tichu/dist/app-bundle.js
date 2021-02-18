@@ -70565,10 +70565,10 @@ var tichu = {
         "3": {
           hand: []
         }
-      },
-      playerView: PlayerView.STRIP_SECRETS
+      }
     };
   },
+  playerView: PlayerView.STRIP_SECRETS,
   phases: {
     preHand: __webpack_require__(/*! ./PreHand */ "./src/PreHand.js").preHand,
     playTrick: __webpack_require__(/*! ./PlayTrick */ "./src/PlayTrick.js").playTrick
@@ -70595,8 +70595,8 @@ var tichu = {
   maxPlayers: 4
 };
 module.exports = {
-  Tichu: scenarios.giveAllPlayersBombs(tichu) //Tichu: tichu
-
+  //Tichu: scenarios.giveAllPlayersBombs(tichu)
+  Tichu: tichu
 };
 
 /***/ }),
@@ -71861,13 +71861,19 @@ var preHand = {
       takeOrGrand: {
         moves: {
           callGrand: callGrand,
-          takeCards: takeCards
+          takeCards: {
+            move: takeCards,
+            client: false
+          }
         },
         next: constants.phases.preHand.stages.passCards
       },
       passCards: {
         moves: {
-          passCards: passCards,
+          passCards: {
+            move: passCards,
+            client: false
+          },
           callTichu: callTichu
         },
         next: constants.phases.preHand.stages.waitForPass
@@ -71881,7 +71887,10 @@ var preHand = {
       acceptPass: {
         moves: {
           callTichu: callTichu,
-          acceptPass: acceptPass
+          acceptPass: {
+            move: acceptPass,
+            client: false
+          }
         }
       }
     },

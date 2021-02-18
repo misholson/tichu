@@ -56,10 +56,11 @@ const tichu = {
                 "3": {
                     hand: []
                 }
-            },
-            playerView: PlayerView.STRIP_SECRETS,
+            }
         }
     },
+
+    playerView: PlayerView.STRIP_SECRETS,
 
     phases: {
         preHand: require('./PreHand').preHand,
