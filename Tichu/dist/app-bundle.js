@@ -13719,6 +13719,46 @@ function Client(opts) {
 
 /***/ }),
 
+/***/ "./node_modules/boardgame.io/dist/esm/client.js":
+/*!******************************************************!*\
+  !*** ./node_modules/boardgame.io/dist/esm/client.js ***!
+  \******************************************************/
+/*! exports provided: Client, LobbyClient */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var nanoid__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! nanoid */ "./node_modules/nanoid/index.browser.js");
+/* harmony import */ var _Debug_b9c1d3d9_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Debug-b9c1d3d9.js */ "./node_modules/boardgame.io/dist/esm/Debug-b9c1d3d9.js");
+/* harmony import */ var redux__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! redux */ "./node_modules/redux/es/redux.js");
+/* harmony import */ var _turn_order_edf62d74_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./turn-order-edf62d74.js */ "./node_modules/boardgame.io/dist/esm/turn-order-edf62d74.js");
+/* harmony import */ var immer__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! immer */ "./node_modules/immer/dist/immer.esm.js");
+/* harmony import */ var _reducer_774ad0dd_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./reducer-774ad0dd.js */ "./node_modules/boardgame.io/dist/esm/reducer-774ad0dd.js");
+/* harmony import */ var _initialize_67621544_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./initialize-67621544.js */ "./node_modules/boardgame.io/dist/esm/initialize-67621544.js");
+/* harmony import */ var _transport_0079de87_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./transport-0079de87.js */ "./node_modules/boardgame.io/dist/esm/transport-0079de87.js");
+/* harmony import */ var _client_e411e427_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./client-e411e427.js */ "./node_modules/boardgame.io/dist/esm/client-e411e427.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Client", function() { return _client_e411e427_js__WEBPACK_IMPORTED_MODULE_8__["C"]; });
+
+/* harmony import */ var flatted__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! flatted */ "./node_modules/flatted/esm/index.js");
+/* harmony import */ var _ai_edc4e2de_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./ai-edc4e2de.js */ "./node_modules/boardgame.io/dist/esm/ai-edc4e2de.js");
+/* harmony import */ var _client_56a108ab_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./client-56a108ab.js */ "./node_modules/boardgame.io/dist/esm/client-56a108ab.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "LobbyClient", function() { return _client_56a108ab_js__WEBPACK_IMPORTED_MODULE_11__["L"]; });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/***/ }),
+
 /***/ "./node_modules/boardgame.io/dist/esm/core.js":
 /*!****************************************************!*\
   !*** ./node_modules/boardgame.io/dist/esm/core.js ***!
@@ -69695,11 +69735,12 @@ module.exports = {
 /*!********************!*\
   !*** ./src/App.js ***!
   \********************/
-/*! exports provided: App */
+/*! exports provided: LocalClient, App */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LocalClient", function() { return LocalClient; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "App", function() { return App; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
@@ -69708,7 +69749,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Game */ "./src/Game.js");
 /* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_Game__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _Board__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Board */ "./src/Board.js");
-/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! reactstrap */ "./node_modules/reactstrap/es/index.js");
+/* harmony import */ var _TichuLobby__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./TichuLobby */ "./src/TichuLobby.js");
+/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! reactstrap */ "./node_modules/reactstrap/es/index.js");
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -69720,6 +69762,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 
 
 
@@ -69744,20 +69787,35 @@ var ExpandableClient = function ExpandableClient(_ref) {
       bodyVisible = _useState2[0],
       setBodyVisible = _useState2[1];
 
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Card"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["CardHeader"], {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_6__["Card"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_6__["CardHeader"], {
     tag: "h5"
-  }, "Player ", playerID, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
+  }, "Player ", playerID, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_6__["Button"], {
     className: "mx-3",
     onClick: function onClick() {
       return setBodyVisible(function (prev) {
         return !prev;
       });
     }
-  }, "View")), bodyVisible && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["CardBody"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(TichuClient, {
+  }, "View")), bodyVisible && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_6__["CardBody"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(TichuClient, {
     playerID: playerID
   }))));
 };
 
+var LocalClient = function LocalClient() {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
+    style: {
+      width: "100%"
+    }
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ExpandableClient, {
+    playerID: "0"
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ExpandableClient, {
+    playerID: "1"
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ExpandableClient, {
+    playerID: "2"
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ExpandableClient, {
+    playerID: "3"
+  })))));
+};
 var App = function App() {
   var gameServer = "http://".concat(window.location.hostname);
 
@@ -69766,33 +69824,22 @@ var App = function App() {
   }
 
   gameServer += '/';
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(boardgame_io_react__WEBPACK_IMPORTED_MODULE_1__["Lobby"], {
-    gameServer: gameServer,
-    lobbyServer: gameServer,
-    gameComponents: [{
-      game: _Game__WEBPACK_IMPORTED_MODULE_3__["Tichu"],
-      board: _Board__WEBPACK_IMPORTED_MODULE_4__["TichuBoard"]
-    }]
-  })
-  /*<TichuClient playerID="0" />*/
+  return (
+    /*#__PURE__*/
 
-  /*<table style={{ width: "100%" }}>
-      <tbody>
-          <tr>
-              <td><ExpandableClient playerID="0" /></td>
-          </tr>
-          <tr>
-              <td><ExpandableClient playerID="1" /></td>
-          </tr>
-          <tr>
-              <td><ExpandableClient playerID="2" /></td>
-          </tr>
-          <tr>
-              <td><ExpandableClient playerID="3" /></td>
-          </tr>
-      </tbody>
-  </table>*/
-  ;
+    /*<TichuLobby game="Tichu" gameServer={gameServer} />*/
+
+    /*<Lobby
+        gameServer={gameServer}
+        lobbyServer={gameServer}
+        gameComponents={[
+            { game: Tichu, board: TichuBoard }
+        ]}
+    />*/
+
+    /*<TichuClient playerID="0" />*/
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(LocalClient, null)
+  );
 };
 
 /***/ }),
@@ -69866,7 +69913,8 @@ var TichuBoard = function TichuBoard(props) {
   var G = props.G,
       ctx = props.ctx,
       moves = props.moves,
-      playerID = props.playerID;
+      playerID = props.playerID,
+      matchData = props.matchData;
   var player = G.players[playerID];
   var stage = null;
 
@@ -70061,7 +70109,8 @@ var TichuBoard = function TichuBoard(props) {
     phase: phase,
     currentPlayer: ctx.currentPlayer,
     tichu: G["public"].players[playerIDs.partner].tichu,
-    grand: G["public"].players[playerIDs.partner].grand
+    grand: G["public"].players[playerIDs.partner].grand,
+    matchData: matchData
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["PartnerHand"], {
     backs: G["public"].players[playerIDs.partner].cards
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
@@ -70077,7 +70126,8 @@ var TichuBoard = function TichuBoard(props) {
     phase: phase,
     currentPlayer: ctx.currentPlayer,
     tichu: G["public"].players[playerIDs.left].tichu,
-    grand: G["public"].players[playerIDs.left].grand
+    grand: G["public"].players[playerIDs.left].grand,
+    matchData: matchData
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
     backs: G["public"].players[playerIDs.left].cards
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
@@ -70102,7 +70152,8 @@ var TichuBoard = function TichuBoard(props) {
     phase: phase,
     currentPlayer: ctx.currentPlayer,
     tichu: G["public"].players[playerIDs.right].tichu,
-    grand: G["public"].players[playerIDs.right].grand
+    grand: G["public"].players[playerIDs.right].grand,
+    matchData: matchData
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
     backs: G["public"].players[playerIDs.right].cards
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], {
@@ -70118,7 +70169,8 @@ var TichuBoard = function TichuBoard(props) {
     phase: phase,
     currentPlayer: ctx.currentPlayer,
     tichu: G["public"].players[playerID].tichu,
-    grand: G["public"].players[playerID].grand
+    grand: G["public"].players[playerID].grand,
+    matchData: matchData
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
     hand: hand,
     selectedCards: selectedCards,
@@ -70159,13 +70211,12 @@ var TichuBoard = function TichuBoard(props) {
     className: "mx-1",
     onClick: onBombClicked,
     disabled: bombButtonDisabled()
-  }, " Bomb")), ctx.activePlayers[playerID] === constants.phases.playTrick.stages.bomb && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
+  }, " Bomb")), ctx.activePlayers[playerID] === constants.phases.playTrick.stages.bomb && !G["public"].players[playerID].tichu && hand.length === 14 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
     className: "under-hand"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
     color: "primary",
     className: "mx-1",
-    onClick: handleTichuCalled,
-    disabled: G["public"].players[playerID].tichu || hand.length !== 14
+    onClick: handleTichuCalled
   }, "Tichu")), isPlayerActive && stage === constants.phases.playTrick.stages.makeWish && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
     className: "under-hand"
   }, Array(13).fill(null).map(function (_, ix) {
@@ -70514,10 +70565,10 @@ var tichu = {
         "3": {
           hand: []
         }
-      },
-      playerView: PlayerView.STRIP_SECRETS
+      }
     };
   },
+  playerView: PlayerView.STRIP_SECRETS,
   phases: {
     preHand: __webpack_require__(/*! ./PreHand */ "./src/PreHand.js").preHand,
     playTrick: __webpack_require__(/*! ./PlayTrick */ "./src/PlayTrick.js").playTrick
@@ -71599,13 +71650,27 @@ var Player = function Player(_ref) {
       phase = _ref.phase,
       currentPlayer = _ref.currentPlayer,
       tichu = _ref.tichu,
-      grand = _ref.grand;
+      grand = _ref.grand,
+      matchData = _ref.matchData;
   var displayIsActive = phase === constants.phases.playTrick.name && playerID === currentPlayer;
+  var playerName = "Player ".concat(playerID);
+
+  if (matchData) {
+    var playerNum = parseInt(playerID);
+    var playerInfo = Object.values(matchData).find(function (playerInfo) {
+      return playerInfo.id === playerNum;
+    });
+
+    if (playerInfo) {
+      playerName = playerInfo.name;
+    }
+  }
+
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     style: {
       "float": "none"
     }
-  }, "Player ", playerID, " ", grand && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "GRAND"), " ", tichu && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "TICHU"), " ", displayIsActive && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "ACTIVE"));
+  }, playerName, " ", grand && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "GRAND"), " ", tichu && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "TICHU"), " ", displayIsActive && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "ACTIVE"));
 };
 
 /***/ }),
@@ -71796,13 +71861,19 @@ var preHand = {
       takeOrGrand: {
         moves: {
           callGrand: callGrand,
-          takeCards: takeCards
+          takeCards: {
+            move: takeCards,
+            client: false
+          }
         },
         next: constants.phases.preHand.stages.passCards
       },
       passCards: {
         moves: {
-          passCards: passCards,
+          passCards: {
+            move: passCards,
+            client: false
+          },
           callTichu: callTichu
         },
         next: constants.phases.preHand.stages.waitForPass
@@ -71816,7 +71887,10 @@ var preHand = {
       acceptPass: {
         moves: {
           callTichu: callTichu,
-          acceptPass: acceptPass
+          acceptPass: {
+            move: acceptPass,
+            client: false
+          }
         }
       }
     },
@@ -71839,6 +71913,307 @@ function generateDeck(size) {
 module.exports = {
   preHand: preHand,
   generateDeck: generateDeck
+};
+
+/***/ }),
+
+/***/ "./src/TichuLobby.js":
+/*!***************************!*\
+  !*** ./src/TichuLobby.js ***!
+  \***************************/
+/*! exports provided: TichuLobby */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TichuLobby", function() { return TichuLobby; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! reactstrap */ "./node_modules/reactstrap/es/index.js");
+/* harmony import */ var boardgame_io_client__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! boardgame.io/client */ "./node_modules/boardgame.io/dist/esm/client.js");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+
+
+
+var TichuLobby = function TichuLobby(_ref) {
+  var _ref$game = _ref.game,
+      game = _ref$game === void 0 ? "Tichu" : _ref$game,
+      gameServer = _ref.gameServer;
+
+  var _useState = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])([]),
+      _useState2 = _slicedToArray(_useState, 2),
+      matches = _useState2[0],
+      setMatches = _useState2[1];
+
+  var _useState3 = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(null),
+      _useState4 = _slicedToArray(_useState3, 2),
+      intervalID = _useState4[0],
+      setIntervalID = _useState4[1];
+
+  var _useState5 = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(getPlayerName()),
+      _useState6 = _slicedToArray(_useState5, 2),
+      playerName = _useState6[0],
+      setPlayerName = _useState6[1];
+
+  var lobbyClient = Object(react__WEBPACK_IMPORTED_MODULE_0__["useMemo"])(function () {
+    return new boardgame_io_client__WEBPACK_IMPORTED_MODULE_2__["LobbyClient"]({
+      server: gameServer
+    });
+  }, [gameServer]);
+  var getMatches = Object(react__WEBPACK_IMPORTED_MODULE_0__["useCallback"])(function () {
+    lobbyClient.listMatches(game).then(function (_ref2) {
+      var matchArray = _ref2.matches;
+
+      if (matchArray) {
+        setMatches(_toConsumableArray(matchArray));
+      }
+    });
+  }, [game]);
+
+  var handleJoinMatch = function handleJoinMatch(matchID, playerID) {
+    lobbyClient.joinMatch(game, matchID, {
+      playerID: playerID,
+      playerName: getPlayerName()
+    }).then(function (_ref3) {
+      var playerCredentials = _ref3.playerCredentials;
+      window.localStorage.setItem("match-".concat(matchID), playerCredentials);
+    });
+  };
+
+  Object(react__WEBPACK_IMPORTED_MODULE_0__["useEffect"])(function () {
+    setIntervalID(setInterval(getMatches, 1000));
+    getMatches();
+    return function () {
+      if (intervalID) {
+        clearInterval(intervalID);
+      }
+    };
+  }, [getMatches]);
+
+  var handleCreateMatch = function handleCreateMatch() {
+    console.debug("Creating match");
+    lobbyClient.createMatch(game, {
+      numPlayers: 4
+    }).then(function (_ref4) {
+      var matchID = _ref4.matchID;
+      handleJoinMatch(matchID, '0');
+    });
+  };
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Container"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Row"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "float-right"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["FormGroup"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Label"], {
+    id: "nameLabel",
+    "for": "nameInput"
+  }, "Name"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Input"], {
+    value: playerName,
+    onChange: function onChange(e) {
+      return setPlayerName(e.target.value);
+    }
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Button"], {
+    onClick: function onClick() {
+      return window.localStorage.setItem('playerName', playerName);
+    }
+  }, "Set")))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Card"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["CardHeader"], null, "Games", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "float-right"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(MatchModal, {
+    className: "pull-right",
+    onCreate: handleCreateMatch
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["CardBody"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Table"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
+    style: {
+      width: "50%"
+    }
+  }, "Players"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Created Time"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Last Updated"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, matches.map(function (match) {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Match, {
+      match: match,
+      key: match.matchID,
+      onJoinMatch: handleJoinMatch
+    });
+  }))))));
+};
+
+function getPlayerName() {
+  return window.localStorage.getItem('playerName');
+}
+
+var MatchModal = function MatchModal(_ref5) {
+  var onCreate = _ref5.onCreate;
+
+  var _useState7 = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(false),
+      _useState8 = _slicedToArray(_useState7, 2),
+      createModalOpen = _useState8[0],
+      setCreateModalOpen = _useState8[1];
+
+  var handleCreateClicked = function handleCreateClicked() {
+    if (onCreate) {
+      onCreate();
+    }
+
+    setCreateModalOpen(false);
+  };
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Button"], {
+    onClick: function onClick() {
+      return setCreateModalOpen(true);
+    }
+  }, "Create Match"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Modal"], {
+    isOpen: createModalOpen
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["ModalHeader"], null, "New Match"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["ModalBody"], null, "Match Settings"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["ModalFooter"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Button"], {
+    color: "primary",
+    onClick: handleCreateClicked
+  }, "Create"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Button"], {
+    color: "secondary",
+    onClick: function onClick() {
+      return setCreateModalOpen(false);
+    }
+  }, "Cancel"))));
+};
+
+var JoinModal = function JoinModal(_ref6) {
+  var onJoin = _ref6.onJoin,
+      match = _ref6.match,
+      playerName = _ref6.playerName;
+
+  var _useState9 = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(false),
+      _useState10 = _slicedToArray(_useState9, 2),
+      joinModalOpen = _useState10[0],
+      setJoinModalOpen = _useState10[1];
+
+  var handleJoinClicked = function handleJoinClicked(playerID) {
+    if (onJoin) {
+      onJoin(match.matchID, playerID);
+    }
+
+    setJoinModalOpen(false);
+  };
+
+  var handleLeaveClicked = function handleLeaveClicked() {
+    setJoinModalOpen(false);
+  };
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Button"], {
+    onClick: function onClick() {
+      return setJoinModalOpen(true);
+    }
+  }, "Join"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Modal"], {
+    isOpen: joinModalOpen
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["ModalHeader"], null, "Join Match"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["ModalBody"], null, match && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Row"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Col"], {
+    xs: 4
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(JoinOrLeave, {
+    position: "0",
+    players: match.players,
+    onJoin: handleJoinClicked,
+    onLeave: handleLeaveClicked
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(JoinOrLeave, {
+    position: "2",
+    players: match.players,
+    onJoin: handleJoinClicked,
+    onLeave: handleLeaveClicked
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Col"], {
+    xs: 4
+  }, "Vs"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Col"], {
+    xs: 4
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(JoinOrLeave, {
+    position: "1",
+    players: match.players,
+    onJoin: handleJoinClicked,
+    onLeave: handleLeaveClicked
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(JoinOrLeave, {
+    position: "3",
+    players: match.players,
+    onJoin: handleJoinClicked,
+    onLeave: handleLeaveClicked
+  }))))));
+};
+
+var JoinOrLeave = function JoinOrLeave(_ref7) {
+  var position = _ref7.position,
+      players = _ref7.players,
+      onJoin = _ref7.onJoin,
+      onLeave = _ref7.onLeave;
+  var currentPlayer = players[position];
+
+  var handleJoinClicked = function handleJoinClicked() {
+    if (onJoin) {
+      onJoin(position);
+    }
+  };
+
+  var handleLeaveClicked = function handleLeaveClicked() {
+    if (onLeave) {
+      onLeave(position);
+    }
+  };
+
+  if (currentPlayer && currentPlayer.name) {
+    var playerName = getPlayerName();
+
+    if (currentPlayer.name === playerName) {
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Row"], null, playerName), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Row"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Button"], {
+        color: "secondary",
+        onClick: handleLeaveClicked
+      }, "Leave")));
+    } else {
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Row"], null, currentPlayer.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Row"], null));
+    }
+  } else {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Row"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Row"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Button"], {
+      color: "primary",
+      onClick: handleJoinClicked
+    }, "Join")));
+  }
+};
+/*<Row>
+    <Col xs={{ size: 4, offset: 4 }}>
+        <Button>Join N</Button>
+    </Col>
+</Row>
+<Row>
+    <Col xs={4}>
+        <Button>Join W</Button>
+    </Col>
+    <Col xs={4}>
+        Select Position
+    </Col>
+    <Col xs={4}>
+        <Button>Join E</Button>
+    </Col>
+</Row>
+<Row>
+    <Col xs={{ size: 4, offset: 4 }}>
+        <Button>Join S</Button>
+    </Col>
+</Row>*/
+
+
+var Match = function Match(_ref8) {
+  var match = _ref8.match,
+      onJoinMatch = _ref8.onJoinMatch;
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
+    key: match.matchID
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, JSON.stringify(match)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, match.createdAt), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, match.updatedAt), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(JoinModal, {
+    match: match,
+    onJoin: onJoinMatch
+  })));
 };
 
 /***/ }),

@@ -154,13 +154,19 @@ const preHand = {
             takeOrGrand: {
                 moves: {
                     callGrand: callGrand,
-                    takeCards: takeCards
+                    takeCards: {
+                        move: takeCards,
+                        client: false
+                    }
                 },
                 next: constants.phases.preHand.stages.passCards
             },
             passCards: {
                 moves: {
-                    passCards: passCards,
+                    passCards: {
+                        move: passCards,
+                        client: false
+                    },
                     callTichu: callTichu
                 },
                 next: constants.phases.preHand.stages.waitForPass
@@ -174,7 +180,10 @@ const preHand = {
             acceptPass: {
                 moves: {
                     callTichu: callTichu,
-                    acceptPass: acceptPass
+                    acceptPass: {
+                        move: acceptPass,
+                        client: false
+                    }
                 }
             }
         },

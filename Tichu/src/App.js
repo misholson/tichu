@@ -3,6 +3,7 @@ import { Client, Lobby } from 'boardgame.io/react';
 import { SocketIO } from 'boardgame.io/multiplayer';
 import { Tichu } from './Game';
 import { TichuBoard } from './Board';
+import { TichuLobby } from './TichuLobby';
 import { Card, CardHeader, CardBody, Button } from 'reactstrap';
 
 const TichuClient = Client({
@@ -30,6 +31,27 @@ const ExpandableClient = ({ playerID }) => {
     );
 }
 
+export const LocalClient = () => {
+    return (
+        <table style={{ width: "100%" }}>
+            <tbody>
+                <tr>
+                    <td><ExpandableClient playerID="0" /></td>
+                </tr>
+                <tr>
+                    <td><ExpandableClient playerID="1" /></td>
+                </tr>
+                <tr>
+                    <td><ExpandableClient playerID="2" /></td>
+                </tr>
+                <tr>
+                    <td><ExpandableClient playerID="3" /></td>
+                </tr>
+            </tbody>
+        </table>
+        )
+}
+
 export const App = () => {
     var gameServer = `http://${window.location.hostname}`;
     if (window.location.port && window.location.port !== ' ') {
@@ -37,6 +59,7 @@ export const App = () => {
     }
     gameServer += '/';
     return (
+        /*<TichuLobby game="Tichu" gameServer={gameServer} />*/
     
         <Lobby
             gameServer={gameServer}
@@ -46,21 +69,5 @@ export const App = () => {
             ]}
         />
 /*<TichuClient playerID="0" />*/
-
-    /*<table style={{ width: "100%" }}>
-        <tbody>
-            <tr>
-                <td><ExpandableClient playerID="0" /></td>
-            </tr>
-            <tr>
-                <td><ExpandableClient playerID="1" /></td>
-            </tr>
-            <tr>
-                <td><ExpandableClient playerID="2" /></td>
-            </tr>
-            <tr>
-                <td><ExpandableClient playerID="3" /></td>
-            </tr>
-        </tbody>
-    </table>*/
+        /*<LocalClient />*/
 )};
