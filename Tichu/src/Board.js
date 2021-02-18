@@ -237,9 +237,9 @@ export const TichuBoard = (props) => {
                                 <Button color="primary" className="mx-1" onClick={onBombClicked} disabled={bombButtonDisabled()} > Bomb</Button>
                             </FormGroup>
                         }
-                        {ctx.activePlayers[playerID] === constants.phases.playTrick.stages.bomb &&
+                        {ctx.activePlayers[playerID] === constants.phases.playTrick.stages.bomb && !G.public.players[playerID].tichu && hand.length === 14 &&
                             <FormGroup className="under-hand">
-                                <Button color="primary" className="mx-1" onClick={handleTichuCalled} disabled={G.public.players[playerID].tichu || hand.length !== 14}>Tichu</Button>
+                                <Button color="primary" className="mx-1" onClick={handleTichuCalled}>Tichu</Button>
                             </FormGroup>
                         }
                         {isPlayerActive && stage === constants.phases.playTrick.stages.makeWish &&
