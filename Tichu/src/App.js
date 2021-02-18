@@ -61,13 +61,13 @@ export const App = () => {
     return (
         /*<TichuLobby game="Tichu" gameServer={gameServer} />*/
     
-        /*<Lobby
+        <Lobby
             gameServer={gameServer}
             lobbyServer={gameServer}
             gameComponents={[
                 { game: Tichu, board: TichuBoard }
             ]}
-        />*/
+        />
 /*<TichuClient playerID="0" />*/
-        <LocalClient />
+        /*<LocalClient />*/
 )};
