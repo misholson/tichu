@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { Route } from 'react-router';
 import { Client, Lobby } from 'boardgame.io/react';
 import { SocketIO } from 'boardgame.io/multiplayer';
 import { Tichu } from './Game';
 import { TichuBoard } from './Board';
 import { TichuLobby } from './TichuLobby';
 import { Card, CardHeader, CardBody, Button } from 'reactstrap';
+import { gameServer } from './ClientHelpers';
 
 const TichuClient = Client({
     game: Tichu,
@@ -53,21 +55,23 @@ export const LocalClient = () => {
 }
 
 export const App = () => {
-    var gameServer = `http://${window.location.hostname}`;
-    if (window.location.port && window.location.port !== ' ') {
-        gameServer += `:${window.location.port}`;
-    }
-    gameServer += '/';
     return (
-        /*<TichuLobby game="Tichu" gameServer={gameServer} />*/
-    
-        <Lobby
-            gameServer={gameServer}
-            lobbyServer={gameServer}
-            gameComponents={[
-                { game: Tichu, board: TichuBoard }
-            ]}
-        />
-/*<TichuClient playerID="0" />*/
-        /*<LocalClient />*/
+        <>
+            <Route exact path='/'>
+                <Lobby
+                    gameServer={gameServer}
+                    lobbyServer={gameServer}
+                    gameComponents={[
+                        { game: Tichu, board: TichuBoard }
+                    ]}
+                />
+            </Route>
+
+            <Route path='/newlobby' component={TichuLobby}>
+                <TichuLobby game="Tichu" gameServer={gameServer} />
+            </Route>
+            <Route path='/local'>
+                <LocalClient />
+            </Route>
+        </>
 )};

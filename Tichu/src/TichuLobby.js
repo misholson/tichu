@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Button, Container, Row, Col, Card, CardHeader, CardBody, Table, FormGroup, Label, Input, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { LobbyClient } from 'boardgame.io/client';
+import { gameServer as defaultGameServer } from './ClientHelpers';
 
 
-export const TichuLobby = ({ game = "Tichu", gameServer }) => {
+export const TichuLobby = ({ game = "Tichu", gameServer = defaultGameServer }) => {
 
     const [matches, setMatches] = useState([]);
     const [intervalID, setIntervalID] = useState(null);
