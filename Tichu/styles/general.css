@@ -2,16 +2,14 @@ body {
 }
 
 .hand .card-front {
-    border: 1px solid black;
     border-radius: 5px;
-    box-shadow: 1px 1px 5px #555;
+    box-shadow: -1px -1px 5px #555;
     float: left;
 }
 
 .hand-vertical .card-back-rotated {
-    border: 1px solid black;
     border-radius: 5px;
-    box-shadow: 1px 1px 5px #555;
+    box-shadow: -1px -1px 5px #555;
     /*float: left;*/
     background-image: url("/images/back_rotated.jpg");
     background-position: center;
@@ -35,9 +33,8 @@ body {
 }
 
 .card-front {
-    border: 1px solid black;
     border-radius: 5px;
-    box-shadow: 1px 1px 5px #555;
+    box-shadow: -1px -1px 5px #555;
 }
 
 .play-area .play {

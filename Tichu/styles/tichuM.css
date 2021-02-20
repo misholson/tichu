@@ -28,7 +28,8 @@ ul.hand-vertical {
 }
 
 .card-selected {
-    margin-top: 16px;
+    margin-top: -16px;
+    margin-bottom: 16px;
 }
 
 .sidebar .header {
@@ -53,4 +54,8 @@ ul.hand-vertical {
 .play-area .bottom {
     top: 208px;
     left: 240px;
+}
+
+div.hand {
+    margin-bottom: 16px;
 }
