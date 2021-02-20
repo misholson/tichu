@@ -46,14 +46,6 @@ function findNextPlayer(G, ctx) {
 
     var nextPlayerPos = (currentPlayerPos + 1) % ctx.numPlayers;
 
-    // If the previous play was the dog, go one player further.
-    if (previousPlay) {
-        if (previousPlay.cards.length === 1 && previousPlay.cards[0] === constants.specials.dog) {
-            nextPlayerPos = (nextPlayerPos + 1) % ctx.numPlayers;
-            console.debug(`Player ${ctx.playOrder[ctx.playOrderPos]} played the dog, so play moves to player ${ctx.playOrder[nextPlayerPos]}`)
-        }
-    }
-
     // Find the next player who's not out.
     nextPlayerPos = findNextPlayerNotOut(G, ctx, nextPlayerPos);
 
@@ -76,13 +68,6 @@ function onTurnBegin(G, ctx) {
     console.debug(`Turn of ${ctx.currentPlayer} is beginning.`);
 
     var previousPlay = getPreviousPlay(G.currentTrick);
-
-    // If the previous play was the dog, so clear out the trick before starting play.
-    if (previousPlay) {
-        if (previousPlay.cards.length === 1 && previousPlay.cards[0] === constants.specials.dog) {
-            G.currentTrick = null;
-        }
-    }
 
     ctx.events.setActivePlayers({ all: constants.phases.playTrick.stages.bomb });
 }
@@ -329,6 +314,11 @@ function findTrickWinner(G, ctx) {
         var previousPlayIndex = G.currentTrick.plays.findIndex((play) => !play.pass);
         var previousPlay = G.currentTrick.plays[previousPlayIndex];
         var previousPlayerID = previousPlay.player;
+
+        // If the card played is the dog then the trick is over, return the players partner.
+        if (previousPlay.cards[0] === constants.specials.dog) {
+            return getPlayerIDs(ctx, previousPlay.player).partner;
+        }
 
         // At least one player needs to have passed.
         if (previousPlayIndex > 0) {

@@ -188,7 +188,6 @@ export const TichuBoard = (props) => {
         return true;
     }
 
-    var previousTrickWinnerName = G.previousTricks ? getPlayerName(G.previousTricks[0].winner, matchData) : null;
 
     return (
         <Container fluid>
@@ -279,8 +278,8 @@ export const TichuBoard = (props) => {
                                 </FormGroup>
                             </>
                         }
-                        {showTrickEnd &&
-                            <TrickOverNotification winnerName={previousTrickWinnerName} okClicked={() => setShowTrickEnd(false)} />
+                                {showTrickEnd &&
+                                    <TrickOverNotification G={G} matchData={matchData} okClicked={() => setShowTrickEnd(false)} />
                         }
                         <Clear />
                     </Col>
