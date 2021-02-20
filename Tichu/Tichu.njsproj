@@ -98,6 +98,9 @@
     <Content Include=".env">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="Procfile">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="scenarios\scenarios.js" />
     <Content Include="server.js" />
     <Content Include="src\App.js" />
