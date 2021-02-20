@@ -107,6 +107,9 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="src\Constants.js" />
+    <Content Include="src\DebugClient.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="src\Deck.js" />
     <Content Include="src\Game.js" />
     <Content Include="src\Hand.js" />

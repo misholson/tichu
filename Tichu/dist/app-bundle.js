@@ -72809,35 +72809,22 @@ module.exports = {
 /*!********************!*\
   !*** ./src/App.js ***!
   \********************/
-/*! exports provided: LocalClient, App */
+/*! exports provided: App */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LocalClient", function() { return LocalClient; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "App", function() { return App; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react_router__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-router */ "./node_modules/react-router/esm/react-router.js");
 /* harmony import */ var boardgame_io_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! boardgame.io/react */ "./node_modules/boardgame.io/dist/esm/react.js");
-/* harmony import */ var boardgame_io_multiplayer__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! boardgame.io/multiplayer */ "./node_modules/boardgame.io/dist/esm/multiplayer.js");
-/* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Game */ "./src/Game.js");
-/* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_Game__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _Board__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Board */ "./src/Board.js");
-/* harmony import */ var _TichuLobby__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./TichuLobby */ "./src/TichuLobby.js");
-/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! reactstrap */ "./node_modules/reactstrap/es/index.js");
-/* harmony import */ var _ClientHelpers__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./ClientHelpers */ "./src/ClientHelpers.js");
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
-
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
-
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+/* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Game */ "./src/Game.js");
+/* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_Game__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _Board__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Board */ "./src/Board.js");
+/* harmony import */ var _TichuLobby__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./TichuLobby */ "./src/TichuLobby.js");
+/* harmony import */ var _ClientHelpers__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./ClientHelpers */ "./src/ClientHelpers.js");
+/* harmony import */ var _DebugClient__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./DebugClient */ "./src/DebugClient.js");
 
 
 
@@ -72846,73 +72833,26 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
-
-
-var TichuClient = Object(boardgame_io_react__WEBPACK_IMPORTED_MODULE_2__["Client"])({
-  game: _Game__WEBPACK_IMPORTED_MODULE_4__["Tichu"],
-  board: _Board__WEBPACK_IMPORTED_MODULE_5__["TichuBoard"],
-  numPlayers: 4,
-  multiplayer: Object(boardgame_io_multiplayer__WEBPACK_IMPORTED_MODULE_3__["Local"])() //multiplayer: SocketIO({ server: gameServer })
-
-});
-
-var ExpandableClient = function ExpandableClient(_ref) {
-  var playerID = _ref.playerID;
-
-  var _useState = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(true),
-      _useState2 = _slicedToArray(_useState, 2),
-      bodyVisible = _useState2[0],
-      setBodyVisible = _useState2[1];
-
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_7__["Card"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_7__["CardHeader"], {
-    tag: "h5"
-  }, "Player ", playerID, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_7__["Button"], {
-    className: "mx-3",
-    onClick: function onClick() {
-      return setBodyVisible(function (prev) {
-        return !prev;
-      });
-    }
-  }, "View")), bodyVisible && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_7__["CardBody"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(TichuClient, {
-    playerID: playerID
-  }))));
-};
-
-var LocalClient = function LocalClient() {
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
-    style: {
-      width: "100%"
-    }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ExpandableClient, {
-    playerID: "0"
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ExpandableClient, {
-    playerID: "1"
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ExpandableClient, {
-    playerID: "2"
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ExpandableClient, {
-    playerID: "3"
-  })))));
-};
 var App = function App() {
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router__WEBPACK_IMPORTED_MODULE_1__["Route"], {
     exact: true,
     path: "/"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(boardgame_io_react__WEBPACK_IMPORTED_MODULE_2__["Lobby"], {
-    gameServer: _ClientHelpers__WEBPACK_IMPORTED_MODULE_8__["gameServer"],
-    lobbyServer: _ClientHelpers__WEBPACK_IMPORTED_MODULE_8__["lobbyServer"],
+    gameServer: _ClientHelpers__WEBPACK_IMPORTED_MODULE_6__["gameServer"],
+    lobbyServer: _ClientHelpers__WEBPACK_IMPORTED_MODULE_6__["lobbyServer"],
     gameComponents: [{
-      game: _Game__WEBPACK_IMPORTED_MODULE_4__["Tichu"],
-      board: _Board__WEBPACK_IMPORTED_MODULE_5__["TichuBoard"]
+      game: _Game__WEBPACK_IMPORTED_MODULE_3__["Tichu"],
+      board: _Board__WEBPACK_IMPORTED_MODULE_4__["TichuBoard"]
     }]
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router__WEBPACK_IMPORTED_MODULE_1__["Route"], {
-    path: "/newlobby",
-    component: _TichuLobby__WEBPACK_IMPORTED_MODULE_6__["TichuLobby"]
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_TichuLobby__WEBPACK_IMPORTED_MODULE_6__["TichuLobby"], {
+    path: "/newlobby"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_TichuLobby__WEBPACK_IMPORTED_MODULE_5__["TichuLobby"], {
     game: "Tichu",
-    gameServer: _ClientHelpers__WEBPACK_IMPORTED_MODULE_8__["gameServer"]
+    gameServer: _ClientHelpers__WEBPACK_IMPORTED_MODULE_6__["gameServer"]
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router__WEBPACK_IMPORTED_MODULE_1__["Route"], {
-    path: "/local"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(LocalClient, null)));
+    path: "/local",
+    component: _DebugClient__WEBPACK_IMPORTED_MODULE_7__["DebugClient"]
+  }));
 };
 
 /***/ }),
@@ -73540,6 +73480,123 @@ module.exports.constants = {
 
 /***/ }),
 
+/***/ "./src/DebugClient.js":
+/*!****************************!*\
+  !*** ./src/DebugClient.js ***!
+  \****************************/
+/*! exports provided: DebugClient */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DebugClient", function() { return DebugClient; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_router__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-router */ "./node_modules/react-router/esm/react-router.js");
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
+/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! reactstrap */ "./node_modules/reactstrap/es/index.js");
+/* harmony import */ var boardgame_io_react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! boardgame.io/react */ "./node_modules/boardgame.io/dist/esm/react.js");
+/* harmony import */ var boardgame_io_multiplayer__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! boardgame.io/multiplayer */ "./node_modules/boardgame.io/dist/esm/multiplayer.js");
+/* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Game */ "./src/Game.js");
+/* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_Game__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _Board__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Board */ "./src/Board.js");
+/* harmony import */ var _scenarios_scenarios__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../scenarios/scenarios */ "./scenarios/scenarios.js");
+/* harmony import */ var _scenarios_scenarios__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(_scenarios_scenarios__WEBPACK_IMPORTED_MODULE_8__);
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+
+
+
+
+
+
+
+
+
+
+var ExpandableClient = function ExpandableClient(_ref) {
+  var playerID = _ref.playerID,
+      scenario = _ref.scenario;
+
+  var _useState = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(true),
+      _useState2 = _slicedToArray(_useState, 2),
+      bodyVisible = _useState2[0],
+      setBodyVisible = _useState2[1];
+
+  var TichuClient = Object(boardgame_io_react__WEBPACK_IMPORTED_MODULE_4__["Client"])({
+    game: scenario ? scenario(_Game__WEBPACK_IMPORTED_MODULE_6__["Tichu"]) : _Game__WEBPACK_IMPORTED_MODULE_6__["Tichu"],
+    board: _Board__WEBPACK_IMPORTED_MODULE_7__["TichuBoard"],
+    numPlayers: 4,
+    multiplayer: Object(boardgame_io_multiplayer__WEBPACK_IMPORTED_MODULE_5__["Local"])() //multiplayer: SocketIO({ server: gameServer })
+
+  });
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_3__["Card"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_3__["CardHeader"], {
+    tag: "h5"
+  }, "Player ", playerID, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_3__["Button"], {
+    className: "mx-3",
+    onClick: function onClick() {
+      return setBodyVisible(function (prev) {
+        return !prev;
+      });
+    }
+  }, "View")), bodyVisible && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_3__["CardBody"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(TichuClient, {
+    playerID: playerID
+  }))));
+};
+
+var DebugTable = function DebugTable(_ref2) {
+  var _match$params;
+
+  var match = _ref2.match;
+  var scenario = null;
+
+  if (match !== null && match !== void 0 && (_match$params = match.params) !== null && _match$params !== void 0 && _match$params.scenario && _scenarios_scenarios__WEBPACK_IMPORTED_MODULE_8___default.a[match.params.scenario]) {
+    scenario = _scenarios_scenarios__WEBPACK_IMPORTED_MODULE_8___default.a[match.params.scenario];
+  }
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
+    style: {
+      width: "100%"
+    }
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ExpandableClient, {
+    playerID: "0",
+    scenario: scenario
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ExpandableClient, {
+    playerID: "1",
+    scenario: scenario
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ExpandableClient, {
+    playerID: "2",
+    scenario: scenario
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ExpandableClient, {
+    playerID: "3",
+    scenario: scenario
+  })))));
+};
+
+var DebugClient = function DebugClient(_ref3) {
+  var match = _ref3.match;
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["Switch"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router__WEBPACK_IMPORTED_MODULE_1__["Route"], {
+    path: match.path,
+    exact: true,
+    component: DebugTable
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router__WEBPACK_IMPORTED_MODULE_1__["Route"], {
+    path: "".concat(match.path, "/:scenario"),
+    component: DebugTable
+  }));
+};
+
+/***/ }),
+
 /***/ "./src/Deck.js":
 /*!*********************!*\
   !*** ./src/Deck.js ***!
@@ -73744,8 +73801,8 @@ var tichu = {
   maxPlayers: 4
 };
 module.exports = {
-  Tichu: scenarios.giveAllPlayersBombs(tichu) //Tichu: tichu
-
+  //Tichu: scenarios.giveAllPlayersBombs(tichu)
+  Tichu: tichu
 };
 
 /***/ }),
@@ -74790,10 +74847,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Player", function() { return Player; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _ClientHelpers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ClientHelpers */ "./src/ClientHelpers.js");
 
 
 var _require = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
     constants = _require.constants;
+
 
 var Player = function Player(_ref) {
   var playerID = _ref.playerID,
@@ -74803,19 +74862,7 @@ var Player = function Player(_ref) {
       grand = _ref.grand,
       matchData = _ref.matchData;
   var displayIsActive = phase === constants.phases.playTrick.name && playerID === currentPlayer;
-  var playerName = "Player ".concat(playerID);
-
-  if (matchData) {
-    var playerNum = parseInt(playerID);
-    var playerInfo = Object.values(matchData).find(function (playerInfo) {
-      return playerInfo.id === playerNum;
-    });
-
-    if (playerInfo) {
-      playerName = playerInfo.name;
-    }
-  }
-
+  var playerName = Object(_ClientHelpers__WEBPACK_IMPORTED_MODULE_1__["getPlayerName"])(playerID, matchData);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     style: {
       "float": "none"
