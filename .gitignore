@@ -7,3 +7,4 @@
 /.vs/Tichu/v16
 /Tichu/obj/Debug
 /Tichu/obj/Release
+*.env

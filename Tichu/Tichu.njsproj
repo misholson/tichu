@@ -95,6 +95,9 @@
     <Content Include="images\s_phoenix.png" />
     <Content Include="index.html" />
     <None Include="Properties\PublishProfiles\tichu - Web Deploy.pubxml" />
+    <Content Include=".env">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="scenarios\scenarios.js" />
     <Content Include="server.js" />
     <Content Include="src\App.js" />

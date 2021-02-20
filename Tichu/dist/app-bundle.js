@@ -96,9 +96,8 @@
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
-/* harmony import */ var _src_ClientHelpers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./src/ClientHelpers */ "./src/ClientHelpers.js");
-/* harmony import */ var _src_App__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./src/App */ "./src/App.js");
-/* harmony import */ var _tests_ValidPlayTests__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./tests/ValidPlayTests */ "./tests/ValidPlayTests.js");
+/* harmony import */ var _src_App__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./src/App */ "./src/App.js");
+/* harmony import */ var _tests_ValidPlayTests__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./tests/ValidPlayTests */ "./tests/ValidPlayTests.js");
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 
 var ReactDOM = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
@@ -106,10 +105,9 @@ var ReactDOM = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/in
 
 
 
-
-Object(_tests_ValidPlayTests__WEBPACK_IMPORTED_MODULE_3__["runTests"])();
+Object(_tests_ValidPlayTests__WEBPACK_IMPORTED_MODULE_2__["runTests"])();
 var rootElement = document.getElementById('root');
-ReactDOM.render( /*#__PURE__*/React.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_0__["HashRouter"], null, /*#__PURE__*/React.createElement(_src_App__WEBPACK_IMPORTED_MODULE_2__["App"], null)), rootElement);
+ReactDOM.render( /*#__PURE__*/React.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_0__["HashRouter"], null, /*#__PURE__*/React.createElement(_src_App__WEBPACK_IMPORTED_MODULE_1__["App"], null)), rootElement);
 
 /***/ }),
 

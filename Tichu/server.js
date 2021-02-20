@@ -4,14 +4,18 @@ var express = require('express');
 var serve = require('koa-static');
 const Server = require('boardgame.io/server').Server;
 const Tichu = require('./src/Game').Tichu;
+const { AzureStorage } = require('bgio-azure-storage');
+const { BlobServiceClient } = require('@azure/storage-blob');
+require('dotenv').config();
 
+console.debug(JSON.stringify(process.env));
 
-const server = Server({ games: [Tichu] });
+const database = new AzureStorage({
+    client: BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING),
+    container: 'games',
+});
 
-//const lobbyConfig = {
-//    apiPort: process.env.PORT,
-//    apiCallback: (...args) => console.log(`Running Lobby API on port ${process.env.PORT}: ${JSON.stringify(args)}`)
-//};
+const server = Server({ games: [Tichu], db: database });
 
 var staticPath = path.join(__dirname, '/');
 server.app.use(serve(staticPath));
