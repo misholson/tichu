@@ -7,7 +7,7 @@
     "build": "webpack-cli app.js --config webpack-config.js"
   },
   "engines": {
-    "node": "~6.10.x"
+    "node": "~8.11.x"
   },
   "author": {
     "name": ""
