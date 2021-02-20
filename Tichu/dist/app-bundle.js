@@ -73408,7 +73408,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "lobbyServer", function() { return lobbyServer; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getPlayerName", function() { return getPlayerName; });
 var getGameServer = function getGameServer() {
-  var gameServer = "".concat(window.location.hostname);
+  var gameServer = "".concat(window.location.protocol, "//").concat(window.location.hostname);
 
   if (window.location.port && window.location.port !== ' ') {
     gameServer += ":".concat(window.location.port);
@@ -73418,7 +73418,7 @@ var getGameServer = function getGameServer() {
 };
 
 var getLobbyServer = function getLobbyServer() {
-  return "".concat(window.location.protocol, "//").concat(getGameServer());
+  return getGameServer();
 };
 
 var gameServer = getGameServer();

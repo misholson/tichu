@@ -1,7 +1,7 @@
 
 
 const getGameServer = () => {
-    var gameServer = `${window.location.hostname}`;
+    var gameServer = `${window.location.protocol}//${window.location.hostname}`;
     if (window.location.port && window.location.port !== ' ') {
         gameServer += `:${window.location.port}`;
     }
@@ -10,7 +10,7 @@ const getGameServer = () => {
 }
 
 const getLobbyServer = () => {
-    return `${window.location.protocol}//${getGameServer()}`;
+    return getGameServer();
 }
 
 export const gameServer = getGameServer();
