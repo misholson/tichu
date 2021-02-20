@@ -5,6 +5,8 @@ import { PassArea } from './PassArea';
 import { PlayArea } from './PlayArea';
 import { FormGroup, Button, Container, Row, Col } from 'reactstrap';
 import 'bootstrap';
+import { TrickOverNotification } from './TrickOverNotification';
+import { getPlayerName } from './ClientHelpers';
 const { sortCards, removeFromHand, getPlayerIDs, addToHand } = require('./Helpers');
 const { constants } = require('./Constants');
 const { validPlays, detectPlayType, canPass, isValidPlay, canFulfillWish, rank, hasBomb } = require('./ValidPlays');
@@ -31,6 +33,7 @@ export const TichuBoard = (props) => {
     const [passedCards, setPassedCards] = useState([]);
     const [hand, setHand] = useState(player.hand);
     const [selectedCards, setSelectedCards] = useState([]);
+    const [showTrickEnd, setShowTrickEnd] = useState(false);
 
 
     const onGrandClicked = () => {
@@ -50,6 +53,17 @@ export const TichuBoard = (props) => {
             return [...player.hand];
         });
     }, [stage, readyToPlay, isPlayerActive, currentTrick]); // Could I just change this to the player hand? Duh.
+
+    var previousTrickCount = 0;
+    if (G.previousTricks) {
+        previousTrickCount = G.previousTricks.length;
+    }
+    // When the number of tricks changes, show a popup to clear the trick.
+    useEffect(() => {
+        if (previousTrickCount > 0) {
+            setShowTrickEnd(true);
+        }
+    }, [setShowTrickEnd, previousTrickCount])
 
     const selectCardToPass = (cardID) => {
         if (passedCards.length < 3) {
@@ -174,6 +188,8 @@ export const TichuBoard = (props) => {
         return true;
     }
 
+    var previousTrickWinnerName = G.previousTricks ? getPlayerName(G.previousTricks[0].winner, matchData) : null;
+
     return (
         <Container fluid>
             <Row>
@@ -200,7 +216,7 @@ export const TichuBoard = (props) => {
                     </Col>
                     <Col xs="8" className="board-middle">
                         {phase === constants.phases.preHand.name && <PassArea selectedCards={stage === constants.phases.preHand.stages.passCards ? passedCards : receivedCards} stage={stage} readyToPlay={G.public.players[playerID].readyToPlay} onReturnPass={handleReturnPass} onPassConfirmed={handlePassConfirmed} onAcceptConfirmed={handleAcceptConfirmed} />}
-                        {phase === constants.phases.playTrick.name && <PlayArea currentTrick={G.currentTrick} previousTricks={G.previousTricks} playerIDs={playerIDs}/>}
+                        {phase === constants.phases.playTrick.name && <PlayArea currentTrick={G.currentTrick} previousTricks={G.previousTricks} trickAcknowledged={!showTrickEnd} playerIDs={playerIDs} />}
                     </Col>
                     <Col xs="2" className="board-side">
                         <Player playerID={playerIDs.right} phase={phase} currentPlayer={ctx.currentPlayer} tichu={G.public.players[playerIDs.right].tichu} grand={G.public.players[playerIDs.right].grand} matchData={matchData} />
@@ -262,6 +278,9 @@ export const TichuBoard = (props) => {
                                     <Button color="primary" className="mx-1" onClick={() => moves.passDragon(playerIDs.right)}>Player {playerIDs.right} (Right)</Button>
                                 </FormGroup>
                             </>
+                        }
+                        {showTrickEnd &&
+                            <TrickOverNotification winnerName={previousTrickWinnerName} okClicked={() => setShowTrickEnd(false)} />
                         }
                         <Clear />
                     </Col>

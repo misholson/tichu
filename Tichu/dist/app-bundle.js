@@ -72852,9 +72852,8 @@ var TichuClient = Object(boardgame_io_react__WEBPACK_IMPORTED_MODULE_2__["Client
   game: _Game__WEBPACK_IMPORTED_MODULE_4__["Tichu"],
   board: _Board__WEBPACK_IMPORTED_MODULE_5__["TichuBoard"],
   numPlayers: 4,
-  multiplayer: Object(boardgame_io_multiplayer__WEBPACK_IMPORTED_MODULE_3__["SocketIO"])({
-    server: "".concat(window.location.hostname, ":").concat(window.location.port)
-  })
+  multiplayer: Object(boardgame_io_multiplayer__WEBPACK_IMPORTED_MODULE_3__["Local"])() //multiplayer: SocketIO({ server: gameServer })
+
 });
 
 var ExpandableClient = function ExpandableClient(_ref) {
@@ -72900,7 +72899,7 @@ var App = function App() {
     path: "/"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(boardgame_io_react__WEBPACK_IMPORTED_MODULE_2__["Lobby"], {
     gameServer: _ClientHelpers__WEBPACK_IMPORTED_MODULE_8__["gameServer"],
-    lobbyServer: _ClientHelpers__WEBPACK_IMPORTED_MODULE_8__["gameServer"],
+    lobbyServer: _ClientHelpers__WEBPACK_IMPORTED_MODULE_8__["lobbyServer"],
     gameComponents: [{
       game: _Game__WEBPACK_IMPORTED_MODULE_4__["Tichu"],
       board: _Board__WEBPACK_IMPORTED_MODULE_5__["TichuBoard"]
@@ -72937,6 +72936,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! reactstrap */ "./node_modules/reactstrap/es/index.js");
 /* harmony import */ var bootstrap__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! bootstrap */ "./node_modules/bootstrap/dist/js/bootstrap.js");
 /* harmony import */ var bootstrap__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(bootstrap__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _TrickOverNotification__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./TrickOverNotification */ "./src/TrickOverNotification.js");
+/* harmony import */ var _ClientHelpers__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./ClientHelpers */ "./src/ClientHelpers.js");
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -72956,6 +72957,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+
 
 
 
@@ -73015,6 +73018,11 @@ var TichuBoard = function TichuBoard(props) {
       selectedCards = _useState6[0],
       setSelectedCards = _useState6[1];
 
+  var _useState7 = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(false),
+      _useState8 = _slicedToArray(_useState7, 2),
+      showTrickEnd = _useState8[0],
+      setShowTrickEnd = _useState8[1];
+
   var onGrandClicked = function onGrandClicked() {
     moves.callGrand();
   };
@@ -73031,6 +73039,19 @@ var TichuBoard = function TichuBoard(props) {
       return _toConsumableArray(player.hand);
     });
   }, [stage, readyToPlay, isPlayerActive, currentTrick]); // Could I just change this to the player hand? Duh.
+
+  var previousTrickCount = 0;
+
+  if (G.previousTricks) {
+    previousTrickCount = G.previousTricks.length;
+  } // When the number of tricks changes, show a popup to clear the trick.
+
+
+  Object(react__WEBPACK_IMPORTED_MODULE_0__["useEffect"])(function () {
+    if (previousTrickCount > 0) {
+      setShowTrickEnd(true);
+    }
+  }, [setShowTrickEnd, previousTrickCount]);
 
   var selectCardToPass = function selectCardToPass(cardID) {
     if (passedCards.length < 3) {
@@ -73165,6 +73186,7 @@ var TichuBoard = function TichuBoard(props) {
     return true;
   };
 
+  var previousTrickWinnerName = G.previousTricks ? Object(_ClientHelpers__WEBPACK_IMPORTED_MODULE_8__["getPlayerName"])(G.previousTricks[0].winner, matchData) : null;
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Container"], {
     fluid: true
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
@@ -73217,6 +73239,7 @@ var TichuBoard = function TichuBoard(props) {
   }), phase === constants.phases.playTrick.name && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_PlayArea__WEBPACK_IMPORTED_MODULE_4__["PlayArea"], {
     currentTrick: G.currentTrick,
     previousTricks: G.previousTricks,
+    trickAcknowledged: !showTrickEnd,
     playerIDs: playerIDs
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
     xs: "2",
@@ -73322,7 +73345,12 @@ var TichuBoard = function TichuBoard(props) {
     onClick: function onClick() {
       return moves.passDragon(playerIDs.right);
     }
-  }, "Player ", playerIDs.right, " (Right)"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
+  }, "Player ", playerIDs.right, " (Right)"))), showTrickEnd && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_TrickOverNotification__WEBPACK_IMPORTED_MODULE_7__["TrickOverNotification"], {
+    winnerName: previousTrickWinnerName,
+    okClicked: function okClicked() {
+      return setShowTrickEnd(false);
+    }
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
     xs: "2",
     className: "board-side"
   }, "\xA0")))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
@@ -73431,24 +73459,46 @@ var Card = function Card(_ref) {
 /*!******************************!*\
   !*** ./src/ClientHelpers.js ***!
   \******************************/
-/*! exports provided: gameServer */
+/*! exports provided: gameServer, lobbyServer, getPlayerName */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "gameServer", function() { return gameServer; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "lobbyServer", function() { return lobbyServer; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getPlayerName", function() { return getPlayerName; });
 var getGameServer = function getGameServer() {
-  var gameServer = "http://".concat(window.location.hostname);
+  var gameServer = "".concat(window.location.hostname);
 
   if (window.location.port && window.location.port !== ' ') {
     gameServer += ":".concat(window.location.port);
   }
 
-  gameServer += '/';
   return gameServer;
 };
 
+var getLobbyServer = function getLobbyServer() {
+  return "".concat(window.location.protocol, "//").concat(getGameServer());
+};
+
 var gameServer = getGameServer();
+var lobbyServer = getLobbyServer();
+var getPlayerName = function getPlayerName(playerID, matchData) {
+  var playerName = "Player ".concat(playerID);
+
+  if (matchData) {
+    var playerNum = parseInt(playerID);
+    var playerInfo = Object.values(matchData).find(function (playerInfo) {
+      return playerInfo.id === playerNum;
+    });
+
+    if (playerInfo) {
+      playerName = playerInfo.name;
+    }
+  }
+
+  return playerName;
+};
 
 /***/ }),
 
@@ -73694,8 +73744,8 @@ var tichu = {
   maxPlayers: 4
 };
 module.exports = {
-  //Tichu: scenarios.giveAllPlayersBombs(tichu)
-  Tichu: tichu
+  Tichu: scenarios.giveAllPlayersBombs(tichu) //Tichu: tichu
+
 };
 
 /***/ }),
@@ -73991,13 +74041,14 @@ var PlayArea = function PlayArea(_ref) {
   var currentTrick = _ref.currentTrick,
       previousTricks = _ref.previousTricks,
       playerIDs = _ref.playerIDs,
-      playClearAnimation = _ref.playClearAnimation;
-  var displayingPreviousTrickOutcome = false;
+      playClearAnimation = _ref.playClearAnimation,
+      trickAcknowledged = _ref.trickAcknowledged;
 
   if ((!currentTrick || !currentTrick.plays || currentTrick.plays.length === 0) && previousTricks && previousTricks.length > 0) {
     // If the current trick hasn't started yet, keep displaying the previous trick with a note.
-    currentTrick = previousTricks[0];
-    displayingPreviousTrickOutcome = true;
+    if (!trickAcknowledged) {
+      currentTrick = previousTricks[0];
+    }
   }
 
   var plays = [];
@@ -75316,6 +75367,38 @@ var Match = function Match(_ref8) {
     match: match,
     onJoin: onJoinMatch
   })));
+};
+
+/***/ }),
+
+/***/ "./src/TrickOverNotification.js":
+/*!**************************************!*\
+  !*** ./src/TrickOverNotification.js ***!
+  \**************************************/
+/*! exports provided: TrickOverNotification */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TrickOverNotification", function() { return TrickOverNotification; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! reactstrap */ "./node_modules/reactstrap/es/index.js");
+
+
+var TrickOverNotification = function TrickOverNotification(_ref) {
+  var winnerName = _ref.winnerName,
+      okClicked = _ref.okClicked;
+  // if (!G.currentTrick && G.previousTricks && G.previousTricks.length > 0) 
+  // then we're between tricks.
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Modal"], {
+    isOpen: true
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["ModalHeader"], null, "Trick Ended"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["ModalBody"], null, winnerName, " has won the trick"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["ModalFooter"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Button"], {
+    color: "primary",
+    onClick: function onClick() {
+      return okClicked();
+    }
+  }, "OK")));
 };
 
 /***/ }),

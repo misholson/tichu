@@ -116,8 +116,10 @@
     <Content Include="src\Player.js" />
     <Content Include="src\PlayTrick.js" />
     <Content Include="src\PreHand.js" />
-    <Content Include="src\PrimaryPlay.js" />
     <Content Include="src\TichuLobby.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="src\TrickOverNotification.js">
       <SubType>Code</SubType>
     </Content>
     <Content Include="src\ValidPlays.js" />

@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
 import { Route } from 'react-router';
 import { Client, Lobby } from 'boardgame.io/react';
-import { SocketIO } from 'boardgame.io/multiplayer';
+import { Local } from 'boardgame.io/multiplayer';
 import { Tichu } from './Game';
 import { TichuBoard } from './Board';
 import { TichuLobby } from './TichuLobby';
 import { Card, CardHeader, CardBody, Button } from 'reactstrap';
-import { gameServer } from './ClientHelpers';
+import { gameServer, lobbyServer } from './ClientHelpers';
 
 const TichuClient = Client({
     game: Tichu,
     board: TichuBoard,
     numPlayers: 4,
-    multiplayer: SocketIO({ server: `${window.location.hostname}:${window.location.port}` })
+    multiplayer: Local()
+    //multiplayer: SocketIO({ server: gameServer })
 });
 
 const ExpandableClient = ({ playerID }) => {
@@ -60,7 +61,7 @@ export const App = () => {
             <Route exact path='/'>
                 <Lobby
                     gameServer={gameServer}
-                    lobbyServer={gameServer}
+                    lobbyServer={lobbyServer}
                     gameComponents={[
                         { game: Tichu, board: TichuBoard }
                     ]}

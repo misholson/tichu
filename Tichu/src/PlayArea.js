@@ -4,12 +4,12 @@ import { Card } from './Card';
 import { Button } from 'reactstrap';
 const { constants } = require('./Constants');
 
-export const PlayArea = ({ currentTrick, previousTricks, playerIDs, playClearAnimation }) => {
-    var displayingPreviousTrickOutcome = false;
+export const PlayArea = ({ currentTrick, previousTricks, playerIDs, playClearAnimation, trickAcknowledged }) => {
     if ((!currentTrick || !currentTrick.plays || currentTrick.plays.length === 0) && previousTricks && previousTricks.length > 0) {
         // If the current trick hasn't started yet, keep displaying the previous trick with a note.
-        currentTrick = previousTricks[0];
-        displayingPreviousTrickOutcome = true;
+        if (!trickAcknowledged) {
+            currentTrick = previousTricks[0];
+        }
     }
 
     var plays = [];

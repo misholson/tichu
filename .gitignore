@@ -8,3 +8,4 @@
 /Tichu/obj/Debug
 /Tichu/obj/Release
 *.env
+*.njsproj.user
