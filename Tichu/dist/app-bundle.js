@@ -72850,7 +72850,7 @@ var App = function App() {
     game: "Tichu",
     gameServer: _ClientHelpers__WEBPACK_IMPORTED_MODULE_6__["gameServer"]
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router__WEBPACK_IMPORTED_MODULE_1__["Route"], {
-    path: "/local",
+    path: "/debug",
     component: _DebugClient__WEBPACK_IMPORTED_MODULE_7__["DebugClient"]
   }));
 };
