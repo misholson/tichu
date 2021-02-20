@@ -16,7 +16,7 @@ export const Card = ({ cardID, selected, onCardClicked }) => {
 
     var classes = "card-front card-shape";
 
-    if (!selected) {
+    if (selected) {
         classes += " card-selected";
         //style.marginTop = "20px";
     }
