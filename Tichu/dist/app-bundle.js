@@ -74152,7 +74152,7 @@ var PlayArea = function PlayArea(_ref) {
             zIndex: 999 - i
           },
           key: i
-        }, "Player ", play.player, " ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
+        }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
           hand: play.cards
         })));
       }
@@ -75054,7 +75054,10 @@ var preHand = {
     stages: {
       takeOrGrand: {
         moves: {
-          callGrand: callGrand,
+          callGrand: {
+            move: callGrand,
+            client: false
+          },
           takeCards: {
             move: takeCards,
             client: false

@@ -28,7 +28,7 @@ export const PlayArea = ({ currentTrick, previousTricks, playerIDs, playClearAni
                     positionClass = "bottom";
                 }
 
-                plays.push((<div className={`play clearfix ${positionClass}`} style={{ zIndex: 999-i }} key={i}>Player {play.player} <Hand hand={play.cards} /></div>));
+                plays.push((<div className={`play clearfix ${positionClass}`} style={{ zIndex: 999-i }} key={i}><Hand hand={play.cards} /></div>));
             }
         }
     }

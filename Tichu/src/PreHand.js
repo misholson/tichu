@@ -165,7 +165,10 @@ const preHand = {
         stages: {
             takeOrGrand: {
                 moves: {
-                    callGrand: callGrand,
+                    callGrand: {
+                        move: callGrand,
+                        client: false
+                    },
                     takeCards: {
                         move: takeCards,
                         client: false
