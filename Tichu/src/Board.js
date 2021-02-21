@@ -199,8 +199,8 @@ export const TichuBoard = (props) => {
                         &nbsp;
                     </Col>
                     <Col xs="8" className="board-middle">
-                        <Player playerID={playerIDs.partner} phase={phase} currentPlayer={ctx.currentPlayer} tichu={G.public.players[playerIDs.partner].tichu} grand={G.public.players[playerIDs.partner].grand} matchData={matchData} />
-                        <PartnerHand backs={G.public.players[playerIDs.partner].cards} />
+                                <Player playerID={playerIDs.partner} phase={phase} currentPlayer={ctx.currentPlayer} tichu={G.public.players[playerIDs.partner].tichu} grand={G.public.players[playerIDs.partner].grand} matchData={matchData} />
+                                <PartnerHand backs={G.public.players[playerIDs.partner].cards} active={ctx.currentPlayer === playerIDs.partner} />
                         <Clear />
                     </Col>
                     <Col xs="2" className="board-side">
@@ -210,7 +210,7 @@ export const TichuBoard = (props) => {
                 <Row className="board-row clearfix">
                     <Col xs="2" className="board-side">
                         <Player playerID={playerIDs.left} phase={phase} currentPlayer={ctx.currentPlayer} tichu={G.public.players[playerIDs.left].tichu} grand={G.public.players[playerIDs.left].grand} matchData={matchData}/>
-                        <OpponentHand backs={G.public.players[playerIDs.left].cards} />
+                                <OpponentHand backs={G.public.players[playerIDs.left].cards} active={ctx.currentPlayer === playerIDs.left} />
                         <Clear />
                     </Col>
                     <Col xs="8" className="board-middle">
@@ -219,7 +219,7 @@ export const TichuBoard = (props) => {
                     </Col>
                     <Col xs="2" className="board-side">
                         <Player playerID={playerIDs.right} phase={phase} currentPlayer={ctx.currentPlayer} tichu={G.public.players[playerIDs.right].tichu} grand={G.public.players[playerIDs.right].grand} matchData={matchData} />
-                        <OpponentHand backs={G.public.players[playerIDs.right].cards} />
+                                <OpponentHand backs={G.public.players[playerIDs.right].cards} active={ctx.currentPlayer === playerIDs.right} />
                         <Clear />
                     </Col>
                 </Row>
@@ -229,7 +229,7 @@ export const TichuBoard = (props) => {
                     </Col>
                     <Col xs="8" className="board-middle">
                         <Player playerID={playerID} phase={phase} currentPlayer={ctx.currentPlayer} tichu={G.public.players[playerID].tichu} grand={G.public.players[playerID].grand} matchData={matchData} />
-                        <Hand hand={hand} selectedCards={selectedCards} onCardClicked={handleCardClicked} />
+                        <Hand hand={hand} selectedCards={selectedCards} onCardClicked={handleCardClicked} active={isPlayerActive} />
                         {stage === constants.phases.preHand.stages.takeOrGrand &&
                             <FormGroup className="under-hand-buttons">
                                 <Button color="primary" className="mx-1" onClick={onGrandClicked}>Grand Tichu</Button>

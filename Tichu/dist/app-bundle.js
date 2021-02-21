@@ -73147,7 +73147,8 @@ var TichuBoard = function TichuBoard(props) {
     grand: G["public"].players[playerIDs.partner].grand,
     matchData: matchData
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["PartnerHand"], {
-    backs: G["public"].players[playerIDs.partner].cards
+    backs: G["public"].players[playerIDs.partner].cards,
+    active: ctx.currentPlayer === playerIDs.partner
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
     xs: "2",
     className: "board-side"
@@ -73164,7 +73165,8 @@ var TichuBoard = function TichuBoard(props) {
     grand: G["public"].players[playerIDs.left].grand,
     matchData: matchData
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
-    backs: G["public"].players[playerIDs.left].cards
+    backs: G["public"].players[playerIDs.left].cards,
+    active: ctx.currentPlayer === playerIDs.left
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
     xs: "8",
     className: "board-middle"
@@ -73191,7 +73193,8 @@ var TichuBoard = function TichuBoard(props) {
     grand: G["public"].players[playerIDs.right].grand,
     matchData: matchData
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
-    backs: G["public"].players[playerIDs.right].cards
+    backs: G["public"].players[playerIDs.right].cards,
+    active: ctx.currentPlayer === playerIDs.right
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], {
     className: "board-row clearfix"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
@@ -73210,7 +73213,8 @@ var TichuBoard = function TichuBoard(props) {
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
     hand: hand,
     selectedCards: selectedCards,
-    onCardClicked: handleCardClicked
+    onCardClicked: handleCardClicked,
+    active: isPlayerActive
   }), stage === constants.phases.preHand.stages.takeOrGrand && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
     className: "under-hand-buttons"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
@@ -73826,6 +73830,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var Hand = function Hand(_ref) {
   var hand = _ref.hand,
+      active = _ref.active,
       selectedCards = _ref.selectedCards,
       onCardClicked = _ref.onCardClicked;
 
@@ -73839,52 +73844,67 @@ var Hand = function Hand(_ref) {
     });
   };
 
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("ul", {
-    className: "hand"
+  var className = "hand";
+
+  if (active) {
+    className += " activehand";
+  }
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: className
   }, hand && hand.map(function (cardID) {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", {
-      key: cardID
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Card__WEBPACK_IMPORTED_MODULE_1__["Card"], {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Card__WEBPACK_IMPORTED_MODULE_1__["Card"], {
+      key: cardID,
       cardID: cardID,
       selected: isSelected(cardID),
       onCardClicked: onCardClicked
-    }));
+    });
   }));
 };
 var PartnerHand = function PartnerHand(_ref2) {
-  var backs = _ref2.backs;
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("ul", {
-    className: "hand"
+  var backs = _ref2.backs,
+      active = _ref2.active;
+  var className = "hand";
+
+  if (active) {
+    className += " activehand";
+  }
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: className
   }, backs && Array(backs).fill(null).map(function (_, i) {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", {
-      key: i
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Card__WEBPACK_IMPORTED_MODULE_1__["Card"], {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Card__WEBPACK_IMPORTED_MODULE_1__["Card"], {
+      key: i,
       cardID: "back"
-    }));
+    });
   }));
 };
 var OpponentHand = function OpponentHand(_ref3) {
-  var backs = _ref3.backs;
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("ul", {
-    className: "hand-vertical hand"
+  var backs = _ref3.backs,
+      active = _ref3.active;
+  var className = "hand-vertical hand";
+
+  if (active) {
+    className += " activehandvertical";
+  }
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: className
   }, backs && Array(Math.floor((14 - backs) / 2)).fill(null).map(function (_, i) {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", {
-      key: i
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      key: i,
       className: "card-spacer card-shape"
-    }, "\xA0"));
+    }, "\xA0");
   }), backs && Array(backs).fill(null).map(function (_, i) {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", {
-      key: i
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      key: i,
       className: "card-back-rotated card-shape"
-    }));
+    });
   }), backs && Array(Math.ceil((14 - backs) / 2)).fill(null).map(function (_, i) {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", {
-      key: i
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      key: i,
       className: "card-spacer card-shape"
-    }, "\xA0"));
+    }, "\xA0");
   }));
 };
 

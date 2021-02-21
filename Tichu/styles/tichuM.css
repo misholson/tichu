@@ -9,6 +9,7 @@
     width: 96px;
     height: 64px;
     margin-top: -40px;
+    margin-left: 0px;
 }
 
 .hand-vertical .card-spacer {
@@ -16,10 +17,13 @@
     height: 64px;
     margin-top: -40px;
     border: 0px;
+    margin-left: 0px;
 }
 
-ul.hand-vertical {
+div.hand-vertical {
+    width: 96px;
     margin-top: 30px;
+    margin-left: 0px;
 }
 
 .card-shape {
@@ -58,4 +62,12 @@ ul.hand-vertical {
 
 div.hand {
     margin-bottom: 16px;
+}
+
+div .activehand {
+    box-shadow: -16px 0px 30px 10px greenyellow;
+}
+
+div .activehandvertical {
+    box-shadow: 0px -20px 30px 10px greenyellow;
 }
