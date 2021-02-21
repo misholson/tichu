@@ -66,8 +66,12 @@ function handAlmostFinished(game) {
             G.public.players["3"].cards = 1;
             G.previousTricks = [
                 {
-                    player: "0",
-                    cards: [50, 37, 11, 22],
+                    plays: [
+                        {
+                            cards: [50, 37, 11, 22],
+                            player: "0"
+                        }
+                    ],
                     winner: "0",
                     pass: false
                 }
