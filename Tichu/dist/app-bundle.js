@@ -74518,7 +74518,7 @@ function trickEndIf(G, ctx) {
 }
 
 function passDragon(G, ctx, receivingPlayerID) {
-  var playerIDs = getPlayerIDs(ctx, ctx.currentPlayer);
+  var playerIDs = getPlayerIDs(ctx, ctx.playerID);
 
   if (playerIDs.left !== receivingPlayerID && playerIDs.right !== receivingPlayerID) {
     console.debug("Cannot give dragon trick to player ".concat(receivingPlayerID, ". Only ").concat(playerIDs.left, " and ").concat(playerIDs.right, " are valid."));
@@ -74656,28 +74656,6 @@ function onTrickEnd(G, ctx) {
   }
 }
 
-function turnEndIf(G, ctx) {
-  // If there's a winner for the trick, end the turn.
-  if (G.currentTrick.winner) {
-    //if (G.currentTrick.plays && G.currentTrick.plays[0].cards[0] === constants.specials.dragon) {
-    //    console.debug(`Setting active player to ${G.currentTrick.winner}`);
-    //    var activePlayers = {};
-    //    activePlayers[G.currentTrick.winner] = constants.phases.playTrick.stages.passDragon.name;
-    //    ctx.events.setActivePlayers({
-    //        value: activePlayers
-    //    });
-    //}
-    return true;
-  } // If the current player is out, play proceeds in regular turn order.
-
-
-  console.debug("Player ".concat(ctx.currentPlayer, " hand length is ").concat(G.players[ctx.currentPlayer].hand.length));
-  return G.players[ctx.currentPlayer].hand.length === 0;
-}
-
-function onTurnEnd(G, ctx) {// On turn end
-}
-
 function updateScore(G, ctx) {
   if (G && G.score) {
     console.debug("Counting score"); // Give last player out tricks to first player out, cards to opponent.
@@ -74805,9 +74783,7 @@ function moveCardsBetweenArrays(fromArray, toArray) {
 var playTrick = {
   onBegin: onPhaseBegin,
   turn: {
-    onEnd: onTurnEnd,
     onBegin: onTurnBegin,
-    //endIf: turnEndIf,
     order: _objectSpread(_objectSpread({}, TurnOrder.DEFAULT), {}, {
       first: findStartPlayer,
       next: findNextPlayer
