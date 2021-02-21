@@ -147,6 +147,18 @@ const preHand = {
         dealCards(G, 8);
         ctx.events.setActivePlayers({ all: constants.phases.preHand.stages.takeOrGrand });
         G.wish = null; // reset wish
+
+        G.previousTricks = [];
+        G.currentTrick = null;
+
+        // Reset public player data.
+        Object.keys(G.public.players).forEach((playerID) => G.public.players[playerID] = {
+            cards: 8,
+            tichu: false,
+            grand: false,
+            readyToPlay: false,
+            out: false
+        }); 
         return G;
     },
     turn: {

@@ -75041,6 +75041,18 @@ var preHand = {
     });
     G.wish = null; // reset wish
 
+    G.previousTricks = [];
+    G.currentTrick = null; // Reset public player data.
+
+    Object.keys(G["public"].players).forEach(function (playerID) {
+      return G["public"].players[playerID] = {
+        cards: 8,
+        tichu: false,
+        grand: false,
+        readyToPlay: false,
+        out: false
+      };
+    });
     return G;
   },
   turn: {
