@@ -75924,7 +75924,8 @@ function isValidFullHouse(selectedCards, currentTrick) {
   } // Get the value of the 3 of a kind in the previous play.
 
 
-  var previousThreesRank = getFullHouseThreesRank(getPreviousPlay(currentTrick).cards); // Check that the new play is higher than the previous.
+  var previousPlayCards = getPreviousPlay(currentTrick).cards;
+  var previousThreesRank = getFullHouseThreesRank(_toConsumableArray(previousPlayCards)); // Check that the new play is higher than the previous.
 
   return threesRank > previousThreesRank;
 }
