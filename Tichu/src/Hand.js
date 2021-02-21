@@ -27,21 +27,20 @@ export const PartnerHand = ({ backs, active }) => {
     }
     return (
         <div className={className}>
-            {backs && Array(backs).fill(null).map((_, i) => <Card key={i} cardID={"back"} />)}
+            {backs > 0 && Array(backs).fill(null).map((_, i) => <Card key={i} cardID={"back"} />)}
         </div>
     )
 }
 
 export const OpponentHand = ({ backs, active }) => {
-    var className = "hand-vertical hand";
-    if (active) {
-        className += " activehandvertical";
-    }
+    var activeClass = active ? "activehandvertical" : "";
     return (
-        <div className={className}>
-            {backs && Array(Math.floor((14 - backs) / 2)).fill(null).map((_, i) => <div key={i} className="card-spacer card-shape">&nbsp;</div>)}
-            {backs && Array(backs).fill(null).map((_, i) => <div key={i} className="card-back-rotated card-shape"></div>)}
-            {backs && Array(Math.ceil((14 - backs) / 2)).fill(null).map((_, i) => <div key={i} className="card-spacer card-shape">&nbsp;</div>)}
+        <div className="hand-vertical hand">
+            {backs > 0 && Array(Math.floor((14 - backs) / 2)).fill(null).map((_, i) => <div key={i} className="card-spacer card-shape">&nbsp;</div>)}
+            <div className={activeClass}>
+                {backs > 0 && Array(backs).fill(null).map((_, i) => <div key={i} className="card-back-rotated card-shape"></div>)}
+            </div>
+            {backs > 0 && Array(Math.ceil((14 - backs) / 2)).fill(null).map((_, i) => <div key={i} className="card-spacer card-shape">&nbsp;</div>)}
         </div>
         )
 }

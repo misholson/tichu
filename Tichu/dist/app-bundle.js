@@ -73148,7 +73148,7 @@ var TichuBoard = function TichuBoard(props) {
     matchData: matchData
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["PartnerHand"], {
     backs: G["public"].players[playerIDs.partner].cards,
-    active: ctx.currentPlayer === playerIDs.partner
+    active: phase === constants.phases.playTrick.name && ctx.currentPlayer === playerIDs.partner
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
     xs: "2",
     className: "board-side"
@@ -73166,7 +73166,7 @@ var TichuBoard = function TichuBoard(props) {
     matchData: matchData
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
     backs: G["public"].players[playerIDs.left].cards,
-    active: ctx.currentPlayer === playerIDs.left
+    active: phase === constants.phases.playTrick.name && ctx.currentPlayer === playerIDs.left
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
     xs: "8",
     className: "board-middle"
@@ -73194,7 +73194,7 @@ var TichuBoard = function TichuBoard(props) {
     matchData: matchData
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
     backs: G["public"].players[playerIDs.right].cards,
-    active: ctx.currentPlayer === playerIDs.right
+    active: phase === constants.phases.playTrick.name && ctx.currentPlayer === playerIDs.right
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], {
     className: "board-row clearfix"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
@@ -73872,7 +73872,7 @@ var PartnerHand = function PartnerHand(_ref2) {
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: className
-  }, backs && Array(backs).fill(null).map(function (_, i) {
+  }, backs > 0 && Array(backs).fill(null).map(function (_, i) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Card__WEBPACK_IMPORTED_MODULE_1__["Card"], {
       key: i,
       cardID: "back"
@@ -73882,25 +73882,22 @@ var PartnerHand = function PartnerHand(_ref2) {
 var OpponentHand = function OpponentHand(_ref3) {
   var backs = _ref3.backs,
       active = _ref3.active;
-  var className = "hand-vertical hand";
-
-  if (active) {
-    className += " activehandvertical";
-  }
-
+  var activeClass = active ? "activehandvertical" : "";
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: className
-  }, backs && Array(Math.floor((14 - backs) / 2)).fill(null).map(function (_, i) {
+    className: "hand-vertical hand"
+  }, backs > 0 && Array(Math.floor((14 - backs) / 2)).fill(null).map(function (_, i) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
       key: i,
       className: "card-spacer card-shape"
     }, "\xA0");
-  }), backs && Array(backs).fill(null).map(function (_, i) {
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: activeClass
+  }, backs > 0 && Array(backs).fill(null).map(function (_, i) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
       key: i,
       className: "card-back-rotated card-shape"
     });
-  }), backs && Array(Math.ceil((14 - backs) / 2)).fill(null).map(function (_, i) {
+  })), backs > 0 && Array(Math.ceil((14 - backs) / 2)).fill(null).map(function (_, i) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
       key: i,
       className: "card-spacer card-shape"
