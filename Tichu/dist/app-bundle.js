@@ -72988,7 +72988,7 @@ var TichuBoard = function TichuBoard(props) {
 
 
   Object(react__WEBPACK_IMPORTED_MODULE_0__["useEffect"])(function () {
-    if (previousTrickCount > 0) {
+    if (previousTrickCount > 0 && !G["public"].players[playerID].out) {
       setShowTrickEnd(true);
     }
   }, [setShowTrickEnd, previousTrickCount]);

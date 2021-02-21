@@ -60,7 +60,7 @@ export const TichuBoard = (props) => {
     }
     // When the number of tricks changes, show a popup to clear the trick.
     useEffect(() => {
-        if (previousTrickCount > 0) {
+        if (previousTrickCount > 0 && !G.public.players[playerID].out) {
             setShowTrickEnd(true);
         }
     }, [setShowTrickEnd, previousTrickCount])
@@ -278,8 +278,8 @@ export const TichuBoard = (props) => {
                                 </FormGroup>
                             </>
                         }
-                                {showTrickEnd &&
-                                    <TrickOverNotification G={G} matchData={matchData} okClicked={() => setShowTrickEnd(false)} />
+                        {showTrickEnd &&
+                            <TrickOverNotification G={G} matchData={matchData} okClicked={() => setShowTrickEnd(false)} />
                         }
                         <Clear />
                     </Col>
