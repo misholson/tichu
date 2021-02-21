@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { constants } from './Constants';
 import { getPlayerName } from './ClientHelpers';
@@ -17,6 +17,41 @@ export const TrickOverNotification = ({ G, matchData, okClicked }) => {
             text = `${winnerName} has won the trick`;
         }
     }
+
+    const [intervalSettings, setIntervalSettings] = useState(() => {
+        return {
+            secondsLeft: 3,
+            interval: null
+        }
+    });
+
+    const countdownRefresh = () => {
+        setIntervalSettings((prev) => {
+            return {
+                ...prev,
+                secondsLeft: prev.secondsLeft - 1
+            }
+        });
+    }
+
+    const handleClose = () => {
+        okClicked();
+        clearInterval(intervalSettings.interval);
+    }
+
+    useEffect(() => {
+        if (!intervalSettings.interval) {
+            setIntervalSettings((prev) => {
+                return {
+                    ...prev,
+                    interval: setInterval(countdownRefresh, 1000)
+                }
+            });
+        } else if (intervalSettings.secondsLeft <= 0) {
+            handleClose();
+        }
+    })
+
     return (
         <Modal isOpen={true}>
             <ModalHeader>
@@ -26,7 +61,7 @@ export const TrickOverNotification = ({ G, matchData, okClicked }) => {
                 {text}
             </ModalBody>
             <ModalFooter>
-                <Button color="primary" onClick={() => okClicked()}>OK</Button>
+                Closing in {intervalSettings.secondsLeft}... <Button color="primary" onClick={handleClose}>OK</Button>
             </ModalFooter>
         </Modal>
     )
