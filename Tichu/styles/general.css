@@ -95,10 +95,6 @@ ul.hand {
     color: floralwhite;
 }
 
-.board-row div {
-    float: left;
-}
-
 .board-middle table {
     margin: auto;
     margin-top: 50px;

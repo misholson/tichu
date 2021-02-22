@@ -67,10 +67,14 @@ div.hand {
     margin-bottom: 12px;
 }
 
+div .button-row {
+    margin-bottom: 12px;
+}
+
 div .activehand {
     box-shadow: -12px 0px 25px 10px greenyellow;
 }
 
 div .activehandvertical {
-    box-shadow: 0px -16px 25px 10px greenyellow;
+    box-shadow: 0px 0px 25px 10px greenyellow;
 }

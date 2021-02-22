@@ -72953,6 +72953,7 @@ var TichuBoardInner = function TichuBoardInner(props) {
 
   var phase = ctx.phase;
   var playerIDs = getPlayerIDs(ctx, playerID);
+  var playerMetadata = Object(_ClientHelpers__WEBPACK_IMPORTED_MODULE_8__["usePlayerMetadata"])();
   var isPlayerActive = phase === constants.phases.playTrick.name && playerID === ctx.currentPlayer;
 
   var _useState = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])([]),
@@ -73143,7 +73144,11 @@ var TichuBoardInner = function TichuBoardInner(props) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
     xs: "10",
     className: "board"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Container"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Container"], {
+    style: {
+      marginTop: "20px"
+    }
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], {
     className: "board-row clearfix"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
     xs: "2",
@@ -73155,10 +73160,10 @@ var TichuBoardInner = function TichuBoardInner(props) {
     playerID: playerIDs.partner,
     tichu: G["public"].players[playerIDs.partner].tichu,
     grand: G["public"].players[playerIDs.partner].grand
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["PartnerHand"], {
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["PartnerHand"], {
     backs: G["public"].players[playerIDs.partner].cards,
     active: phase === constants.phases.playTrick.name && ctx.currentPlayer === playerIDs.partner
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
     xs: "2",
     className: "board-side"
   }, "\xA0")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], {
@@ -73206,18 +73211,19 @@ var TichuBoardInner = function TichuBoardInner(props) {
   }, "\xA0", G.wish && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "Wish: ", wishRank(G.wish))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
     xs: "8",
     className: "board-middle"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], {
+    className: "button-row"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
+    xs: "4"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Player__WEBPACK_IMPORTED_MODULE_2__["Player"], {
     playerID: playerID,
     tichu: G["public"].players[playerID].tichu,
     grand: G["public"].players[playerID].grand
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
-    hand: hand,
-    selectedCards: selectedCards,
-    onCardClicked: handleCardClicked,
-    active: isPlayerActive
-  }), stage === constants.phases.preHand.stages.takeOrGrand && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
+    xs: "8"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
     className: "under-hand-buttons"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
+  }, stage === constants.phases.preHand.stages.takeOrGrand && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
     color: "primary",
     className: "mx-1",
     onClick: onGrandClicked
@@ -73225,16 +73231,12 @@ var TichuBoardInner = function TichuBoardInner(props) {
     color: "primary",
     className: "mx-1",
     onClick: onTakeClicked
-  }, "Take")), (stage === constants.phases.preHand.stages.passCards || stage === constants.phases.preHand.stages.acceptPass || stage === constants.phases.preHand.stages.acceptPass) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
-    className: "under-hand"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
+  }, "Take")), (stage === constants.phases.preHand.stages.passCards || stage === constants.phases.preHand.stages.acceptPass || stage === constants.phases.preHand.stages.acceptPass) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
     color: "primary",
     className: "mx-1",
     onClick: handleTichuCalled,
-    disabled: G["public"].players[playerID].tichu || hand.length !== 14
-  }, "Tichu")), isPlayerActive && stage !== constants.phases.playTrick.stages.makeWish && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
-    className: "under-hand"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
+    disabled: playerMetadata.self.tichu || hand.length !== 14
+  }, "Tichu"), playerMetadata.self.isActive && stage !== constants.phases.playTrick.stages.makeWish && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
     color: "primary",
     className: "mx-1",
     onClick: onPlayClicked,
@@ -73244,20 +73246,21 @@ var TichuBoardInner = function TichuBoardInner(props) {
     className: "mx-1",
     onClick: onPassClicked,
     disabled: !canPass(G, ctx) && hand.length > 0
-  }, "Pass")), ctx.activePlayers[playerID] === constants.phases.playTrick.stages.bomb && hasBomb(hand) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
-    className: "under-hand"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
+  }, "Pass")), ctx.activePlayers[playerID] === constants.phases.playTrick.stages.bomb && hasBomb(hand) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
     color: "primary",
     className: "mx-1",
     onClick: onBombClicked,
     disabled: bombButtonDisabled()
-  }, " Bomb")), ctx.activePlayers[playerID] === constants.phases.playTrick.stages.bomb && !G["public"].players[playerID].tichu && hand.length === 14 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
-    className: "under-hand"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
+  }, " Bomb"), ctx.activePlayers[playerID] === constants.phases.playTrick.stages.bomb && !G["public"].players[playerID].tichu && hand.length === 14 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
     color: "primary",
     className: "mx-1",
     onClick: handleTichuCalled
-  }, "Tichu")), isPlayerActive && stage === constants.phases.playTrick.stages.makeWish && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
+  }, "Tichu")))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
+    hand: hand,
+    selectedCards: selectedCards,
+    onCardClicked: handleCardClicked,
+    active: isPlayerActive
+  }), isPlayerActive && stage === constants.phases.playTrick.stages.makeWish && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
     className: "under-hand"
   }, Array(13).fill(null).map(function (_, ix) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
@@ -73288,7 +73291,7 @@ var TichuBoardInner = function TichuBoardInner(props) {
     onClick: function onClick() {
       return moves.passDragon(playerIDs.right);
     }
-  }, "Player ", playerIDs.right, " (Right)"))), showTrickEnd && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_TrickOverNotification__WEBPACK_IMPORTED_MODULE_7__["TrickOverNotification"], {
+  }, "Player ", playerIDs.right, " (Right)")))), showTrickEnd && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_TrickOverNotification__WEBPACK_IMPORTED_MODULE_7__["TrickOverNotification"], {
     G: G,
     okClicked: function okClicked() {
       return setShowTrickEnd(false);
@@ -73416,6 +73419,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Constants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Constants */ "./src/Constants.js");
 /* harmony import */ var _Constants__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_Constants__WEBPACK_IMPORTED_MODULE_1__);
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 var _require = __webpack_require__(/*! ./Helpers */ "./src/Helpers.js"),
@@ -73466,32 +73475,32 @@ var usePlayerMetadata = function usePlayerMetadata(playerID) {
 
   if (!playerID) {
     playerID = gameContext.playerID;
-  } // Generate the player data that doesn't change
+  }
 
+  var playerIDs = getPlayerIDs(gameContext.ctx, playerID);
+  var playerMetadata = {};
 
-  return Object(react__WEBPACK_IMPORTED_MODULE_0__["useMemo"])(function () {
-    var playerIDs = getPlayerIDs(gameContext.ctx, playerID);
-    var playerMetadata = {};
-    var thisPlayer = {
-      id: playerID,
-      position: "self",
-      name: getPlayerName(playerID, gameContext.matchData),
-      isActive: gameContext.ctx.phase === _Constants__WEBPACK_IMPORTED_MODULE_1__["constants"].phases.playTrick.name && playerID === gameContext.ctx.currentPlayer
-    };
-    playerMetadata["self"] = thisPlayer;
-    playerMetadata[playerID] = thisPlayer;
-    Object.keys(playerIDs).forEach(function (position) {
-      var player = {
-        id: playerIDs[position],
-        position: position,
-        name: getPlayerName(playerIDs[position], gameContext.matchData),
-        isActive: gameContext.ctx.phase === _Constants__WEBPACK_IMPORTED_MODULE_1__["constants"].phases.playTrick.name && playerIDs[position] === gameContext.ctx.currentPlayer
-      };
-      playerMetadata[position] = player;
-      playerMetadata[playerIDs[position]] = player;
-    });
-    return playerMetadata;
-  }, [playerID]);
+  var thisPlayer = _objectSpread({
+    id: playerID,
+    position: "self",
+    name: getPlayerName(playerID, gameContext.matchData),
+    isActive: gameContext.ctx.phase === _Constants__WEBPACK_IMPORTED_MODULE_1__["constants"].phases.playTrick.name && playerID === gameContext.ctx.currentPlayer
+  }, gameContext.G["public"].players[playerID]);
+
+  playerMetadata["self"] = thisPlayer;
+  playerMetadata[playerID] = thisPlayer;
+  Object.keys(playerIDs).forEach(function (position) {
+    var player = _objectSpread({
+      id: playerIDs[position],
+      position: position,
+      name: getPlayerName(playerIDs[position], gameContext.matchData),
+      isActive: gameContext.ctx.phase === _Constants__WEBPACK_IMPORTED_MODULE_1__["constants"].phases.playTrick.name && playerIDs[position] === gameContext.ctx.currentPlayer
+    }, gameContext.G["public"].players[playerIDs[position]]);
+
+    playerMetadata[position] = player;
+    playerMetadata[playerIDs[position]] = player;
+  });
+  return playerMetadata;
 };
 
 /***/ }),

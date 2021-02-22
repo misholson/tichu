@@ -45,36 +45,35 @@ export const usePlayerMetadata = (playerID) => {
         playerID = gameContext.playerID;
     }
 
-    // Generate the player data that doesn't change
-    return useMemo(() => {
-        var playerIDs = getPlayerIDs(gameContext.ctx, playerID);
+    var playerIDs = getPlayerIDs(gameContext.ctx, playerID);
 
-        var playerMetadata = {};
+    var playerMetadata = {};
 
-        var thisPlayer = {
-            id: playerID,
-            position: "self",
-            name: getPlayerName(playerID, gameContext.matchData),
-            isActive: gameContext.ctx.phase === constants.phases.playTrick.name && playerID === gameContext.ctx.currentPlayer
-        }
+    var thisPlayer = {
+        id: playerID,
+        position: "self",
+        name: getPlayerName(playerID, gameContext.matchData),
+        isActive: gameContext.ctx.phase === constants.phases.playTrick.name && playerID === gameContext.ctx.currentPlayer,
+        ...gameContext.G.public.players[playerID]
+    }
 
-        playerMetadata["self"] = thisPlayer;
-        playerMetadata[playerID] = thisPlayer;
+    playerMetadata["self"] = thisPlayer;
+    playerMetadata[playerID] = thisPlayer;
 
-        Object.keys(playerIDs).forEach((position) => {
-            var player = {
-                id: playerIDs[position],
-                position: position,
-                name: getPlayerName(playerIDs[position], gameContext.matchData),
-                isActive: gameContext.ctx.phase === constants.phases.playTrick.name && playerIDs[position] === gameContext.ctx.currentPlayer
-            };
+    Object.keys(playerIDs).forEach((position) => {
+        var player = {
+            id: playerIDs[position],
+            position: position,
+            name: getPlayerName(playerIDs[position], gameContext.matchData),
+            isActive: gameContext.ctx.phase === constants.phases.playTrick.name && playerIDs[position] === gameContext.ctx.currentPlayer,
+            ...gameContext.G.public.players[playerIDs[position]]
+        };
 
-            playerMetadata[position] = player;
-            playerMetadata[playerIDs[position]] = player;
+        playerMetadata[position] = player;
+        playerMetadata[playerIDs[position]] = player;
 
-        });
+    });
 
-        return playerMetadata;
-    }, [playerID]);
+    return playerMetadata;
 
 }
