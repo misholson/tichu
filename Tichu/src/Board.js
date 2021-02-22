@@ -318,29 +318,37 @@ const TichuBoardInner = (props) => {
 	);
 }
 
-const Sidebar = ({ G, ctx, playerID }) => {
-	const playerIDs = getPlayerIDs(ctx, playerID);
+const Sidebar = ({ G }) => {
+	const playerMetadata = usePlayerMetadata();
 
 	const ourScore = (scoreRecord) => {
-		return scoreRecord[playerID] + scoreRecord[playerIDs.partner];
+		return scoreRecord[playerMetadata.self.id] + scoreRecord[playerMetadata.partner.id];
 	}
 
 	const theirScore = (scoreRecord) => {
-		return scoreRecord[playerIDs.left] + scoreRecord[playerIDs.right];
+		return scoreRecord[playerMetadata.left.id] + scoreRecord[playerMetadata.right.id];
 	}
 
 	return (
 		<Container className="sidebar">
 			<Row className="header">
-				<Col>
-					Us
+				<Col className="border-right">
+					{playerMetadata.self.name}
 				</Col>
 				<Col>
-					Opponents
+					{playerMetadata.left.name}
 				</Col>
 			</Row>
 			<Row className="header">
+				<Col className="border-right">
+					{playerMetadata.partner.name}
+				</Col>
 				<Col>
+					{playerMetadata.right.name}
+				</Col>
+			</Row>
+			<Row className="header">
+				<Col className="border-right">
 					{ourScore(G.score)}
 				</Col>
 				<Col>
@@ -351,11 +359,23 @@ const Sidebar = ({ G, ctx, playerID }) => {
 			{G.scoreHistory &&
 				G.scoreHistory.map((score, ix) =>
 					<Row key={ix} className="history">
-						<Col>
-							{ourScore(score)}
+						<Col xs="1" style={{ textDecoration: score[playerMetadata.self.id].tichuMade ? "" : "line-through" }}>
+							{score[playerMetadata.self.id].tichu ? score[playerMetadata.self.id].grand ? "G" : "T" : ""}
 						</Col>
-						<Col>
-							{theirScore(score)}
+						<Col xs="3">
+							{score[playerMetadata.self.id].score + score[playerMetadata.partner.id].score}
+						</Col>
+						<Col xs="1" style={{ textDecoration: score[playerMetadata.partner.id].tichuMade ? "" : "line-through" }}>
+							{score[playerMetadata.partner.id].tichu ? score[playerMetadata.partner.id].grand ? "G" : "T" : ""}
+						</Col>
+						<Col xs="1" style={{ textDecoration: score[playerMetadata.left.id].tichuMade ? "" : "line-through" }}>
+							{score[playerMetadata.left.id].tichu ? score[playerMetadata.left.id].grand ? "G" : "T" : ""}
+						</Col>
+						<Col xs="3">
+							{score[playerMetadata.left.id].score + score[playerMetadata.right.id].score}
+						</Col>
+						<Col xs="1" style={{ textDecoration: score[playerMetadata.right.id].tichuMade ? "" : "line-through" }}>
+							{score[playerMetadata.right.id].tichu ? score[playerMetadata.right.id].grand ? "G" : "T" : ""}
 						</Col>
 					</Row>
 			)}

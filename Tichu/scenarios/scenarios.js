@@ -53,16 +53,20 @@ function handAlmostFinished(game) {
             console.log(G);
             G.secret.deck = [];
             G.players["0"].hand = [55];
-            G.players["0"].cardsWon = [50, 37, 11, 22, 45, 19, 6, 17, 16, 15, 40, 39, 0];
-            G.players["1"].hand = [38];
+            G.players["0"].cardsWon = [50, 37, 11, 22, 45, 19, 6, 17, 16, 15, 40, 39, 38];
+            G.players["1"].hand = [0];
             G.players["1"].cardsWon = [25, 24, 36, 23, 48, 46, 32, 44, 43, 29, 3, 27, 54];
-            G.players["2"].hand = [13];
-            G.players["2"].cardsWon = [52, 53, 12, 10, 9, 47, 8, 7, 31, 18, 4, 2, 1];
-            G.players["3"].hand = [26];
+            G.players["2"].hand = [12];
+            G.players["2"].cardsWon = [26, 53, 10, 9, 47, 8, 7, 31, 18, 4, 2, 13, 1];
+            G.players["3"].hand = [52];
             G.players["3"].cardsWon = [51, 49, 35, 34, 21, 33, 20, 5, 30, 42, 41, 28, 14];
             G.public.players["0"].cards = 1;
+            G.public.players["0"].tichu = true;
             G.public.players["1"].cards = 1;
+            G.public.players["1"].tichu = true;
+            G.public.players["1"].grand = true;
             G.public.players["2"].cards = 1;
+            G.public.players["2"].tichu = true;
             G.public.players["3"].cards = 1;
             G.previousTricks = [
                 {
@@ -113,20 +117,55 @@ function giveAllPlayersBombs(game) {
                 "3": 100
             };
             G.scoreHistory = [{ // 30-70
-                "0": 115,
-                "1": 40,
-                "2": 15,
-                "3": 30
+                "0":
+                {
+                    score: 115,
+                    tichu: true,
+                    tichuMade: true
+                },
+                "1": {
+                    score: 40
+                },
+                "2": {
+                    score: 15
+                },
+                "3": {
+                    score: 30
+                }
             }, { // 280-20
-                "0": 225,
-                "1": 0,
-                "2": 55,
-                "3": 20
+                "0": {
+                    score: 225,
+                    tichu: true,
+                    grand: true,
+                    tichuMade: true
+                },
+                "1": {
+                    score: 0
+                },
+                "2": {
+                    score: 55
+                },
+                "3": {
+                    score: 20
+                }
             }, { // 240-60
-                "0": 210,
-                "1": -10,
-                "2": 30,
-                "3": 70
+                "0": {
+                    score: 210,
+                    tichu: true,
+                    grand: true,
+                    tichuMade: true
+                },
+                "1": {
+                    score: -10,
+                    tichu: true,
+                    tichuMade: false
+                },
+                "2": {
+                    score: 30
+                },
+                "3": {
+                    score: 70
+                }
             }
             ];
         } else {

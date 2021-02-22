@@ -445,16 +445,22 @@ function updateScore(G, ctx) {
         // Setup the score for this round.
         var roundScore = {};
         for (var i = 0; i < ctx.numPlayers; i++) {
-            roundScore[ctx.playOrder[i]] = 0;
+            roundScore[ctx.playOrder[i]] = {
+                score: 0
+            };
         }
 
         // Count score for this round.
         if (isOneTwo(G, ctx, ctx.playOrder[0])) {
             console.debug(`Team ${ctx.playOrder[0]}-${ctx.playOrder[2]} went one-two (first if)`);
-            roundScore[ctx.playOrder[0]] = 200;
+            roundScore[ctx.playOrder[0]] = {
+                score: 200
+            };
         } else if (isOneTwo(G, ctx, ctx.playOrder[1])) {
             console.debug(`Team ${ctx.playOrder[1]}-${ctx.playOrder[3]} went one-two (second if)`);
-            roundScore[ctx.playOrder[1]] = 200;
+            roundScore[ctx.playOrder[1]] = {
+                score: 200
+            };
         } else {
             for (var j = 0; j < ctx.numPlayers; j++) {
                 var playerID = ctx.playOrder[j];
@@ -463,7 +469,9 @@ function updateScore(G, ctx) {
                 console.debug(`calculating score for player ${playerID} with the following cards: ${JSON.stringify(cardsWon)}`);
                 var totalScore = 0;
                 cardsWon.forEach((cardID) => totalScore += score(cardID));
-                roundScore[playerID] = totalScore;
+                roundScore[playerID] = {
+                    score: totalScore
+                };
                 //roundScore[playerID] = cardsWon.reduce((totalScore, cardID) => { totalScore + score(cardID) }, 0);
                 console.debug(`score for player ${playerID} is ${totalScore}`);
             }
@@ -481,10 +489,20 @@ function updateScore(G, ctx) {
 
                 if (player.outOrder === 1) {
                     console.debug(`player ${playerIDt} went out first and won their ${player.grand ? 'grand ' : ''}tichu`);
-                    roundScore[playerIDt] += bet;
+                    roundScore[playerIDt] = {
+                        score: roundScore[playerIDt].score + bet,
+                        tichu: player.tichu,
+                        grand: player.grand,
+                        tichuMade: true
+                    };
                 } else {
                     console.debug(`player ${playerIDt} went out ${player.outOrder} and lost their ${player.grand ? 'grand ' : ''}tichu`);
-                    roundScore[playerIDt] -= bet;
+                    roundScore[playerIDt] = {
+                        score: roundScore[playerIDt].score - bet,
+                        tichu: player.tichu,
+                        grand: player.grand,
+                        tichuMade: false
+                    };
                 }
             }
         }
@@ -504,11 +522,11 @@ function updateScore(G, ctx) {
         });
 
         // Store the new score.
-        G.scoreHistory.unshift(roundScore);
+        G.scoreHistory.push(roundScore);
 
         // Calculate it into the global score.
         Object.keys(G.score).forEach((pId) => {
-            G.score[pId] += roundScore[pId];
+            G.score[pId] += roundScore[pId].score;
         });
 
         var team1score = G.score[ctx.playOrder[0]] + G.score[ctx.playOrder[2]];

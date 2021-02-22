@@ -72685,16 +72685,20 @@ function handAlmostFinished(game) {
       console.log(G);
       G.secret.deck = [];
       G.players["0"].hand = [55];
-      G.players["0"].cardsWon = [50, 37, 11, 22, 45, 19, 6, 17, 16, 15, 40, 39, 0];
-      G.players["1"].hand = [38];
+      G.players["0"].cardsWon = [50, 37, 11, 22, 45, 19, 6, 17, 16, 15, 40, 39, 38];
+      G.players["1"].hand = [0];
       G.players["1"].cardsWon = [25, 24, 36, 23, 48, 46, 32, 44, 43, 29, 3, 27, 54];
-      G.players["2"].hand = [13];
-      G.players["2"].cardsWon = [52, 53, 12, 10, 9, 47, 8, 7, 31, 18, 4, 2, 1];
-      G.players["3"].hand = [26];
+      G.players["2"].hand = [12];
+      G.players["2"].cardsWon = [26, 53, 10, 9, 47, 8, 7, 31, 18, 4, 2, 13, 1];
+      G.players["3"].hand = [52];
       G.players["3"].cardsWon = [51, 49, 35, 34, 21, 33, 20, 5, 30, 42, 41, 28, 14];
       G["public"].players["0"].cards = 1;
+      G["public"].players["0"].tichu = true;
       G["public"].players["1"].cards = 1;
+      G["public"].players["1"].tichu = true;
+      G["public"].players["1"].grand = true;
       G["public"].players["2"].cards = 1;
+      G["public"].players["2"].tichu = true;
       G["public"].players["3"].cards = 1;
       G.previousTricks = [{
         plays: [{
@@ -72747,22 +72751,56 @@ function giveAllPlayersBombs(game) {
       };
       G.scoreHistory = [{
         // 30-70
-        "0": 115,
-        "1": 40,
-        "2": 15,
-        "3": 30
+        "0": {
+          score: 115,
+          tichu: true,
+          tichuMade: true
+        },
+        "1": {
+          score: 40
+        },
+        "2": {
+          score: 15
+        },
+        "3": {
+          score: 30
+        }
       }, {
         // 280-20
-        "0": 225,
-        "1": 0,
-        "2": 55,
-        "3": 20
+        "0": {
+          score: 225,
+          tichu: true,
+          grand: true,
+          tichuMade: true
+        },
+        "1": {
+          score: 0
+        },
+        "2": {
+          score: 55
+        },
+        "3": {
+          score: 20
+        }
       }, {
         // 240-60
-        "0": 210,
-        "1": -10,
-        "2": 30,
-        "3": 70
+        "0": {
+          score: 210,
+          tichu: true,
+          grand: true,
+          tichuMade: true
+        },
+        "1": {
+          score: -10,
+          tichu: true,
+          tichuMade: false
+        },
+        "2": {
+          score: 30
+        },
+        "3": {
+          score: 70
+        }
       }];
     } else {
       G.currentTrick = null;
@@ -73309,30 +73347,60 @@ var TichuBoardInner = function TichuBoardInner(props) {
 };
 
 var Sidebar = function Sidebar(_ref) {
-  var G = _ref.G,
-      ctx = _ref.ctx,
-      playerID = _ref.playerID;
-  var playerIDs = getPlayerIDs(ctx, playerID);
+  var G = _ref.G;
+  var playerMetadata = Object(_ClientHelpers__WEBPACK_IMPORTED_MODULE_8__["usePlayerMetadata"])();
 
   var ourScore = function ourScore(scoreRecord) {
-    return scoreRecord[playerID] + scoreRecord[playerIDs.partner];
+    return scoreRecord[playerMetadata.self.id] + scoreRecord[playerMetadata.partner.id];
   };
 
   var theirScore = function theirScore(scoreRecord) {
-    return scoreRecord[playerIDs.left] + scoreRecord[playerIDs.right];
+    return scoreRecord[playerMetadata.left.id] + scoreRecord[playerMetadata.right.id];
   };
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Container"], {
     className: "sidebar"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], {
     className: "header"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], null, "Us"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], null, "Opponents")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
+    className: "border-right"
+  }, playerMetadata.self.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], null, playerMetadata.left.name)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], {
     className: "header"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], null, ourScore(G.score)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], null, theirScore(G.score))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), G.scoreHistory && G.scoreHistory.map(function (score, ix) {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
+    className: "border-right"
+  }, playerMetadata.partner.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], null, playerMetadata.right.name)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], {
+    className: "header"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
+    className: "border-right"
+  }, ourScore(G.score)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], null, theirScore(G.score))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), G.scoreHistory && G.scoreHistory.map(function (score, ix) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], {
       key: ix,
       className: "history"
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], null, ourScore(score)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], null, theirScore(score)));
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
+      xs: "1",
+      style: {
+        textDecoration: score[playerMetadata.self.id].tichuMade ? "" : "line-through"
+      }
+    }, score[playerMetadata.self.id].tichu ? score[playerMetadata.self.id].grand ? "G" : "T" : ""), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
+      xs: "3"
+    }, score[playerMetadata.self.id].score + score[playerMetadata.partner.id].score), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
+      xs: "1",
+      style: {
+        textDecoration: score[playerMetadata.partner.id].tichuMade ? "" : "line-through"
+      }
+    }, score[playerMetadata.partner.id].tichu ? score[playerMetadata.partner.id].grand ? "G" : "T" : ""), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
+      xs: "1",
+      style: {
+        textDecoration: score[playerMetadata.left.id].tichuMade ? "" : "line-through"
+      }
+    }, score[playerMetadata.left.id].tichu ? score[playerMetadata.left.id].grand ? "G" : "T" : ""), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
+      xs: "3"
+    }, score[playerMetadata.left.id].score + score[playerMetadata.right.id].score), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
+      xs: "1",
+      style: {
+        textDecoration: score[playerMetadata.right.id].tichuMade ? "" : "line-through"
+      }
+    }, score[playerMetadata.right.id].tichu ? score[playerMetadata.right.id].grand ? "G" : "T" : ""));
   }));
 };
 
@@ -74746,16 +74814,22 @@ function updateScore(G, ctx) {
     var roundScore = {};
 
     for (var i = 0; i < ctx.numPlayers; i++) {
-      roundScore[ctx.playOrder[i]] = 0;
+      roundScore[ctx.playOrder[i]] = {
+        score: 0
+      };
     } // Count score for this round.
 
 
     if (isOneTwo(G, ctx, ctx.playOrder[0])) {
       console.debug("Team ".concat(ctx.playOrder[0], "-").concat(ctx.playOrder[2], " went one-two (first if)"));
-      roundScore[ctx.playOrder[0]] = 200;
+      roundScore[ctx.playOrder[0]] = {
+        score: 200
+      };
     } else if (isOneTwo(G, ctx, ctx.playOrder[1])) {
       console.debug("Team ".concat(ctx.playOrder[1], "-").concat(ctx.playOrder[3], " went one-two (second if)"));
-      roundScore[ctx.playOrder[1]] = 200;
+      roundScore[ctx.playOrder[1]] = {
+        score: 200
+      };
     } else {
       for (var j = 0; j < ctx.numPlayers; j++) {
         var playerID = ctx.playOrder[j];
@@ -74765,7 +74839,9 @@ function updateScore(G, ctx) {
         cardsWon.forEach(function (cardID) {
           return totalScore += score(cardID);
         });
-        roundScore[playerID] = totalScore; //roundScore[playerID] = cardsWon.reduce((totalScore, cardID) => { totalScore + score(cardID) }, 0);
+        roundScore[playerID] = {
+          score: totalScore
+        }; //roundScore[playerID] = cardsWon.reduce((totalScore, cardID) => { totalScore + score(cardID) }, 0);
 
         console.debug("score for player ".concat(playerID, " is ").concat(totalScore));
       }
@@ -74785,10 +74861,20 @@ function updateScore(G, ctx) {
 
         if (player.outOrder === 1) {
           console.debug("player ".concat(playerIDt, " went out first and won their ").concat(player.grand ? 'grand ' : '', "tichu"));
-          roundScore[playerIDt] += bet;
+          roundScore[playerIDt] = {
+            score: roundScore[playerIDt].score + bet,
+            tichu: player.tichu,
+            grand: player.grand,
+            tichuMade: true
+          };
         } else {
           console.debug("player ".concat(playerIDt, " went out ").concat(player.outOrder, " and lost their ").concat(player.grand ? 'grand ' : '', "tichu"));
-          roundScore[playerIDt] -= bet;
+          roundScore[playerIDt] = {
+            score: roundScore[playerIDt].score - bet,
+            tichu: player.tichu,
+            grand: player.grand,
+            tichuMade: false
+          };
         }
       }
     }
@@ -74805,10 +74891,10 @@ function updateScore(G, ctx) {
       publicData.grand = false;
     }); // Store the new score.
 
-    G.scoreHistory.unshift(roundScore); // Calculate it into the global score.
+    G.scoreHistory.push(roundScore); // Calculate it into the global score.
 
     Object.keys(G.score).forEach(function (pId) {
-      G.score[pId] += roundScore[pId];
+      G.score[pId] += roundScore[pId].score;
     });
     var team1score = G.score[ctx.playOrder[0]] + G.score[ctx.playOrder[2]];
     var team2score = G.score[ctx.playOrder[1]] + G.score[ctx.playOrder[3]];
