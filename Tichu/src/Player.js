@@ -1,13 +1,12 @@
 import React from 'react';
 const { constants } = require('./Constants');
-import { getPlayerName } from './ClientHelpers';
+import { usePlayerMetadata } from './ClientHelpers';
 
-export const Player = ({ playerID, phase, currentPlayer, tichu, grand, matchData }) => {
-    var displayIsActive = (phase === constants.phases.playTrick.name && playerID === currentPlayer);
-    var playerName = getPlayerName(playerID, matchData);
+export const Player = ({ playerID, tichu, grand }) => {
+    const playerMetadata = usePlayerMetadata()[playerID];
     return (
         <div style={{ float: "none" }}>
-            {playerName} {grand && <>GRAND</>} {tichu && <>TICHU</>} {displayIsActive && <>ACTIVE</>} 
+            {playerMetadata.name} {grand && <>GRAND</>} {tichu && <>TICHU</>} {playerMetadata.isActive && <>ACTIVE</>} 
         </div>
         )
 }

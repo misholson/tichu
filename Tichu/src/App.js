@@ -26,4 +26,5 @@ export const App = () => {
             </Route>
             <Route path='/debug' component={DebugClient} />
         </>
-)};
+    )
+};

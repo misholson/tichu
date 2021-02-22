@@ -6,12 +6,26 @@ import { PlayArea } from './PlayArea';
 import { FormGroup, Button, Container, Row, Col } from 'reactstrap';
 import 'bootstrap';
 import { TrickOverNotification } from './TrickOverNotification';
-import { getPlayerName } from './ClientHelpers';
+import { GameContext } from './ClientHelpers';
 const { sortCards, removeFromHand, getPlayerIDs, addToHand } = require('./Helpers');
 const { constants } = require('./Constants');
-const { validPlays, detectPlayType, canPass, isValidPlay, canFulfillWish, rank, hasBomb } = require('./ValidPlays');
+const { canPass, isValidPlay, canFulfillWish, rank, hasBomb } = require('./ValidPlays');
 
 export const TichuBoard = (props) => {
+    var metadata = {
+        matchData: props.matchData,
+        playerID: props.playerID,
+        G: props.G,
+        ctx: props.ctx
+    }
+    return (
+        <GameContext.Provider value={metadata}>
+            <TichuBoardInner {...props} />
+        </GameContext.Provider>
+        )
+}
+
+const TichuBoardInner = (props) => {
 
     const {
         G,
@@ -199,7 +213,7 @@ export const TichuBoard = (props) => {
                         &nbsp;
                     </Col>
                     <Col xs="8" className="board-middle">
-                        <Player playerID={playerIDs.partner} phase={phase} currentPlayer={ctx.currentPlayer} tichu={G.public.players[playerIDs.partner].tichu} grand={G.public.players[playerIDs.partner].grand} matchData={matchData} />
+                        <Player playerID={playerIDs.partner} tichu={G.public.players[playerIDs.partner].tichu} grand={G.public.players[playerIDs.partner].grand} />
                         <PartnerHand backs={G.public.players[playerIDs.partner].cards} active={phase === constants.phases.playTrick.name && ctx.currentPlayer === playerIDs.partner} />
                         <Clear />
                     </Col>
@@ -209,7 +223,7 @@ export const TichuBoard = (props) => {
                 </Row>
                 <Row className="board-row clearfix">
                     <Col xs="2" className="board-side">
-                        <Player playerID={playerIDs.left} phase={phase} currentPlayer={ctx.currentPlayer} tichu={G.public.players[playerIDs.left].tichu} grand={G.public.players[playerIDs.left].grand} matchData={matchData}/>
+                        <Player playerID={playerIDs.left} tichu={G.public.players[playerIDs.left].tichu} grand={G.public.players[playerIDs.left].grand} />
                         <OpponentHand backs={G.public.players[playerIDs.left].cards} active={phase === constants.phases.playTrick.name && ctx.currentPlayer === playerIDs.left} />
                         <Clear />
                     </Col>
@@ -218,7 +232,7 @@ export const TichuBoard = (props) => {
                         {phase === constants.phases.playTrick.name && <PlayArea currentTrick={G.currentTrick} previousTricks={G.previousTricks} trickAcknowledged={!showTrickEnd} playerIDs={playerIDs} />}
                     </Col>
                     <Col xs="2" className="board-side">
-                        <Player playerID={playerIDs.right} phase={phase} currentPlayer={ctx.currentPlayer} tichu={G.public.players[playerIDs.right].tichu} grand={G.public.players[playerIDs.right].grand} matchData={matchData} />
+                        <Player playerID={playerIDs.right} tichu={G.public.players[playerIDs.right].tichu} grand={G.public.players[playerIDs.right].grand} />
                         <OpponentHand backs={G.public.players[playerIDs.right].cards} active={phase === constants.phases.playTrick.name && ctx.currentPlayer === playerIDs.right} />
                         <Clear />
                     </Col>
@@ -228,7 +242,7 @@ export const TichuBoard = (props) => {
                             &nbsp;{G.wish && <>Wish: {wishRank(G.wish)}</>}
                     </Col>
                     <Col xs="8" className="board-middle">
-                        <Player playerID={playerID} phase={phase} currentPlayer={ctx.currentPlayer} tichu={G.public.players[playerID].tichu} grand={G.public.players[playerID].grand} matchData={matchData} />
+                        <Player playerID={playerID} tichu={G.public.players[playerID].tichu} grand={G.public.players[playerID].grand} />
                         <Hand hand={hand} selectedCards={selectedCards} onCardClicked={handleCardClicked} active={isPlayerActive} />
                         {stage === constants.phases.preHand.stages.takeOrGrand &&
                             <FormGroup className="under-hand-buttons">
@@ -279,7 +293,7 @@ export const TichuBoard = (props) => {
                             </>
                         }
                         {showTrickEnd &&
-                            <TrickOverNotification G={G} matchData={matchData} okClicked={() => setShowTrickEnd(false)} />
+                            <TrickOverNotification G={G} okClicked={() => setShowTrickEnd(false)} />
                         }
                         <Clear />
                     </Col>

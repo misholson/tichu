@@ -72920,8 +72920,6 @@ var _require2 = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
     constants = _require2.constants;
 
 var _require3 = __webpack_require__(/*! ./ValidPlays */ "./src/ValidPlays.js"),
-    validPlays = _require3.validPlays,
-    detectPlayType = _require3.detectPlayType,
     canPass = _require3.canPass,
     isValidPlay = _require3.isValidPlay,
     canFulfillWish = _require3.canFulfillWish,
@@ -72929,6 +72927,18 @@ var _require3 = __webpack_require__(/*! ./ValidPlays */ "./src/ValidPlays.js"),
     hasBomb = _require3.hasBomb;
 
 var TichuBoard = function TichuBoard(props) {
+  var metadata = {
+    matchData: props.matchData,
+    playerID: props.playerID,
+    G: props.G,
+    ctx: props.ctx
+  };
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ClientHelpers__WEBPACK_IMPORTED_MODULE_8__["GameContext"].Provider, {
+    value: metadata
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(TichuBoardInner, props));
+};
+
+var TichuBoardInner = function TichuBoardInner(props) {
   var G = props.G,
       ctx = props.ctx,
       moves = props.moves,
@@ -73143,11 +73153,8 @@ var TichuBoard = function TichuBoard(props) {
     className: "board-middle"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Player__WEBPACK_IMPORTED_MODULE_2__["Player"], {
     playerID: playerIDs.partner,
-    phase: phase,
-    currentPlayer: ctx.currentPlayer,
     tichu: G["public"].players[playerIDs.partner].tichu,
-    grand: G["public"].players[playerIDs.partner].grand,
-    matchData: matchData
+    grand: G["public"].players[playerIDs.partner].grand
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["PartnerHand"], {
     backs: G["public"].players[playerIDs.partner].cards,
     active: phase === constants.phases.playTrick.name && ctx.currentPlayer === playerIDs.partner
@@ -73161,11 +73168,8 @@ var TichuBoard = function TichuBoard(props) {
     className: "board-side"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Player__WEBPACK_IMPORTED_MODULE_2__["Player"], {
     playerID: playerIDs.left,
-    phase: phase,
-    currentPlayer: ctx.currentPlayer,
     tichu: G["public"].players[playerIDs.left].tichu,
-    grand: G["public"].players[playerIDs.left].grand,
-    matchData: matchData
+    grand: G["public"].players[playerIDs.left].grand
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
     backs: G["public"].players[playerIDs.left].cards,
     active: phase === constants.phases.playTrick.name && ctx.currentPlayer === playerIDs.left
@@ -73189,11 +73193,8 @@ var TichuBoard = function TichuBoard(props) {
     className: "board-side"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Player__WEBPACK_IMPORTED_MODULE_2__["Player"], {
     playerID: playerIDs.right,
-    phase: phase,
-    currentPlayer: ctx.currentPlayer,
     tichu: G["public"].players[playerIDs.right].tichu,
-    grand: G["public"].players[playerIDs.right].grand,
-    matchData: matchData
+    grand: G["public"].players[playerIDs.right].grand
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["OpponentHand"], {
     backs: G["public"].players[playerIDs.right].cards,
     active: phase === constants.phases.playTrick.name && ctx.currentPlayer === playerIDs.right
@@ -73207,11 +73208,8 @@ var TichuBoard = function TichuBoard(props) {
     className: "board-middle"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Player__WEBPACK_IMPORTED_MODULE_2__["Player"], {
     playerID: playerID,
-    phase: phase,
-    currentPlayer: ctx.currentPlayer,
     tichu: G["public"].players[playerID].tichu,
-    grand: G["public"].players[playerID].grand,
-    matchData: matchData
+    grand: G["public"].players[playerID].grand
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
     hand: hand,
     selectedCards: selectedCards,
@@ -73292,7 +73290,6 @@ var TichuBoard = function TichuBoard(props) {
     }
   }, "Player ", playerIDs.right, " (Right)"))), showTrickEnd && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_TrickOverNotification__WEBPACK_IMPORTED_MODULE_7__["TrickOverNotification"], {
     G: G,
-    matchData: matchData,
     okClicked: function okClicked() {
       return setShowTrickEnd(false);
     }
@@ -73405,7 +73402,7 @@ var Card = function Card(_ref) {
 /*!******************************!*\
   !*** ./src/ClientHelpers.js ***!
   \******************************/
-/*! exports provided: gameServer, lobbyServer, getPlayerName */
+/*! exports provided: gameServer, lobbyServer, getPlayerName, GameContext, usePlayerMetadata */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -73413,6 +73410,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "gameServer", function() { return gameServer; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "lobbyServer", function() { return lobbyServer; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getPlayerName", function() { return getPlayerName; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GameContext", function() { return GameContext; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "usePlayerMetadata", function() { return usePlayerMetadata; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Constants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Constants */ "./src/Constants.js");
+/* harmony import */ var _Constants__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_Constants__WEBPACK_IMPORTED_MODULE_1__);
+
+
+var _require = __webpack_require__(/*! ./Helpers */ "./src/Helpers.js"),
+    getPlayerIDs = _require.getPlayerIDs;
+
+
+
 var getGameServer = function getGameServer() {
   var gameServer = "".concat(window.location.protocol, "//").concat(window.location.hostname);
 
@@ -73444,6 +73454,44 @@ var getPlayerName = function getPlayerName(playerID, matchData) {
   }
 
   return playerName;
+};
+var GameContext = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createContext({
+  matchData: null,
+  playerID: null,
+  G: null,
+  ctx: null
+});
+var usePlayerMetadata = function usePlayerMetadata(playerID) {
+  var gameContext = Object(react__WEBPACK_IMPORTED_MODULE_0__["useContext"])(GameContext);
+
+  if (!playerID) {
+    playerID = gameContext.playerID;
+  } // Generate the player data that doesn't change
+
+
+  return Object(react__WEBPACK_IMPORTED_MODULE_0__["useMemo"])(function () {
+    var playerIDs = getPlayerIDs(gameContext.ctx, playerID);
+    var playerMetadata = {};
+    var thisPlayer = {
+      id: playerID,
+      position: "self",
+      name: getPlayerName(playerID, gameContext.matchData),
+      isActive: gameContext.ctx.phase === _Constants__WEBPACK_IMPORTED_MODULE_1__["constants"].phases.playTrick.name && playerID === gameContext.ctx.currentPlayer
+    };
+    playerMetadata["self"] = thisPlayer;
+    playerMetadata[playerID] = thisPlayer;
+    Object.keys(playerIDs).forEach(function (position) {
+      var player = {
+        id: playerIDs[position],
+        position: position,
+        name: getPlayerName(playerIDs[position], gameContext.matchData),
+        isActive: gameContext.ctx.phase === _Constants__WEBPACK_IMPORTED_MODULE_1__["constants"].phases.playTrick.name && playerIDs[position] === gameContext.ctx.currentPlayer
+      };
+      playerMetadata[position] = player;
+      playerMetadata[playerIDs[position]] = player;
+    });
+    return playerMetadata;
+  }, [playerID]);
 };
 
 /***/ }),
@@ -74841,18 +74889,14 @@ var _require = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
 
 var Player = function Player(_ref) {
   var playerID = _ref.playerID,
-      phase = _ref.phase,
-      currentPlayer = _ref.currentPlayer,
       tichu = _ref.tichu,
-      grand = _ref.grand,
-      matchData = _ref.matchData;
-  var displayIsActive = phase === constants.phases.playTrick.name && playerID === currentPlayer;
-  var playerName = Object(_ClientHelpers__WEBPACK_IMPORTED_MODULE_1__["getPlayerName"])(playerID, matchData);
+      grand = _ref.grand;
+  var playerMetadata = Object(_ClientHelpers__WEBPACK_IMPORTED_MODULE_1__["usePlayerMetadata"])()[playerID];
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     style: {
       "float": "none"
     }
-  }, playerName, " ", grand && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "GRAND"), " ", tichu && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "TICHU"), " ", displayIsActive && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "ACTIVE"));
+  }, playerMetadata.name, " ", grand && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "GRAND"), " ", tichu && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "TICHU"), " ", playerMetadata.isActive && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "ACTIVE"));
 };
 
 /***/ }),
@@ -75458,18 +75502,16 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 var TrickOverNotification = function TrickOverNotification(_ref) {
   var G = _ref.G,
-      matchData = _ref.matchData,
       okClicked = _ref.okClicked;
-  // if (!G.currentTrick && G.previousTricks && G.previousTricks.length > 0) 
-  // then we're between tricks.
+  var playerMetadata = Object(_ClientHelpers__WEBPACK_IMPORTED_MODULE_3__["usePlayerMetadata"])();
   var text = "Trick has ended.";
 
   if (G.previousTricks) {
     var previousTrick = G.previousTricks[0];
-    var winnerName = Object(_ClientHelpers__WEBPACK_IMPORTED_MODULE_3__["getPlayerName"])(previousTrick.winner, matchData);
+    var winnerName = playerMetadata[previousTrick.winner].name;
 
     if (previousTrick.plays[0].cards[0] === _Constants__WEBPACK_IMPORTED_MODULE_2__["constants"].specials.dog) {
-      var partnerName = Object(_ClientHelpers__WEBPACK_IMPORTED_MODULE_3__["getPlayerName"])(previousTrick.plays[0].player, matchData);
+      var partnerName = playerMetadata[previousTrick.plays[0].player].name;
       text = "".concat(partnerName, " passed the Dog to ").concat(winnerName);
     } else {
       text = "".concat(winnerName, " has won the trick");
