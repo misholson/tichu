@@ -72865,6 +72865,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _TichuLobby__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./TichuLobby */ "./src/TichuLobby.js");
 /* harmony import */ var _ClientHelpers__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./ClientHelpers */ "./src/ClientHelpers.js");
 /* harmony import */ var _DebugClient__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./DebugClient */ "./src/DebugClient.js");
+/* harmony import */ var _TichuClient__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./TichuClient */ "./src/TichuClient.js");
+
 
 
 
@@ -72875,8 +72877,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var App = function App() {
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router__WEBPACK_IMPORTED_MODULE_1__["Route"], {
-    exact: true,
-    path: "/"
+    path: "/defaultlobby"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(boardgame_io_react__WEBPACK_IMPORTED_MODULE_2__["Lobby"], {
     gameServer: _ClientHelpers__WEBPACK_IMPORTED_MODULE_6__["gameServer"],
     lobbyServer: _ClientHelpers__WEBPACK_IMPORTED_MODULE_6__["lobbyServer"],
@@ -72885,7 +72886,11 @@ var App = function App() {
       board: _Board__WEBPACK_IMPORTED_MODULE_4__["TichuBoard"]
     }]
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router__WEBPACK_IMPORTED_MODULE_1__["Route"], {
-    path: "/newlobby"
+    path: "/match/:id",
+    component: _TichuClient__WEBPACK_IMPORTED_MODULE_8__["TichuMatch"]
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router__WEBPACK_IMPORTED_MODULE_1__["Route"], {
+    exact: true,
+    path: "/"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_TichuLobby__WEBPACK_IMPORTED_MODULE_5__["TichuLobby"], {
     game: "Tichu",
     gameServer: _ClientHelpers__WEBPACK_IMPORTED_MODULE_6__["gameServer"]
@@ -73473,7 +73478,7 @@ var Card = function Card(_ref) {
 /*!******************************!*\
   !*** ./src/ClientHelpers.js ***!
   \******************************/
-/*! exports provided: gameServer, lobbyServer, getPlayerName, GameContext, usePlayerMetadata */
+/*! exports provided: gameServer, lobbyServer, getPlayerName, GameContext, usePlayerMetadata, setMatchCrendentials, getMatchCredentials */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -73483,6 +73488,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getPlayerName", function() { return getPlayerName; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GameContext", function() { return GameContext; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "usePlayerMetadata", function() { return usePlayerMetadata; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setMatchCrendentials", function() { return setMatchCrendentials; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getMatchCredentials", function() { return getMatchCredentials; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Constants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Constants */ "./src/Constants.js");
@@ -73569,6 +73576,15 @@ var usePlayerMetadata = function usePlayerMetadata(playerID) {
     playerMetadata[playerIDs[position]] = player;
   });
   return playerMetadata;
+};
+var setMatchCrendentials = function setMatchCrendentials(matchID, playerID, playerCredentials) {
+  window.localStorage.setItem("match-".concat(matchID), JSON.stringify({
+    credentials: playerCredentials,
+    playerID: playerID
+  }));
+};
+var getMatchCredentials = function getMatchCredentials(matchID) {
+  return JSON.parse(window.localStorage.getItem("match-".concat(matchID)));
 };
 
 /***/ }),
@@ -75253,6 +75269,57 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./src/TichuClient.js":
+/*!****************************!*\
+  !*** ./src/TichuClient.js ***!
+  \****************************/
+/*! exports provided: TichuMatch */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TichuMatch", function() { return TichuMatch; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var boardgame_io_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! boardgame.io/react */ "./node_modules/boardgame.io/dist/esm/react.js");
+/* harmony import */ var boardgame_io_multiplayer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! boardgame.io/multiplayer */ "./node_modules/boardgame.io/dist/esm/multiplayer.js");
+/* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Game */ "./src/Game.js");
+/* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_Game__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _Board__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Board */ "./src/Board.js");
+/* harmony import */ var _ClientHelpers__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./ClientHelpers */ "./src/ClientHelpers.js");
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
+
+
+
+
+
+
+var TichuClient = Object(boardgame_io_react__WEBPACK_IMPORTED_MODULE_1__["Client"])({
+  game: _Game__WEBPACK_IMPORTED_MODULE_3__["Tichu"],
+  board: _Board__WEBPACK_IMPORTED_MODULE_4__["TichuBoard"],
+  numPlayers: 4,
+  multiplayer: Object(boardgame_io_multiplayer__WEBPACK_IMPORTED_MODULE_2__["SocketIO"])({
+    server: _ClientHelpers__WEBPACK_IMPORTED_MODULE_5__["gameServer"]
+  })
+});
+var TichuMatch = function TichuMatch(props) {
+  var matchID = props.match.params.id;
+  var matchCredentials = Object(_ClientHelpers__WEBPACK_IMPORTED_MODULE_5__["getMatchCredentials"])(matchID);
+
+  if (!(matchCredentials !== null && matchCredentials !== void 0 && matchCredentials.credentials)) {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "You do not have access to this match.");
+  }
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(TichuClient, _extends({
+    matchID: matchID
+  }, matchCredentials, {
+    debug: false
+  }));
+};
+
+/***/ }),
+
 /***/ "./src/TichuLobby.js":
 /*!***************************!*\
   !*** ./src/TichuLobby.js ***!
@@ -75268,6 +75335,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! reactstrap */ "./node_modules/reactstrap/es/index.js");
 /* harmony import */ var boardgame_io_client__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! boardgame.io/client */ "./node_modules/boardgame.io/dist/esm/client.js");
 /* harmony import */ var _ClientHelpers__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ClientHelpers */ "./src/ClientHelpers.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -75334,8 +75407,16 @@ var TichuLobby = function TichuLobby(_ref) {
       playerName: getPlayerName()
     }).then(function (_ref3) {
       var playerCredentials = _ref3.playerCredentials;
-      window.localStorage.setItem("match-".concat(matchID), playerCredentials);
+      Object(_ClientHelpers__WEBPACK_IMPORTED_MODULE_3__["setMatchCrendentials"])(matchID, playerID, playerCredentials);
     });
+  };
+
+  var handleLeaveMatch = function handleLeaveMatch(matchID) {
+    var matchCredentials = Object(_ClientHelpers__WEBPACK_IMPORTED_MODULE_3__["getMatchCredentials"])(matchID);
+
+    if (matchCredentials) {
+      lobbyClient.leaveMatch(game, matchID, _objectSpread({}, matchCredentials));
+    }
   };
 
   Object(react__WEBPACK_IMPORTED_MODULE_0__["useEffect"])(function () {
@@ -75377,15 +75458,12 @@ var TichuLobby = function TichuLobby(_ref) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(MatchModal, {
     className: "pull-right",
     onCreate: handleCreateMatch
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["CardBody"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Table"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
-    style: {
-      width: "50%"
-    }
-  }, "Players"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Created Time"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Last Updated"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, matches.map(function (match) {
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["CardBody"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Table"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "N"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "S"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Vs"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "E"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "W"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Play"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Created Time"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Last Updated"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, matches.map(function (match) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Match, {
       match: match,
       key: match.matchID,
-      onJoinMatch: handleJoinMatch
+      onJoinMatch: handleJoinMatch,
+      onLeaveMatch: handleLeaveMatch
     });
   }))))));
 };
@@ -75427,68 +75505,11 @@ var MatchModal = function MatchModal(_ref5) {
   }, "Cancel"))));
 };
 
-var JoinModal = function JoinModal(_ref6) {
-  var onJoin = _ref6.onJoin,
-      match = _ref6.match,
-      playerName = _ref6.playerName;
-
-  var _useState9 = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(false),
-      _useState10 = _slicedToArray(_useState9, 2),
-      joinModalOpen = _useState10[0],
-      setJoinModalOpen = _useState10[1];
-
-  var handleJoinClicked = function handleJoinClicked(playerID) {
-    if (onJoin) {
-      onJoin(match.matchID, playerID);
-    }
-
-    setJoinModalOpen(false);
-  };
-
-  var handleLeaveClicked = function handleLeaveClicked() {
-    setJoinModalOpen(false);
-  };
-
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Button"], {
-    onClick: function onClick() {
-      return setJoinModalOpen(true);
-    }
-  }, "Join"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Modal"], {
-    isOpen: joinModalOpen
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["ModalHeader"], null, "Join Match"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["ModalBody"], null, match && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Row"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Col"], {
-    xs: 4
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(JoinOrLeave, {
-    position: "0",
-    players: match.players,
-    onJoin: handleJoinClicked,
-    onLeave: handleLeaveClicked
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(JoinOrLeave, {
-    position: "2",
-    players: match.players,
-    onJoin: handleJoinClicked,
-    onLeave: handleLeaveClicked
-  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Col"], {
-    xs: 4
-  }, "Vs"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Col"], {
-    xs: 4
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(JoinOrLeave, {
-    position: "1",
-    players: match.players,
-    onJoin: handleJoinClicked,
-    onLeave: handleLeaveClicked
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(JoinOrLeave, {
-    position: "3",
-    players: match.players,
-    onJoin: handleJoinClicked,
-    onLeave: handleLeaveClicked
-  }))))));
-};
-
-var JoinOrLeave = function JoinOrLeave(_ref7) {
-  var position = _ref7.position,
-      players = _ref7.players,
-      onJoin = _ref7.onJoin,
-      onLeave = _ref7.onLeave;
+var JoinOrLeave = function JoinOrLeave(_ref6) {
+  var position = _ref6.position,
+      players = _ref6.players,
+      onJoin = _ref6.onJoin,
+      onLeave = _ref6.onLeave;
   var currentPlayer = players[position];
 
   var handleJoinClicked = function handleJoinClicked() {
@@ -75515,44 +75536,61 @@ var JoinOrLeave = function JoinOrLeave(_ref7) {
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Row"], null, currentPlayer.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Row"], null));
     }
   } else {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Row"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Row"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Button"], {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Row"], null, "[Open]"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Row"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Button"], {
       color: "primary",
       onClick: handleJoinClicked
     }, "Join")));
   }
 };
-/*<Row>
-    <Col xs={{ size: 4, offset: 4 }}>
-        <Button>Join N</Button>
-    </Col>
-</Row>
-<Row>
-    <Col xs={4}>
-        <Button>Join W</Button>
-    </Col>
-    <Col xs={4}>
-        Select Position
-    </Col>
-    <Col xs={4}>
-        <Button>Join E</Button>
-    </Col>
-</Row>
-<Row>
-    <Col xs={{ size: 4, offset: 4 }}>
-        <Button>Join S</Button>
-    </Col>
-</Row>*/
 
+var Match = function Match(_ref7) {
+  var match = _ref7.match,
+      onJoinMatch = _ref7.onJoinMatch,
+      onLeaveMatch = _ref7.onLeaveMatch;
 
-var Match = function Match(_ref8) {
-  var match = _ref8.match,
-      onJoinMatch = _ref8.onJoinMatch;
+  var handleJoinClicked = function handleJoinClicked(position) {
+    if (onJoinMatch) {
+      onJoinMatch(match.matchID, position);
+    }
+  };
+
+  var handleLeaveClicked = function handleLeaveClicked(position) {
+    if (onLeaveMatch) {
+      onLeaveMatch(match.matchID, position);
+    }
+  };
+
+  var hasMatchCredentials = function hasMatchCredentials(matchID) {
+    return !!Object(_ClientHelpers__WEBPACK_IMPORTED_MODULE_3__["getMatchCredentials"])(matchID);
+  };
+
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
     key: match.matchID
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, JSON.stringify(match)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, match.createdAt), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, match.updatedAt), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(JoinModal, {
-    match: match,
-    onJoin: onJoinMatch
-  })));
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(JoinOrLeave, {
+    position: "0",
+    players: match.players,
+    onJoin: handleJoinClicked,
+    onLeave: handleLeaveClicked
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(JoinOrLeave, {
+    position: "2",
+    players: match.players,
+    onJoin: handleJoinClicked,
+    onLeave: handleLeaveClicked
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Vs"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(JoinOrLeave, {
+    position: "3",
+    players: match.players,
+    onJoin: handleJoinClicked,
+    onLeave: handleLeaveClicked
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(JoinOrLeave, {
+    position: "1",
+    players: match.players,
+    onJoin: handleJoinClicked,
+    onLeave: handleLeaveClicked
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, hasMatchCredentials(match.matchID) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Button"], {
+    color: "primary",
+    tag: "a",
+    href: "#/match/".concat(match.matchID)
+  }, "Play")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, new Date(match.createdAt).toLocaleString()), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, new Date(match.updatedAt).toLocaleString()));
 };
 
 /***/ }),

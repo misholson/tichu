@@ -122,6 +122,9 @@
     <Content Include="src\Player.js" />
     <Content Include="src\PlayTrick.js" />
     <Content Include="src\PreHand.js" />
+    <Content Include="src\TichuClient.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="src\TichuLobby.js">
       <SubType>Code</SubType>
     </Content>

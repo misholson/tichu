@@ -6,12 +6,13 @@ import { TichuBoard } from './Board';
 import { TichuLobby } from './TichuLobby';
 import { gameServer, lobbyServer } from './ClientHelpers';
 import { DebugClient } from './DebugClient';
+import { TichuMatch } from './TichuClient';
 
 
 export const App = () => {
     return (
         <>
-            <Route exact path='/'>
+            <Route path='/defaultlobby'>
                 <Lobby
                     gameServer={gameServer}
                     lobbyServer={lobbyServer}
@@ -21,7 +22,9 @@ export const App = () => {
                 />
             </Route>
 
-            <Route path='/newlobby'>
+            <Route path='/match/:id' component={TichuMatch} />
+
+            <Route exact path='/'>
                 <TichuLobby game="Tichu" gameServer={gameServer} />
             </Route>
             <Route path='/debug' component={DebugClient} />

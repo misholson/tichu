@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Button, Container, Row, Col, Card, CardHeader, CardBody, Table, FormGroup, Label, Input, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { LobbyClient } from 'boardgame.io/client';
-import { gameServer as defaultGameServer } from './ClientHelpers';
+import { gameServer as defaultGameServer, setMatchCrendentials, getMatchCredentials } from './ClientHelpers';
 
 
 export const TichuLobby = ({ game = "Tichu", gameServer = defaultGameServer }) => {
@@ -30,8 +30,15 @@ export const TichuLobby = ({ game = "Tichu", gameServer = defaultGameServer }) =
             playerName: getPlayerName()
         })
             .then(({ playerCredentials }) => {
-                window.localStorage.setItem(`match-${matchID}`, playerCredentials);
+                setMatchCrendentials(matchID, playerID, playerCredentials);
             });
+    }
+
+    const handleLeaveMatch = (matchID) => {
+        var matchCredentials = getMatchCredentials(matchID);
+        if (matchCredentials) {
+            lobbyClient.leaveMatch(game, matchID, { ...matchCredentials });
+        }
     }
 
     useEffect(() => {
@@ -74,15 +81,19 @@ export const TichuLobby = ({ game = "Tichu", gameServer = defaultGameServer }) =
                     <Table>
                         <thead>
                             <tr>
-                                <th style={{ width: "50%" }}>Players</th>
+                                <th>N</th>
+                                <th>S</th>
+                                <th>Vs</th>
+                                <th>E</th>
+                                <th>W</th>
+                                <th>Play</th>
                                 <th>Created Time</th>
                                 <th>Last Updated</th>
-                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
                             {matches.map((match) =>
-                                <Match match={match} key={match.matchID} onJoinMatch={handleJoinMatch} />
+                                <Match match={match} key={match.matchID} onJoinMatch={handleJoinMatch} onLeaveMatch={handleLeaveMatch} />
                                     )}
                         </tbody>
                     </Table>
@@ -124,48 +135,6 @@ const MatchModal = ({ onCreate }) => {
 };
 
 
-const JoinModal = ({ onJoin, match, playerName }) => {
-    const [joinModalOpen, setJoinModalOpen] = useState(false);
-
-    const handleJoinClicked = (playerID) => {
-        if (onJoin) {
-            onJoin(match.matchID, playerID);
-        }
-
-        setJoinModalOpen(false);
-    }
-
-    const handleLeaveClicked = () => {
-        setJoinModalOpen(false);
-    }
-
-    return (
-        <>
-            <Button onClick={() => setJoinModalOpen(true)}>Join</Button>
-            <Modal isOpen={joinModalOpen}>
-                <ModalHeader>Join Match</ModalHeader>
-                <ModalBody>
-                    {match &&
-                    <Row>
-                        <Col xs={4}>
-                            <JoinOrLeave position="0" players={match.players} onJoin={handleJoinClicked} onLeave={handleLeaveClicked} />
-                            <JoinOrLeave position="2" players={match.players} onJoin={handleJoinClicked} onLeave={handleLeaveClicked} />
-                        </Col>
-                        <Col xs={4}>
-                            Vs
-                        </Col>
-                        <Col xs={4}>
-                            <JoinOrLeave position="1" players={match.players} onJoin={handleJoinClicked} onLeave={handleLeaveClicked} />
-                            <JoinOrLeave position="3" players={match.players} onJoin={handleJoinClicked} onLeave={handleLeaveClicked} />
-                        </Col>
-                    </Row>
-                    }
-                </ModalBody>
-            </Modal>
-        </>
-    )
-}
-
 const JoinOrLeave = ({ position, players, onJoin, onLeave }) => {
     var currentPlayer = players[position];
 
@@ -200,41 +169,47 @@ const JoinOrLeave = ({ position, players, onJoin, onLeave }) => {
     } else {
         return (
             <>
-                <Row></Row>
+                <Row>[Open]</Row>
                 <Row><Button color="primary" onClick={handleJoinClicked}>Join</Button></Row>
                 </>)
     }
 }
 
-                    /*<Row>
-                        <Col xs={{ size: 4, offset: 4 }}>
-                            <Button>Join N</Button>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col xs={4}>
-                            <Button>Join W</Button>
-                        </Col>
-                        <Col xs={4}>
-                            Select Position
-                        </Col>
-                        <Col xs={4}>
-                            <Button>Join E</Button>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col xs={{ size: 4, offset: 4 }}>
-                            <Button>Join S</Button>
-                        </Col>
-                    </Row>*/
+const Match = ({ match, onJoinMatch, onLeaveMatch }) => {
+    const handleJoinClicked = (position) => {
+        if (onJoinMatch) {
+            onJoinMatch(match.matchID, position)
+        }
+    }
 
-const Match = ({ match, onJoinMatch }) => {
+    const handleLeaveClicked = (position) => {
+        if (onLeaveMatch) {
+            onLeaveMatch(match.matchID, position);
+        }
+    }
+
+    const hasMatchCredentials = (matchID) => {
+        return !!getMatchCredentials(matchID);
+    }
+
     return (
         <tr key={match.matchID}>
-            <td>{JSON.stringify(match)}</td>
-            <td>{match.createdAt}</td>
-            <td>{match.updatedAt}</td>
-            <td><JoinModal match={match} onJoin={onJoinMatch} /></td>
+            <td>
+                <JoinOrLeave position="0" players={match.players} onJoin={handleJoinClicked} onLeave={handleLeaveClicked} />
+            </td>
+            <td>
+                <JoinOrLeave position="2" players={match.players} onJoin={handleJoinClicked} onLeave={handleLeaveClicked} />
+            </td>
+            <td>Vs</td>
+            <td>
+                <JoinOrLeave position="3" players={match.players} onJoin={handleJoinClicked} onLeave={handleLeaveClicked} />
+            </td>
+            <td>
+                <JoinOrLeave position="1" players={match.players} onJoin={handleJoinClicked} onLeave={handleLeaveClicked} />
+            </td>
+            <td>{hasMatchCredentials(match.matchID) && <Button color="primary" tag="a" href={`#/match/${match.matchID}`}>Play</Button>}</td>
+            <td>{new Date(match.createdAt).toLocaleString()}</td>
+            <td>{new Date(match.updatedAt).toLocaleString()}</td>
         </tr>
         )
 }
