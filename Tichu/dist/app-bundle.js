@@ -72866,6 +72866,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ClientHelpers__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./ClientHelpers */ "./src/ClientHelpers.js");
 /* harmony import */ var _DebugClient__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./DebugClient */ "./src/DebugClient.js");
 /* harmony import */ var _TichuClient__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./TichuClient */ "./src/TichuClient.js");
+/* harmony import */ var _Layout__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./Layout */ "./src/Layout.js");
+
 
 
 
@@ -72876,7 +72878,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 var App = function App() {
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router__WEBPACK_IMPORTED_MODULE_1__["Route"], {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Layout__WEBPACK_IMPORTED_MODULE_9__["Layout"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router__WEBPACK_IMPORTED_MODULE_1__["Route"], {
     path: "/defaultlobby"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(boardgame_io_react__WEBPACK_IMPORTED_MODULE_2__["Lobby"], {
     gameServer: _ClientHelpers__WEBPACK_IMPORTED_MODULE_6__["gameServer"],
@@ -74141,6 +74143,56 @@ function dealCards(G, number) {
     G["public"].players[playerNumber].cards = hand.length;
   });
 }
+
+/***/ }),
+
+/***/ "./src/Layout.js":
+/*!***********************!*\
+  !*** ./src/Layout.js ***!
+  \***********************/
+/*! exports provided: Layout */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Layout", function() { return Layout; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _NavMenu__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./NavMenu */ "./src/NavMenu.js");
+
+
+var Layout = function Layout(props) {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_NavMenu__WEBPACK_IMPORTED_MODULE_1__["NavMenu"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, props.children));
+};
+
+/***/ }),
+
+/***/ "./src/NavMenu.js":
+/*!************************!*\
+  !*** ./src/NavMenu.js ***!
+  \************************/
+/*! exports provided: NavMenu */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NavMenu", function() { return NavMenu; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! reactstrap */ "./node_modules/reactstrap/es/index.js");
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
+
+
+
+var NavMenu = function NavMenu() {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("header", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["Navbar"], {
+    className: "navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3",
+    light: true
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_1__["NavbarBrand"], {
+    tag: react_router_dom__WEBPACK_IMPORTED_MODULE_2__["Link"],
+    to: "/"
+  }, "Tichu")));
+};
 
 /***/ }),
 

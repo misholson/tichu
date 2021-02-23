@@ -117,6 +117,12 @@
     <Content Include="src\Game.js" />
     <Content Include="src\Hand.js" />
     <Content Include="src\Helpers.js" />
+    <Content Include="src\Layout.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="src\NavMenu.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="src\PassArea.js" />
     <Content Include="src\PlayArea.js" />
     <Content Include="src\Player.js" />
