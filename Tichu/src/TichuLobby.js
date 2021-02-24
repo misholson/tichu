@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Button, Container, Row, Col, Card, CardHeader, CardBody, Table, FormGroup, Label, Input, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { LobbyClient } from 'boardgame.io/client';
 import { gameServer as defaultGameServer, setMatchCrendentials, getMatchCredentials } from './ClientHelpers';
+import jwt from 'jsonwebtoken';
 
 
 export const TichuLobby = ({ game = "Tichu", gameServer = defaultGameServer }) => {
@@ -32,10 +33,13 @@ export const TichuLobby = ({ game = "Tichu", gameServer = defaultGameServer }) =
         }
         lobbyClient.joinMatch(game, matchID, {
             playerID: playerID,
-            playerName: getPlayerName()
+            playerName: getPlayerName(),
+            data: {
+                userID: getPlayerUserID()
+            }
         }, init)
-            .then(({ playerCredentials }) => {
-                setMatchCrendentials(matchID, playerID, playerCredentials);
+            .then(() => {
+                setMatchCrendentials(matchID, playerID);
             });
     }
 
@@ -72,19 +76,10 @@ export const TichuLobby = ({ game = "Tichu", gameServer = defaultGameServer }) =
 
     return (
         <Container>
-            <Row>
-                <div className="float-right">
-                    <FormGroup>
-                        <Label id="nameLabel" for="nameInput">Name</Label>
-                        <Input value={playerName} onChange={(e) => setPlayerName(e.target.value)} />
-                        <Button onClick={() => window.localStorage.setItem('playerName', playerName)}>Set</Button>
-                    </FormGroup>
-                </div>
-            </Row>
             <Card>
-                <CardHeader>Games
+                <CardHeader><h5>Games</h5>
                     <div className="float-right">
-                        <MatchModal className="pull-right" onCreate={handleCreateMatch}/>
+                        <Button onClick={handleCreateMatch}>Create Match</Button>
                     </div>
                 </CardHeader>
                 <CardBody>
@@ -114,7 +109,15 @@ export const TichuLobby = ({ game = "Tichu", gameServer = defaultGameServer }) =
 }
 
 function getPlayerName() {
-    return window.localStorage.getItem('playerName');
+    var tokenString = window.localStorage.getItem('id_token');
+    var token = jwt.decode(tokenString);
+    return token.given_name;
+}
+
+function getPlayerUserID() {
+    var tokenString = window.localStorage.getItem('id_token');
+    var token = jwt.decode(tokenString);
+    return token.email;
 }
 
 const MatchModal = ({ onCreate }) => {

@@ -8,6 +8,9 @@ import { Tichu } from './Game';
 import { TichuBoard } from './Board';
 import scenarios from '../scenarios/scenarios';
 
+// Run my janky unit tests.
+import { runTests } from './tests/ValidPlayTests';
+runTests();
 
 
 const ExpandableClient = ({ playerID, scenario }) => {

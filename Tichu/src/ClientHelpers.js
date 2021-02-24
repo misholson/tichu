@@ -78,13 +78,14 @@ export const usePlayerMetadata = (playerID) => {
 
 }
 
-export const setMatchCrendentials = (matchID, playerID, playerCredentials) => {
-    window.localStorage.setItem(`match-${matchID}`, JSON.stringify({
-        credentials: playerCredentials,
-        playerID: playerID
-    }));
+export const setMatchCrendentials = (matchID, playerID) => {
+    window.localStorage.setItem(`match-${matchID}`, playerID);
 }
 
 export const getMatchCredentials = (matchID) => {
-    return JSON.parse(window.localStorage.getItem(`match-${matchID}`));
+    var playerID = window.localStorage.getItem(`match-${matchID}`);
+    return {
+        credentials: window.localStorage.getItem('id_token'),
+        playerID
+    };
 }
