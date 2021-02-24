@@ -120,6 +120,9 @@
     <Content Include="src\Layout.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="src\Login.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="src\NavMenu.js">
       <SubType>Code</SubType>
     </Content>
@@ -128,6 +131,9 @@
     <Content Include="src\Player.js" />
     <Content Include="src\PlayTrick.js" />
     <Content Include="src\PreHand.js" />
+    <Content Include="src\SocialButton.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="src\TichuClient.js">
       <SubType>Code</SubType>
     </Content>

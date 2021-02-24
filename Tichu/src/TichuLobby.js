@@ -25,10 +25,15 @@ export const TichuLobby = ({ game = "Tichu", gameServer = defaultGameServer }) =
     }, [game]);
 
     const handleJoinMatch = (matchID, playerID) => {
+        var init = {
+            headers: {
+                'Authorization': window.localStorage.getItem('id_token')
+            }
+        }
         lobbyClient.joinMatch(game, matchID, {
             playerID: playerID,
             playerName: getPlayerName()
-        })
+        }, init)
             .then(({ playerCredentials }) => {
                 setMatchCrendentials(matchID, playerID, playerCredentials);
             });
@@ -53,8 +58,13 @@ export const TichuLobby = ({ game = "Tichu", gameServer = defaultGameServer }) =
     }, [getMatches]);
 
     const handleCreateMatch = () => {
+        var init = {
+            headers: {
+                'Authorization': window.localStorage.getItem('id_token')
+            }
+        }
         console.debug("Creating match");
-        lobbyClient.createMatch(game, { numPlayers: 4 })
+        lobbyClient.createMatch(game, { numPlayers: 4 }, init)
             .then(({ matchID }) => {
                 handleJoinMatch(matchID, '0');
             })

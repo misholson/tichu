@@ -7,15 +7,32 @@ const Tichu = require('./src/Game').Tichu;
 const { AzureStorage } = require('bgio-azure-storage');
 const { BlobServiceClient } = require('@azure/storage-blob');
 require('dotenv').config();
+const { jwt } = require('jsonwebtoken');
 
-console.debug(JSON.stringify(process.env));
 
 const database = new AzureStorage({
     client: BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING),
     container: 'games',
 });
 
-const server = Server({ games: [Tichu], db: database });
+const generateCredentials = async ctx => {
+    const authHeader = ctx.request.headers['authorization'];
+    console.debug(authHeader);
+    return "creds";
+}
+
+const authenticateCredentials = async (credentials, playerMetadata) => {
+    if (credentials) {
+        const token = await jwtVerify(jwt, process.env.GOOGLE_CLIENT_SECRET, {
+            issuer: 'accounts.google.com',
+            audience: process.env.GOOGLE_CLIENT_ID
+        })
+        if (token.uid === playerMetadata.credentials) return true;
+    }
+    return false;
+}
+
+const server = Server({ games: [Tichu], db: database, generateCredentials, authenticateCredentials });
 
 var staticPath = path.join(__dirname, '/');
 server.app.use(serve(staticPath));

@@ -8,6 +8,7 @@ import { gameServer, lobbyServer } from './ClientHelpers';
 import { DebugClient } from './DebugClient';
 import { TichuMatch } from './TichuClient';
 import { Layout } from './Layout';
+import { Login } from './Login';
 
 export const App = () => {
     return (
@@ -21,6 +22,8 @@ export const App = () => {
                     ]}
                 />
             </Route>
+
+            <Route path='/login' component={Login} />
 
             <Route path='/match/:id' component={TichuMatch} />
 
