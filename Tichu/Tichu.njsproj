@@ -104,6 +104,12 @@
     <Content Include="scenarios\scenarios.js" />
     <Content Include="server.js" />
     <Content Include="src\App.js" />
+    <Content Include="src\AuthenticatedLobbyClient.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="src\AuthService.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="src\Board.js" />
     <Content Include="src\Card.js" />
     <Content Include="src\ClientHelpers.js">

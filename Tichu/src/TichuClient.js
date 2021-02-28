@@ -4,6 +4,7 @@ import { SocketIO } from 'boardgame.io/multiplayer';
 import { Tichu } from './Game';
 import { TichuBoard } from './Board';
 import { gameServer, getMatchCredentials } from './ClientHelpers';
+import { AuthenticatedLobbyClient } from './AuthenticatedLobbyClient'
 
 const TichuClient = Client({
     game: Tichu,
@@ -15,7 +16,7 @@ const TichuClient = Client({
 export const TichuMatch = (props) => {
     var matchID = props.match.params.id;
 
-    var matchCredentials = getMatchCredentials(matchID);
+    var matchCredentials = AuthenticatedLobbyClient.getMatchCredentials(matchID);
 
     if (!matchCredentials?.credentials) {
         return (

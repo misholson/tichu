@@ -1,18 +1,18 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Button, Container, Row, Col, Card, CardHeader, CardBody, Table, FormGroup, Label, Input, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { LobbyClient } from 'boardgame.io/client';
+import { AuthenticatedLobbyClient } from './AuthenticatedLobbyClient'
 import { gameServer as defaultGameServer, setMatchCrendentials, getMatchCredentials } from './ClientHelpers';
 import jwt from 'jsonwebtoken';
+import authService from './AuthService';
 
 
 export const TichuLobby = ({ game = "Tichu", gameServer = defaultGameServer }) => {
 
     const [matches, setMatches] = useState([]);
-    const [intervalID, setIntervalID] = useState(null);
-    const [playerName, setPlayerName] = useState(getPlayerName());
 
     const lobbyClient = useMemo(() => {
-        return new LobbyClient({ server: gameServer });
+        return new AuthenticatedLobbyClient({ server: gameServer });
     }, [gameServer])
 
     const getMatches = useCallback(() => {
@@ -26,21 +26,7 @@ export const TichuLobby = ({ game = "Tichu", gameServer = defaultGameServer }) =
     }, [game]);
 
     const handleJoinMatch = (matchID, playerID) => {
-        var init = {
-            headers: {
-                'Authorization': window.localStorage.getItem('id_token')
-            }
-        }
-        lobbyClient.joinMatch(game, matchID, {
-            playerID: playerID,
-            playerName: getPlayerName(),
-            data: {
-                userID: getPlayerUserID()
-            }
-        }, init)
-            .then(() => {
-                setMatchCrendentials(matchID, playerID);
-            });
+        lobbyClient.joinMatch(game, matchID, playerID);
     }
 
     const handleLeaveMatch = (matchID) => {
@@ -51,24 +37,19 @@ export const TichuLobby = ({ game = "Tichu", gameServer = defaultGameServer }) =
     }
 
     useEffect(() => {
-        setIntervalID(setInterval(getMatches, 1000));
+        var intervalID = setInterval(getMatches, 1000);
         getMatches();
 
         return () => {
             if (intervalID) {
                 clearInterval(intervalID);
             }
-        }
+        };
     }, [getMatches]);
 
     const handleCreateMatch = () => {
-        var init = {
-            headers: {
-                'Authorization': window.localStorage.getItem('id_token')
-            }
-        }
         console.debug("Creating match");
-        lobbyClient.createMatch(game, { numPlayers: 4 }, init)
+        lobbyClient.createMatch(game, { numPlayers: 4 })
             .then(({ matchID }) => {
                 handleJoinMatch(matchID, '0');
             })
@@ -77,7 +58,7 @@ export const TichuLobby = ({ game = "Tichu", gameServer = defaultGameServer }) =
     return (
         <Container>
             <Card>
-                <CardHeader><h5>Games</h5>
+                <CardHeader><h5 className="float-left">Games</h5>
                     <div className="float-right">
                         <Button onClick={handleCreateMatch}>Create Match</Button>
                     </div>
@@ -108,45 +89,6 @@ export const TichuLobby = ({ game = "Tichu", gameServer = defaultGameServer }) =
         )
 }
 
-function getPlayerName() {
-    var tokenString = window.localStorage.getItem('id_token');
-    var token = jwt.decode(tokenString);
-    return token.given_name;
-}
-
-function getPlayerUserID() {
-    var tokenString = window.localStorage.getItem('id_token');
-    var token = jwt.decode(tokenString);
-    return token.email;
-}
-
-const MatchModal = ({ onCreate }) => {
-    const [createModalOpen, setCreateModalOpen] = useState(false);
-
-    const handleCreateClicked = () => {
-        if (onCreate) {
-            onCreate();
-        }
-
-        setCreateModalOpen(false);
-    }
-    return (
-        <>
-            <Button onClick={() => setCreateModalOpen(true)}>Create Match</Button>
-            <Modal isOpen={createModalOpen}>
-                <ModalHeader>New Match</ModalHeader>
-                <ModalBody>
-                    Match Settings
-                </ModalBody>
-                <ModalFooter>
-                    <Button color="primary" onClick={handleCreateClicked}>Create</Button>
-                    <Button color="secondary" onClick={() => setCreateModalOpen(false)}>Cancel</Button>
-                </ModalFooter>
-            </Modal>
-        </>
-        )
-};
-
 
 const JoinOrLeave = ({ position, players, onJoin, onLeave }) => {
     var currentPlayer = players[position];
@@ -164,7 +106,7 @@ const JoinOrLeave = ({ position, players, onJoin, onLeave }) => {
     }
 
     if (currentPlayer && currentPlayer.name) {
-        const playerName = getPlayerName();
+        const playerName = authService.getDisplayName();
         if (currentPlayer.name === playerName) {
             return (
                 <>

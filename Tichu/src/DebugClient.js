@@ -9,7 +9,7 @@ import { TichuBoard } from './Board';
 import scenarios from '../scenarios/scenarios';
 
 // Run my janky unit tests.
-import { runTests } from './tests/ValidPlayTests';
+import { runTests } from '../tests/ValidPlayTests';
 runTests();
 
 
