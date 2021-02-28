@@ -10,7 +10,6 @@ export const Login = (props) => {
     const handleSocialLogin = (user) => {
         authService.onSignIn(user.token);
         history.push('/');
-        console.log(user)
     }
 
     const handleSocialLoginFailure = (err) => {

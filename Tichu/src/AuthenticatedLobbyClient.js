@@ -1,5 +1,6 @@
 import { LobbyClient } from 'boardgame.io/client';
 import authService from './AuthService';
+import { gameServer } from './ClientHelpers';
 
 export class AuthenticatedLobbyClient {
     constructor(clientSettings) {
@@ -11,6 +12,9 @@ export class AuthenticatedLobbyClient {
     }
 
     joinMatch(game, matchID, playerID) {
+        if (this.canJoinGame(matchID)) {
+            return Promise.resolve();
+        }
         return this.lobbyClient.joinMatch(game, matchID, {
             playerID: playerID,
             playerName: authService.getDisplayName(),
@@ -24,16 +28,19 @@ export class AuthenticatedLobbyClient {
     }
 
     createMatch(game, data) {
-        return this.lobbyClient.createMatch(game, data, this._getAuthInit(init));
+        return this.lobbyClient.createMatch(game, data, this._getAuthInit());
     }
 
-    leaveMatch(game, matchID, playerCredentials) {
-        return this.lobbyClient.leaveMatch(game, matchID, playerCredentials);
+    leaveMatch(game, matchID) {
+        return this.lobbyClient.leaveMatch(game, matchID, this.getMatchCredentials(matchID));
     }
 
+    canJoinGame(matchID) {
+        return !!this.getMatchCredentials(matchID);
+    }
 
     _getAuthInit(init) {
-        if (!this.token) {
+        if (!authService.token) {
             return init;
         }
 
@@ -53,15 +60,27 @@ export class AuthenticatedLobbyClient {
     }
 
 
-    static setMatchCrendentials(matchID, playerID) {
+    setMatchCrendentials(matchID, playerID) {
         window.localStorage.setItem(`match-${matchID}`, playerID);
     }
 
-    static getMatchCredentials(matchID) {
+    getMatchCredentials(matchID) {
         var playerID = window.localStorage.getItem(`match-${matchID}`);
-        return {
-            credentials: this.jwt,
-            playerID
-        };
+        if (playerID) {
+            return {
+                credentials: authService.getJwt(),
+                playerID
+            };
+        }
+
+        return null;
+    }
+
+    isInGame(matchID) {
+        return !!this.getMatchCredentials(matchID);
     }
 }
+
+var lobbyClient = new AuthenticatedLobbyClient({ server: gameServer });
+
+export default lobbyClient;
