@@ -147,6 +147,22 @@ const tests = {
 
         assertFalsy(wishPlay);
     },
+    straightWithPhoenixBeatsEqualStraight: () => {
+        var currentTrick = {
+            plays: [
+                {
+                    cards: [53, 22, 21, 46, 19], // p-J-10-9-8,
+                    player: "1",
+                    pass: false
+                }
+            ]
+        }
+        var hand = [10, 9, 34, 33, 6] // Q-J-10-9-8
+
+        var result = validPlays.straight.isValid(hand, currentTrick);
+
+        assertFalse(result);
+    },
     fullHouseWishInThree: () => {
         var currentTrick = {
             plays: [

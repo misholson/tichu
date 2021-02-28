@@ -741,10 +741,16 @@ function getStraightRankArray(selectedCards) {
         ranks.push(phoenixRank);
 
         // This is an array of ranks, not of card definitions, so use the regular sort function.
-        ranks.sort();
-
-        // Reverse to stay consistent with the card-sorting method that goes high to low
-        ranks.reverse();
+        ranks.sort((a, b) => {
+            // Returns a numeric sort in reverse order.
+            if (a < b) {
+                return 1;
+            } else if (a > b) {
+                return -1;
+            } else {
+                return 0;
+            }
+        });
     }
 
     return ranks;
