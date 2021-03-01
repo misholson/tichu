@@ -43,6 +43,9 @@ const tichu = {
             score: { ...score },
             scoreHistory: [],
 
+            previousHands: [],
+            previousCardsWon: [],
+
             players: {
                 "0": {
                     hand: []

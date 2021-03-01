@@ -49,6 +49,7 @@ const TichuBoardInner = (props) => {
 	const [hand, setHand] = useState(player.hand);
 	const [selectedCards, setSelectedCards] = useState([]);
 	const [showTrickEnd, setShowTrickEnd] = useState(false);
+	const [handAcknowledged, setHandAcknowledged] = useState(true);
 
 
 	const onGrandClicked = () => {
@@ -68,6 +69,13 @@ const TichuBoardInner = (props) => {
 			return [...player.hand];
 		});
 	}, [stage, readyToPlay, isPlayerActive, currentTrick]); // Could I just change this to the player hand? Duh.
+
+	// When the phase changes from playTrick to preHand, make sure we acknowledge that the hand is over.
+	useEffect(() => {
+		if (phase === constants.phases.preHand.name) {
+			setHandAcknowledged(false);
+        }
+    }, [phase])
 
 	var previousTrickCount = 0;
 	if (G.previousTricks) {
@@ -231,8 +239,10 @@ const TichuBoardInner = (props) => {
                                 <Clear />
                             </Col>
                             <Col xs="8" className="board-middle">
-                                {phase === constants.phases.preHand.name && <PassArea selectedCards={stage === constants.phases.preHand.stages.passCards ? passedCards : receivedCards} stage={stage} readyToPlay={G.public.players[playerID].readyToPlay} onReturnPass={handleReturnPass} onPassConfirmed={handlePassConfirmed} onAcceptConfirmed={handleAcceptConfirmed} />}
-                                {phase === constants.phases.playTrick.name && <PlayArea currentTrick={G.currentTrick} previousTricks={G.previousTricks} trickAcknowledged={!showTrickEnd} playerIDs={playerIDs} />}
+                                {handAcknowledged && phase === constants.phases.preHand.name && <PassArea selectedCards={stage === constants.phases.preHand.stages.passCards ? passedCards : receivedCards} stage={stage} readyToPlay={G.public.players[playerID].readyToPlay} onReturnPass={handleReturnPass} onPassConfirmed={handlePassConfirmed} onAcceptConfirmed={handleAcceptConfirmed} />}
+								{(!handAcknowledged || phase === constants.phases.playTrick.name) &&
+									<PlayArea currentTrick={G.currentTrick} previousTricks={G.previousTricks} trickAcknowledged={!showTrickEnd} playerIDs={playerIDs} previousCardsWon={!handAcknowledged && G.previousCardsWon} />
+								}
                             </Col>
                             <Col xs="2" className="board-side">
                                 <Player playerID={playerIDs.right} tichu={G.public.players[playerIDs.right].tichu} grand={G.public.players[playerIDs.right].grand} />
@@ -250,14 +260,14 @@ const TichuBoardInner = (props) => {
                                         <Player playerID={playerID} tichu={G.public.players[playerID].tichu} grand={G.public.players[playerID].grand} />
                                     </Col>
                                     <Col xs="8">
-                                        <FormGroup className="under-hand-buttons">
-                                            {stage === constants.phases.preHand.stages.takeOrGrand &&
+										<FormGroup className="under-hand-buttons">
+											{stage === constants.phases.preHand.stages.takeOrGrand && handAcknowledged &&
                                                 <>
                                                     <Button color="primary" className="mx-1" onClick={onGrandClicked}>Grand Tichu</Button>
                                                     <Button color="primary" className="mx-1" onClick={onTakeClicked}>Take</Button>
                                                 </>
                                             }
-                                            {(stage === constants.phases.preHand.stages.passCards || stage === constants.phases.preHand.stages.acceptPass || stage === constants.phases.preHand.stages.acceptPass) &&
+											{(stage === constants.phases.preHand.stages.passCards || stage === constants.phases.preHand.stages.acceptPass || stage === constants.phases.preHand.stages.acceptPass) &&
                                                 <Button color="primary" className="mx-1" onClick={handleTichuCalled} disabled={playerMetadata.self.tichu || hand.length !== 14}>Tichu</Button>
                                             }
                                             {playerMetadata.self.isActive && stage !== constants.phases.playTrick.stages.makeWish &&
@@ -271,7 +281,10 @@ const TichuBoardInner = (props) => {
                                             }
                                             {ctx.activePlayers[playerID] === constants.phases.playTrick.stages.bomb && !G.public.players[playerID].tichu && hand.length === 14 &&
                                                 <Button color="primary" className="mx-1" onClick={handleTichuCalled}>Tichu</Button>
-                                            }
+											}
+											{phase === constants.phases.preHand.name && !handAcknowledged &&
+												<Button color="primary" class="mx-1" onClick={() => setHandAcknowledged(true)}>OK</Button>
+											}
                                         </FormGroup>
                                     </Col>
                                 </Row>

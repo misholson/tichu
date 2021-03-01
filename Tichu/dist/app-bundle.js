@@ -73021,6 +73021,11 @@ var TichuBoardInner = function TichuBoardInner(props) {
       showTrickEnd = _useState8[0],
       setShowTrickEnd = _useState8[1];
 
+  var _useState9 = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(true),
+      _useState10 = _slicedToArray(_useState9, 2),
+      handAcknowledged = _useState10[0],
+      setHandAcknowledged = _useState10[1];
+
   var onGrandClicked = function onGrandClicked() {
     moves.callGrand();
   };
@@ -73037,7 +73042,13 @@ var TichuBoardInner = function TichuBoardInner(props) {
       return _toConsumableArray(player.hand);
     });
   }, [stage, readyToPlay, isPlayerActive, currentTrick]); // Could I just change this to the player hand? Duh.
+  // When the phase changes from playTrick to preHand, make sure we acknowledge that the hand is over.
 
+  Object(react__WEBPACK_IMPORTED_MODULE_0__["useEffect"])(function () {
+    if (phase === constants.phases.preHand.name) {
+      setHandAcknowledged(false);
+    }
+  }, [phase]);
   var previousTrickCount = 0;
 
   if (G.previousTricks) {
@@ -73226,18 +73237,19 @@ var TichuBoardInner = function TichuBoardInner(props) {
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Clear, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
     xs: "8",
     className: "board-middle"
-  }, phase === constants.phases.preHand.name && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_PassArea__WEBPACK_IMPORTED_MODULE_3__["PassArea"], {
+  }, handAcknowledged && phase === constants.phases.preHand.name && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_PassArea__WEBPACK_IMPORTED_MODULE_3__["PassArea"], {
     selectedCards: stage === constants.phases.preHand.stages.passCards ? passedCards : receivedCards,
     stage: stage,
     readyToPlay: G["public"].players[playerID].readyToPlay,
     onReturnPass: handleReturnPass,
     onPassConfirmed: handlePassConfirmed,
     onAcceptConfirmed: handleAcceptConfirmed
-  }), phase === constants.phases.playTrick.name && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_PlayArea__WEBPACK_IMPORTED_MODULE_4__["PlayArea"], {
+  }), (!handAcknowledged || phase === constants.phases.playTrick.name) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_PlayArea__WEBPACK_IMPORTED_MODULE_4__["PlayArea"], {
     currentTrick: G.currentTrick,
     previousTricks: G.previousTricks,
     trickAcknowledged: !showTrickEnd,
-    playerIDs: playerIDs
+    playerIDs: playerIDs,
+    previousCardsWon: !handAcknowledged && G.previousCardsWon
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
     xs: "2",
     className: "board-side"
@@ -73268,7 +73280,7 @@ var TichuBoardInner = function TichuBoardInner(props) {
     xs: "8"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
     className: "under-hand-buttons"
-  }, stage === constants.phases.preHand.stages.takeOrGrand && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
+  }, stage === constants.phases.preHand.stages.takeOrGrand && handAcknowledged && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
     color: "primary",
     className: "mx-1",
     onClick: onGrandClicked
@@ -73300,7 +73312,13 @@ var TichuBoardInner = function TichuBoardInner(props) {
     color: "primary",
     className: "mx-1",
     onClick: handleTichuCalled
-  }, "Tichu")))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
+  }, "Tichu"), phase === constants.phases.preHand.name && !handAcknowledged && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
+    color: "primary",
+    "class": "mx-1",
+    onClick: function onClick() {
+      return setHandAcknowledged(true);
+    }
+  }, "OK")))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
     hand: hand,
     selectedCards: selectedCards,
     onCardClicked: handleCardClicked,
@@ -73907,6 +73925,8 @@ var tichu = {
       },
       score: _objectSpread({}, score),
       scoreHistory: [],
+      previousHands: [],
+      previousCardsWon: [],
       players: {
         "0": {
           hand: []
@@ -73976,6 +73996,7 @@ __webpack_require__.r(__webpack_exports__);
 var Hand = function Hand(_ref) {
   var hand = _ref.hand,
       active = _ref.active,
+      compressed = _ref.compressed,
       selectedCards = _ref.selectedCards,
       onCardClicked = _ref.onCardClicked;
 
@@ -73990,6 +74011,10 @@ var Hand = function Hand(_ref) {
   };
 
   var className = "hand";
+
+  if (compressed) {
+    className = "hand-compressed";
+  }
 
   if (active) {
     className += " activehand";
@@ -74076,6 +74101,7 @@ var _require = __webpack_require__(/*! ./Deck */ "./src/Deck.js"),
 
 module.exports = {
   sortCards: sortCards,
+  sortByScore: sortByScore,
   removeFromHand: removeFromHand,
   getPlayerIDs: getPlayerIDs,
   addToHand: addToHand,
@@ -74128,6 +74154,23 @@ function cardComparison(a, b) {
   }
 
   return 0;
+}
+
+function sortByScore(array) {
+  array.sort(scoreComparison);
+}
+
+function scoreComparison(a, b) {
+  var cardAscore = Math.abs(cardDefinitions[a].score);
+  var cardBscore = Math.abs(cardDefinitions[b].score);
+
+  if (cardAscore < cardBscore) {
+    return 1;
+  } else if (cardAscore > cardBscore) {
+    return -1;
+  }
+
+  return cardComparison(a, b);
 }
 
 function dealCards(G, number) {
@@ -74309,14 +74352,32 @@ var _require = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
 var PlayArea = function PlayArea(_ref) {
   var currentTrick = _ref.currentTrick,
       previousTricks = _ref.previousTricks,
+      previousCardsWon = _ref.previousCardsWon,
       playerIDs = _ref.playerIDs,
-      playClearAnimation = _ref.playClearAnimation,
       trickAcknowledged = _ref.trickAcknowledged;
+  var compressed = false;
 
   if ((!currentTrick || !currentTrick.plays || currentTrick.plays.length === 0) && previousTricks && previousTricks.length > 0) {
     // If the current trick hasn't started yet, keep displaying the previous trick with a note.
     if (!trickAcknowledged) {
       currentTrick = previousTricks[0];
+    }
+  } else if ((!currentTrick || !currentTrick.plays || currentTrick.plays.length === 0) && (!previousTricks || previousTricks.length === 0)) {
+    // We're at the start of a new hand, so we should generate a "currentTrick" based on the cards won.
+    currentTrick = {
+      plays: []
+    };
+
+    if ((previousCardsWon === null || previousCardsWon === void 0 ? void 0 : previousCardsWon.length) > 0) {
+      var previousEndState = previousCardsWon[0];
+      Object.keys(previousEndState).forEach(function (playerID) {
+        currentTrick.plays.push({
+          cards: previousEndState[playerID],
+          player: playerID,
+          pass: false
+        });
+      });
+      compressed = true;
     }
   }
 
@@ -74346,7 +74407,8 @@ var PlayArea = function PlayArea(_ref) {
           },
           key: i
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
-          hand: play.cards
+          hand: play.cards,
+          compressed: compressed
         })));
       }
     }
@@ -74392,7 +74454,8 @@ var _require = __webpack_require__(/*! boardgame.io/core */ "./node_modules/boar
 var _require2 = __webpack_require__(/*! ./Helpers */ "./src/Helpers.js"),
     sortCards = _require2.sortCards,
     removeFromHand = _require2.removeFromHand,
-    getPlayerIDs = _require2.getPlayerIDs;
+    getPlayerIDs = _require2.getPlayerIDs,
+    sortByScore = _require2.sortByScore;
 
 var _require3 = __webpack_require__(/*! ./Constants */ "./src/Constants.js"),
     constants = _require3.constants;
@@ -74838,6 +74901,7 @@ function onTrickEnd(G, ctx) {
 
       console.debug("Counting score");
       updateScore(G, ctx);
+      G.previousHands.unshift(G.previousTricks);
       console.debug("\n-------------- End Hand --------------\n");
     } else {
       console.debug("There are ".concat(playerOutCount, " players out"));
@@ -74947,11 +75011,18 @@ function updateScore(G, ctx) {
       }
     }
 
-    console.debug("Total scores for this round: ".concat(JSON.stringify(roundScore))); // Clear out cards won
+    console.debug("Total scores for this round: ".concat(JSON.stringify(roundScore))); // Save a history of cards won
 
-    Object.values(G.players).forEach(function (player) {
-      player.cardsWon = [];
-    }); // Clear out public data as well.
+    var previousCardsWon = {}; // Clear out cards won
+
+    Object.keys(G.players).forEach(function (playerID) {
+      var prevCardsWon = G.players[playerID].cardsWon;
+      sortByScore(prevCardsWon);
+      previousCardsWon[playerID] = prevCardsWon;
+      G.players[playerID].cardsWon = [];
+    }); // Store the cards won from this hand.
+
+    G.previousCardsWon.unshift(previousCardsWon); // Clear out public data as well.
 
     Object.values(G["public"].players).forEach(function (publicData) {
       publicData.cards = 0;

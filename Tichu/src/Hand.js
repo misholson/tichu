@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card } from './Card';
 
-export const Hand = ({ hand, active, selectedCards, onCardClicked }) => {
+export const Hand = ({ hand, active, compressed, selectedCards, onCardClicked }) => {
 
     const isSelected = (cardID) => {
         if (!selectedCards) { return false; }
@@ -9,6 +9,10 @@ export const Hand = ({ hand, active, selectedCards, onCardClicked }) => {
     }
 
     var className = "hand";
+
+    if (compressed) {
+        className = "hand-compressed";
+    }
     if (active) {
         className += " activehand";
     }
