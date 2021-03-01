@@ -516,7 +516,7 @@ function updateScore(G, ctx) {
 
         // Clear out cards won
         Object.keys(G.players).forEach((playerID) => {
-            var prevCardsWon = G.players[playerID].cardsWon;
+            var prevCardsWon = G.players[playerID].cardsWon.filter((card) => score(card) !== 0);
             sortByScore(prevCardsWon);
             previousCardsWon[playerID] = prevCardsWon;
             G.players[playerID].cardsWon = [];

@@ -5,7 +5,6 @@ import { Button } from 'reactstrap';
 const { constants } = require('./Constants');
 
 export const PlayArea = ({ currentTrick, previousTricks, previousCardsWon, playerIDs, trickAcknowledged }) => {
-    var compressed = false;
     if ((!currentTrick || !currentTrick.plays || currentTrick.plays.length === 0) && previousTricks && previousTricks.length > 0) {
         // If the current trick hasn't started yet, keep displaying the previous trick with a note.
         if (!trickAcknowledged) {
@@ -25,7 +24,6 @@ export const PlayArea = ({ currentTrick, previousTricks, previousCardsWon, playe
                     pass: false
                 })
             });
-            compressed = true;
         }
     }
 
@@ -45,7 +43,7 @@ export const PlayArea = ({ currentTrick, previousTricks, previousCardsWon, playe
                     positionClass = "bottom";
                 }
 
-                plays.push((<div className={`play clearfix ${positionClass}`} style={{ zIndex: 999 - i }} key={i}><Hand hand={play.cards} compressed={compressed} /></div>));
+                plays.push((<div className={`play clearfix ${positionClass}`} style={{ zIndex: 999 - i }} key={i}><Hand hand={play.cards} /></div>));
             }
         }
     }

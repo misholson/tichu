@@ -289,8 +289,8 @@ const TichuBoardInner = (props) => {
                                         </FormGroup>
                                     </Col>
                                 </Row>
-                                <Row>
-                                    <Hand hand={hand} selectedCards={selectedCards} onCardClicked={handleCardClicked} active={isPlayerActive} />
+								<Row>
+									{!showHandConfirm && <Hand hand={hand} selectedCards={selectedCards} onCardClicked={handleCardClicked} active={isPlayerActive} />}
                                     {isPlayerActive && stage === constants.phases.playTrick.stages.makeWish &&
                                         <>
                                             <Clear />

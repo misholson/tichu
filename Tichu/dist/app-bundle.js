@@ -73319,7 +73319,7 @@ var TichuBoardInner = function TichuBoardInner(props) {
     onClick: function onClick() {
       return setHandAcknowledged(true);
     }
-  }, "OK")))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
+  }, "OK")))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], null, !showHandConfirm && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
     hand: hand,
     selectedCards: selectedCards,
     onCardClicked: handleCardClicked,
@@ -73997,7 +73997,6 @@ __webpack_require__.r(__webpack_exports__);
 var Hand = function Hand(_ref) {
   var hand = _ref.hand,
       active = _ref.active,
-      compressed = _ref.compressed,
       selectedCards = _ref.selectedCards,
       onCardClicked = _ref.onCardClicked;
 
@@ -74012,10 +74011,6 @@ var Hand = function Hand(_ref) {
   };
 
   var className = "hand";
-
-  if (compressed) {
-    className = "hand-compressed";
-  }
 
   if (active) {
     className += " activehand";
@@ -74356,7 +74351,6 @@ var PlayArea = function PlayArea(_ref) {
       previousCardsWon = _ref.previousCardsWon,
       playerIDs = _ref.playerIDs,
       trickAcknowledged = _ref.trickAcknowledged;
-  var compressed = false;
 
   if ((!currentTrick || !currentTrick.plays || currentTrick.plays.length === 0) && previousTricks && previousTricks.length > 0) {
     // If the current trick hasn't started yet, keep displaying the previous trick with a note.
@@ -74378,7 +74372,6 @@ var PlayArea = function PlayArea(_ref) {
           pass: false
         });
       });
-      compressed = true;
     }
   }
 
@@ -74408,8 +74401,7 @@ var PlayArea = function PlayArea(_ref) {
           },
           key: i
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Hand__WEBPACK_IMPORTED_MODULE_1__["Hand"], {
-          hand: play.cards,
-          compressed: compressed
+          hand: play.cards
         })));
       }
     }
@@ -75017,7 +75009,9 @@ function updateScore(G, ctx) {
     var previousCardsWon = {}; // Clear out cards won
 
     Object.keys(G.players).forEach(function (playerID) {
-      var prevCardsWon = G.players[playerID].cardsWon;
+      var prevCardsWon = G.players[playerID].cardsWon.filter(function (card) {
+        return score(card) !== 0;
+      });
       sortByScore(prevCardsWon);
       previousCardsWon[playerID] = prevCardsWon;
       G.players[playerID].cardsWon = [];
