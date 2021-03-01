@@ -1,8 +1,11 @@
 import React from 'react';
 var { cardDefinitions } = require('./Deck');
 
-export const Card = ({ cardID, selected, onCardClicked }) => {
+export const Card = ({ cardID, selected, onCardClicked, size }) => {
     let image = null;
+    if (!size) {
+        size = 1.0;
+    }
     if (cardID === "back") {
         image = "/images/back.png";
     } else {
@@ -14,10 +17,19 @@ export const Card = ({ cardID, selected, onCardClicked }) => {
         backgroundSize: "cover"
     };
 
-    var classes = "card-front card-shape";
+    style = {
+        ...style,
+        width: 80*size,
+        height: 120*size,
+        marginLeft: -40*size
+    };
+
+    var classes = "card-front";
 
     if (selected) {
-        classes += " card-selected";
+        style.marginTop = -20;
+        style.marginBottom = 20;
+        //classes += " card-selected";
         //style.marginTop = "20px";
     }
 

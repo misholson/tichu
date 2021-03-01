@@ -3,6 +3,7 @@ import { Hand } from './Hand';
 import { Card } from './Card';
 import { Button } from 'reactstrap';
 const { constants } = require('./Constants');
+import { useMediaQuery } from 'react-responsive';
 
 export const PlayArea = ({ currentTrick, previousTricks, previousCardsWon, playerIDs, trickAcknowledged }) => {
     if ((!currentTrick || !currentTrick.plays || currentTrick.plays.length === 0) && previousTricks && previousTricks.length > 0) {
@@ -28,22 +29,52 @@ export const PlayArea = ({ currentTrick, previousTricks, previousCardsWon, playe
     }
 
     var plays = [];
+    var size = 1.0;
+    var leftOffset = 0;
+    var topOffset = 0;
+    var rightOffset = 0;
+    var bottomOffset = 0;
+    var offsetInterval = 10;
     if (currentTrick && currentTrick.plays) {
-        for (var i = 0; i < currentTrick.plays.length && plays.length <= 4; i++) {
+        for (var i = 0; i < currentTrick.plays.length; i++) {
             var play = currentTrick.plays[i];
             if (!play.pass) {
-                var positionClass;
+                var positionStyle = {}
                 if (play.player === playerIDs.left) {
-                    positionClass = "left";
+                    positionStyle = {
+                        top: 120 - leftOffset,
+                        left: 20 - leftOffset,
+                        zIndex: 999 - i
+                    }
+                    leftOffset += offsetInterval;
                 } else if (play.player === playerIDs.partner) {
-                    positionClass = "top";
+                    positionStyle = {
+                        top: 20 - topOffset,
+                        left: 200 - topOffset,
+                        zIndex: 999 - i
+                    }
+                    topOffset += offsetInterval;
                 } else if (play.player === playerIDs.right) {
-                    positionClass = "right";
+                    positionStyle = {
+                        top: 140 - rightOffset,
+                        left: 450 - rightOffset,
+                        zIndex: 999 - i
+                    }
+                    rightOffset += offsetInterval;
                 } else {
-                    positionClass = "bottom";
+                    positionStyle = {
+                        top: 260 - bottomOffset,
+                        left: 300 - bottomOffset,
+                        zIndex: 999 - i
+                    }
+                    bottomOffset += offsetInterval;
                 }
 
-                plays.push((<div className={`play clearfix ${positionClass}`} style={{ zIndex: 999 - i }} key={i}><Hand hand={play.cards} /></div>));
+                plays.push((<div className={`play clearfix`} style={positionStyle} key={i}><Hand hand={play.cards} size={size} /></div>));
+
+                if (size >= .6) {
+                    size *= .9;
+                }
             }
         }
     }

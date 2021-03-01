@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card } from './Card';
 
-export const Hand = ({ hand, active, selectedCards, onCardClicked }) => {
+export const Hand = ({ hand, active, selectedCards, onCardClicked, size }) => {
 
     const isSelected = (cardID) => {
         if (!selectedCards) { return false; }
@@ -15,7 +15,7 @@ export const Hand = ({ hand, active, selectedCards, onCardClicked }) => {
 
     return (
         <div className={className}>
-            {hand && hand.map((cardID) => <Card key={cardID} cardID={cardID} selected={isSelected(cardID)} onCardClicked={onCardClicked} />)}
+            {hand && hand.map((cardID) => <Card key={cardID} cardID={cardID} selected={isSelected(cardID)} onCardClicked={onCardClicked} size={size} />)}
         </div>
         )
 }
