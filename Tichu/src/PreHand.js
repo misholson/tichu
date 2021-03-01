@@ -152,12 +152,15 @@ const preHand = {
         G.currentTrick = null;
 
         // Reset public player data.
-        Object.keys(G.public.players).forEach((playerID) => G.public.players[playerID] = {
-            cards: 8,
-            tichu: false,
-            grand: false,
-            readyToPlay: false,
-            out: false
+        Object.keys(G.public.players).forEach((playerID) => {
+            G.public.players[playerID] = {
+                cards: 8,
+                tichu: false,
+                grand: false,
+                readyToPlay: false,
+                out: false
+            };
+            G.players[playerID].receivedPass = null;
         }); 
         return G;
     },

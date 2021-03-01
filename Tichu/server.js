@@ -8,8 +8,6 @@ const { AzureStorage } = require('bgio-azure-storage');
 const { BlobServiceClient } = require('@azure/storage-blob');
 require('dotenv').config();
 
-console.debug(JSON.stringify(process.env));
-
 const database = new AzureStorage({
     client: BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING),
     container: 'games',

@@ -72,7 +72,7 @@ const TichuBoardInner = (props) => {
 
 	// When the phase changes from playTrick to preHand, make sure we acknowledge that the hand is over.
 	useEffect(() => {
-		if (phase === constants.phases.preHand.name) {
+		if (phase === constants.phases.preHand.name && G.previousCardsWon.length > 0) {
 			setHandAcknowledged(false);
         }
     }, [phase])
@@ -211,6 +211,7 @@ const TichuBoardInner = (props) => {
 		return true;
 	}
 
+	var showHandConfirm = !handAcknowledged && G.previousCardsWon && G.previousCardsWon.length > 0;
 
 	return (
         <Container fluid>
@@ -261,7 +262,7 @@ const TichuBoardInner = (props) => {
                                     </Col>
                                     <Col xs="8">
 										<FormGroup className="under-hand-buttons">
-											{stage === constants.phases.preHand.stages.takeOrGrand && handAcknowledged &&
+											{stage === constants.phases.preHand.stages.takeOrGrand && !showHandConfirm &&
                                                 <>
                                                     <Button color="primary" className="mx-1" onClick={onGrandClicked}>Grand Tichu</Button>
                                                     <Button color="primary" className="mx-1" onClick={onTakeClicked}>Take</Button>
@@ -282,7 +283,7 @@ const TichuBoardInner = (props) => {
                                             {ctx.activePlayers[playerID] === constants.phases.playTrick.stages.bomb && !G.public.players[playerID].tichu && hand.length === 14 &&
                                                 <Button color="primary" className="mx-1" onClick={handleTichuCalled}>Tichu</Button>
 											}
-											{phase === constants.phases.preHand.name && !handAcknowledged &&
+											{phase === constants.phases.preHand.name && showHandConfirm &&
 												<Button color="primary" class="mx-1" onClick={() => setHandAcknowledged(true)}>OK</Button>
 											}
                                         </FormGroup>

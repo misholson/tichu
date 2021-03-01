@@ -73045,7 +73045,7 @@ var TichuBoardInner = function TichuBoardInner(props) {
   // When the phase changes from playTrick to preHand, make sure we acknowledge that the hand is over.
 
   Object(react__WEBPACK_IMPORTED_MODULE_0__["useEffect"])(function () {
-    if (phase === constants.phases.preHand.name) {
+    if (phase === constants.phases.preHand.name && G.previousCardsWon.length > 0) {
       setHandAcknowledged(false);
     }
   }, [phase]);
@@ -73195,6 +73195,7 @@ var TichuBoardInner = function TichuBoardInner(props) {
     return true;
   };
 
+  var showHandConfirm = !handAcknowledged && G.previousCardsWon && G.previousCardsWon.length > 0;
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Container"], {
     fluid: true
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Row"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Col"], {
@@ -73280,7 +73281,7 @@ var TichuBoardInner = function TichuBoardInner(props) {
     xs: "8"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["FormGroup"], {
     className: "under-hand-buttons"
-  }, stage === constants.phases.preHand.stages.takeOrGrand && handAcknowledged && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
+  }, stage === constants.phases.preHand.stages.takeOrGrand && !showHandConfirm && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
     color: "primary",
     className: "mx-1",
     onClick: onGrandClicked
@@ -73312,7 +73313,7 @@ var TichuBoardInner = function TichuBoardInner(props) {
     color: "primary",
     className: "mx-1",
     onClick: handleTichuCalled
-  }, "Tichu"), phase === constants.phases.preHand.name && !handAcknowledged && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
+  }, "Tichu"), phase === constants.phases.preHand.name && showHandConfirm && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(reactstrap__WEBPACK_IMPORTED_MODULE_5__["Button"], {
     color: "primary",
     "class": "mx-1",
     onClick: function onClick() {
@@ -75318,13 +75319,14 @@ var preHand = {
     G.currentTrick = null; // Reset public player data.
 
     Object.keys(G["public"].players).forEach(function (playerID) {
-      return G["public"].players[playerID] = {
+      G["public"].players[playerID] = {
         cards: 8,
         tichu: false,
         grand: false,
         readyToPlay: false,
         out: false
       };
+      G.players[playerID].receivedPass = null;
     });
     return G;
   },
