@@ -99,7 +99,7 @@ const JoinOrLeave = ({ position, match, onJoin, onLeave }) => {
 
     if (currentPlayer && currentPlayer.name) {
         // A player has joined in this position.
-        if (lobbyClient.getMatchCredentials(match.matchID).playerID === position) {
+        if (lobbyClient.getMatchCredentials(match.matchID)?.playerID === position) {
             // The logged in player has already joined at this position
             return (
                 <>
