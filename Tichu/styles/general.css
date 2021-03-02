@@ -7,6 +7,12 @@ body {
     float: left;
 }
 
+.hand-compressed .card-front {
+    border-radius: 5px;
+    box-shadow: -1px -1px 5px #555;
+    float: left;
+}
+
 .hand-vertical .card-back-rotated {
     border-radius: 5px;
     box-shadow: -1px -1px 5px #555;

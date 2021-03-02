@@ -4,6 +4,12 @@
     margin-left: -40px;
 }
 
+.hand-compressed .card-shape {
+    width: 80px;
+    height: 120px;
+    margin-left: -60px;
+}
+
 .hand-vertical .card-shape {
     width: 120px;
     height: 80px;
@@ -49,7 +55,7 @@ div.hand-vertical {
 }
 
 .play-area .right {
-    top: 80px;
+    top: 140px;
     left: 450px;
 }
 

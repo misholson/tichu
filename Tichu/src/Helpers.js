@@ -2,6 +2,7 @@ var { cardDefinitions } = require('./Deck');
 
 module.exports = {
     sortCards: sortCards,
+    sortByScore: sortByScore,
     removeFromHand: removeFromHand,
     getPlayerIDs: getPlayerIDs,
     addToHand: addToHand,
@@ -51,7 +52,20 @@ function cardComparison(a, b) {
     return 0;
 }
 
+function sortByScore(array) {
+    array.sort(scoreComparison);
+}
 
+function scoreComparison(a, b) {
+    let cardAscore = Math.abs(cardDefinitions[a].score);
+    let cardBscore = Math.abs(cardDefinitions[b].score);
+    if (cardAscore < cardBscore) {
+        return 1;
+    } else if (cardAscore > cardBscore) {
+        return -1;
+    }
+    return cardComparison(a, b);
+}
 
 function dealCards(G, number) {
     Object.keys(G.players).forEach((playerNumber) => {

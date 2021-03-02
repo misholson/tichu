@@ -1,5 +1,5 @@
 const { INVALID_MOVE, TurnOrder, Stage } = require('boardgame.io/core');
-const { sortCards, removeFromHand, getPlayerIDs } = require('./Helpers');
+const { sortCards, removeFromHand, getPlayerIDs, sortByScore } = require('./Helpers');
 const { constants } = require('./Constants');
 const { detectPlayType, validPlays, canPass, getPreviousPlay, rank, canFulfillWish } = require('./ValidPlays');
 const { cardDefinitions } = require('./Deck');
@@ -404,6 +404,8 @@ function onTrickEnd(G, ctx) {
             console.debug("Counting score");
             updateScore(G, ctx);
 
+            G.previousHands.unshift(G.previousTricks);
+
             console.debug("\n-------------- End Hand --------------\n");
         } else {
             console.debug(`There are ${playerOutCount} players out`);
@@ -509,10 +511,19 @@ function updateScore(G, ctx) {
 
         console.debug(`Total scores for this round: ${JSON.stringify(roundScore)}`);
 
+        // Save a history of cards won
+        var previousCardsWon = {};
+
         // Clear out cards won
-        Object.values(G.players).forEach((player) => {
-            player.cardsWon = [];
+        Object.keys(G.players).forEach((playerID) => {
+            var prevCardsWon = G.players[playerID].cardsWon.filter((card) => score(card) !== 0);
+            sortByScore(prevCardsWon);
+            previousCardsWon[playerID] = prevCardsWon;
+            G.players[playerID].cardsWon = [];
         });
+
+        // Store the cards won from this hand.
+        G.previousCardsWon.unshift(previousCardsWon);
 
         // Clear out public data as well.
         Object.values(G.public.players).forEach((publicData) => {

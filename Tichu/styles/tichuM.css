@@ -4,6 +4,11 @@
     margin-left: -40px;
 }
 
+.hand-compressed .card-shape {
+    width: 64px;
+    height: 96px;
+    margin-left: -55px;
+}
 
 .hand-vertical .card-shape {
     width: 96px;
